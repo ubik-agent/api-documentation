@@ -1,47 +1,44 @@
 {
-  "$schema": "https://mintlify.com/schema.json",
   "name": "UBIK Public API",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/logo-dark.png",
+    "light": "/logo/logo-light.png"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/logo/favicon.png",
   "colors": {
-    "primary": "#3B82F6",
-    "light": "#5AA0F8",
-    "dark": "#2563EB"
-  },
-  "tabs": {
-    "en": "English",
-    "fr": "Français"
+    "primary": "#4D4D4D",
+    "light": "#666666",
+    "dark": "#333333",
+    "background": {
+      "dark": "#121212"
+    }
   },
   "topbarLinks": [
     {
-      "name": "Support",
-      "url": "mailto:support@ubik-agent.com"
+        "name": "Go to App",
+        "url": "https://app.ubik-agent.com"
     }
   ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Getting Started",
       "pages": [
-        "en/index",
-        "en/quickstart",
-        "en/development"
+        "index",
+        "quickstart",
+        "development"
       ]
     },
     {
       "group": "API Reference",
       "pages": [
-        "en/api-reference/introduction",
-        "en/api-reference/openapi"
+        "api-reference/introduction"
       ]
     }
   ],
   "api": {
-    "baseUrl": "https://app.ubik-agent.com/api/v1",
-    "spec": {
-      "path": "/en/api-reference/openapi.json"
-    }
+    "baseUrl": "https://app.ubik-agent.com/api/v1"
+  },
+  "footerSocials": {
+    "github": "https://github.com/ubik-agent"
   }
 }
