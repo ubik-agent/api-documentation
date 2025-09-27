@@ -17,8 +17,8 @@
           "Public API",
           "Public API"
         ],
-        "summary": "Health Check",
-        "description": "Health check endpoint for the public API.",
+        "summary": "État du service",
+        "description": "Route pour la vérification de l'état du service de l'API publique.",
         "operationId": "health_check_health_get",
         "responses": {
           "200": {
@@ -44,8 +44,8 @@
           "Public API",
           "Users"
         ],
-        "summary": "Lire l'Utilisateur Actuel",
-        "description": "Obtenir les détails de l'utilisateur actuel.",
+        "summary": "Consulter l'utilisateur actuel",
+        "description": "Récupère les informations détaillées de l'utilisateur actuellement authentifié.",
         "operationId": "read_current_user_users_me_get",
         "responses": {
           "200": {
@@ -73,7 +73,7 @@
           "Public API - Workspaces"
         ],
         "summary": "Lister les espaces de travail",
-        "description": "Récupère une liste paginée de tous les espaces de travail accessibles à l'utilisateur.\nCela inclut les espaces de travail personnels et les espaces de travail partagés de l'entreprise.",
+        "description": "Récupère une liste paginée de tous les espaces de travail accessibles à l'utilisateur, incluant les espaces personnels et ceux partagés via l'entreprise.",
         "operationId": "get_workspaces_workspaces_get",
         "security": [
           {
@@ -181,8 +181,8 @@
           "Public API",
           "Public API - Workspaces"
         ],
-        "summary": "Obtenir les détails de l'espace de travail",
-        "description": "Récupère les détails d'un espace de travail spécifique, à condition que l'utilisateur y ait accès.",
+        "summary": "Détails d'un espace de travail",
+        "description": "Récupère les informations détaillées d'un espace de travail spécifique, si l'utilisateur dispose des permissions nécessaires.",
         "operationId": "get_workspace_workspaces__workspace_id__get",
         "security": [
           {
@@ -230,7 +230,7 @@
           "Public API - Workspaces"
         ],
         "summary": "Supprimer un espace de travail",
-        "description": "Supprime un espace de travail, à condition que l'utilisateur en soit le propriétaire.",
+        "description": "Supprime un espace de travail, si l'utilisateur en est le propriétaire.",
         "operationId": "delete_workspace_workspaces__workspace_id__delete",
         "security": [
           {
@@ -273,7 +273,7 @@
           "Public API - Workspaces"
         ],
         "summary": "Lister les documents dans un espace de travail",
-        "description": "Récupère une liste paginée de documents au sein d'un espace de travail spécifique.",
+        "description": "Récupère une liste paginée de documents dans un espace de travail spécifique.",
         "operationId": "get_workspace_documents_workspaces__workspace_id__documents_get",
         "security": [
           {
@@ -406,8 +406,8 @@
           "Public API",
           "Public API - Documents"
         ],
-        "summary": "Ingérer des documents à partir de fichiers ou d'URL",
-        "description": "Point de terminaison unifié pour ingérer des documents à partir de diverses sources.\n\nCe point de terminaison peut gérer les téléversements de fichiers et le scraping d'URL en une seule requête.\nIl utilise multipart/form-data.\n\n- Pour téléverser des fichiers, incluez-les dans la partie 'files' du formulaire.\n- Pour scraper des URL, fournissez une chaîne de caractères séparée par des virgules dans le champ de formulaire 'urls'.\n- Spécifiez les ID d'espace de travail pour associer les documents ingérés à des espaces de travail spécifiques.",
+        "summary": "Ingestion de documents (fichiers ou URLs)",
+        "description": "Route unifiée pour ingérer des documents depuis diverses sources.\n\nCette route gère le téléversement de fichiers et le scraping d'URLs en une seule requête (multipart/form-data).\n\n- Pour téléverser des fichiers, utilisez le champ 'files'.\n- Pour scraper des URLs, utilisez le champ 'urls' (liste séparée par des virgules).\n- Associez les documents à des espaces de travail via 'workspace_ids'.",
         "operationId": "ingest_documents_documents_post",
         "security": [
           {
@@ -457,8 +457,8 @@
           "Public API",
           "Public API - Documents"
         ],
-        "summary": "Obtenir les détails du document",
-        "description": "Récupère les détails d'un document spécifique, à condition que l'utilisateur y ait accès.",
+        "summary": "Détails d'un document",
+        "description": "Récupère les informations détaillées d'un document spécifique, si l'utilisateur dispose des permissions nécessaires.",
         "operationId": "get_document_documents__document_id__get",
         "security": [
           {
@@ -506,7 +506,7 @@
           "Public API - Documents"
         ],
         "summary": "Supprimer un document",
-        "description": "Supprimer un document. Cela supprimera le document de l'espace de travail par défaut de l'utilisateur\net, s'il est le dernier propriétaire, le supprimera entièrement du système.",
+        "description": "Supprime un document. Cette action le retire de l'espace de travail par défaut de l'utilisateur et le supprime définitivement du système si l'utilisateur en est le dernier propriétaire.",
         "operationId": "delete_document_documents__document_id__delete",
         "security": [
           {
@@ -599,8 +599,8 @@
           "Public API",
           "Public API - Documents"
         ],
-        "summary": "Supprimer un document des espaces de travail",
-        "description": "Supprime un document d'un ou plusieurs espaces de travail.",
+        "summary": "Retirer un document d'espaces de travail",
+        "description": "Retire un document d'un ou de plusieurs espaces de travail.",
         "operationId": "remove_document_from_workspaces_documents__document_id__workspaces_delete",
         "security": [
           {
@@ -652,8 +652,8 @@
           "Public API",
           "Public API - Workspaces"
         ],
-        "summary": "Supprimer un document d'un espace de travail",
-        "description": "Supprime l'association d'un document d'un espace de travail spécifique sans supprimer le document lui-même.",
+        "summary": "Retirer un document d'un espace de travail",
+        "description": "Retire un document d'un espace de travail spécifique, sans supprimer le document lui-même.",
         "operationId": "remove_document_from_workspace_workspaces__workspace_id__documents__document_id__delete",
         "security": [
           {
@@ -768,8 +768,8 @@
           "Public API",
           "Public API - Tools"
         ],
-        "summary": "Obtenir les détails de l'outil",
-        "description": "Récupère les détails d'un outil spécifique, à condition que l'utilisateur y ait accès.",
+        "summary": "Détails d'un outil",
+        "description": "Récupère les informations détaillées d'un outil spécifique, si l'utilisateur dispose des permissions nécessaires.",
         "operationId": "get_public_tool_tools__tool_id__get",
         "security": [
           {
@@ -818,7 +818,7 @@
           "Public API - Tool Executions"
         ],
         "summary": "Exécuter un outil",
-        "description": "Démarre de manière asynchrone une exécution d'outil et renvoie un ID d'exécution pour suivre les résultats.",
+        "description": "Démarre de manière asynchrone l'exécution d'un outil et renvoie un ID pour suivre les résultats.",
         "operationId": "execute_public_tool_tools__tool_id__execute_post",
         "security": [
           {
@@ -876,7 +876,7 @@
           "Public API",
           "Public API - Tool Executions"
         ],
-        "summary": "Obtenir le résultat de l'exécution",
+        "summary": "Résultat d'une exécution",
         "description": "Récupère le statut et le résultat d'une exécution d'outil spécifique.",
         "operationId": "get_public_tool_execution_tool_executions__execution_id__get",
         "security": [
@@ -925,8 +925,8 @@
           "Public API",
           "Public API - Tool Executions"
         ],
-        "summary": "Diffuser les événements d'exécution",
-        "description": "Diffuse des événements envoyés par le serveur (SSE) pour une exécution d'outil.",
+        "summary": "Streaming des événements d'exécution",
+        "description": "Permet de s'abonner en temps réel aux événements (Server-Sent Events) d'une exécution d'outil.",
         "operationId": "stream_public_tool_execution_tool_executions__execution_id__stream_get",
         "security": [
           {
@@ -972,8 +972,8 @@
           "Public API",
           "Public API - Tool Executions"
         ],
-        "summary": "Fournir une entrée à un outil en attente",
-        "description": "Fournit l'entrée requise à une exécution d'outil qui est dans l'état 'waiting_for_input'.",
+        "summary": "Soumettre des données à un outil en attente",
+        "description": "Permet de fournir les données requises par une exécution d'outil actuellement en état 'waiting_for_input'.",
         "operationId": "provide_public_tool_input_tool_executions__execution_id__provide_input_post",
         "security": [
           {
