@@ -28,9 +28,12 @@
           {
             "group": "API Reference",
             "pages": [
-              "api-reference/introduction"
-            ],
-            "openapi": "api-reference/openapi.json"
+              "api-reference/introduction",
+              {
+                "group": "Endpoints",
+                "openapi": "api-reference/openapi.en.json"
+              }
+            ]
           }
         ]
       },
@@ -48,9 +51,12 @@
           {
             "group": "Référence API",
             "pages": [
-              "api-reference/introduction"
-            ],
-            "openapi": "api-reference/openapi.json"
+              "api-reference/introduction",
+              {
+                "group": "Points de terminaison",
+                "openapi": "api-reference/openapi.fr.json"
+              }
+            ]
           }
         ]
       }
