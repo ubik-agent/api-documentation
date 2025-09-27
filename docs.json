@@ -13,31 +13,47 @@
     "dark": "#333333"
   },
   "navigation": {
-    "tabs": [
-        {
-            "tab": "Guides",
-            "groups": [
-                {
-                    "group": "Getting Started",
-                    "pages": [
-                        "index",
-                        "quickstart",
-                        "development"
-                    ]
-                }
+    "languages": [
+      {
+        "language": "en",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "development"
             ]
-        },
-        {
-            "tab": "API Reference",
-            "groups": [
-                {
-                    "group": "API Endpoints",
-                    "pages": [
-                        "api-reference/introduction"
-                    ]
-                }
+          },
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference/introduction"
+            ],
+            "openapi": "api-reference/openapi.json"
+          }
+        ]
+      },
+      {
+        "language": "fr",
+        "groups": [
+          {
+            "group": "Pour commencer",
+            "pages": [
+              "index.fr",
+              "quickstart.fr",
+              "development.fr"
             ]
-        }
+          },
+          {
+            "group": "Référence API",
+            "pages": [
+              "api-reference/introduction"
+            ],
+            "openapi": "api-reference/openapi.json"
+          }
+        ]
+      }
     ]
   },
   "navbar": {
