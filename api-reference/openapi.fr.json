@@ -1,0 +1,1955 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "UBIK Public API",
+    "description": "Publicly accessible API endpoints for UBIK.",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API"
+        ],
+        "summary": "Health Check",
+        "description": "Health check endpoint for the public API.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API",
+          "Users"
+        ],
+        "summary": "Lire l'Utilisateur Actuel",
+        "description": "Obtenir les détails de l'utilisateur actuel.",
+        "operationId": "read_current_user_users_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/workspaces": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Workspaces"
+        ],
+        "summary": "Lister les espaces de travail",
+        "description": "Récupère une liste paginée de tous les espaces de travail accessibles à l'utilisateur.\nCela inclut les espaces de travail personnels et les espaces de travail partagés de l'entreprise.",
+        "operationId": "get_workspaces_workspaces_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPaginatedWorkspacesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Workspaces"
+        ],
+        "summary": "Créer un espace de travail",
+        "description": "Crée un nouvel espace de travail personnel pour l'utilisateur.",
+        "operationId": "create_workspace_workspaces_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicWorkspace"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspace_id}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Workspaces"
+        ],
+        "summary": "Obtenir les détails de l'espace de travail",
+        "description": "Récupère les détails d'un espace de travail spécifique, à condition que l'utilisateur y ait accès.",
+        "operationId": "get_workspace_workspaces__workspace_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicWorkspace"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Public API",
+          "Public API - Workspaces"
+        ],
+        "summary": "Supprimer un espace de travail",
+        "description": "Supprime un espace de travail, à condition que l'utilisateur en soit le propriétaire.",
+        "operationId": "delete_workspace_workspaces__workspace_id__delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspace_id}/documents": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Workspaces"
+        ],
+        "summary": "Lister les documents dans un espace de travail",
+        "description": "Récupère une liste paginée de documents au sein d'un espace de travail spécifique.",
+        "operationId": "get_workspace_documents_workspaces__workspace_id__documents_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPaginatedDocumentsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Lister les documents",
+        "description": "Récupère une liste paginée de tous les documents accessibles à l'utilisateur.",
+        "operationId": "get_documents_documents_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPaginatedDocumentsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Ingérer des documents à partir de fichiers ou d'URL",
+        "description": "Point de terminaison unifié pour ingérer des documents à partir de diverses sources.\n\nCe point de terminaison peut gérer les téléversements de fichiers et le scraping d'URL en une seule requête.\nIl utilise multipart/form-data.\n\n- Pour téléverser des fichiers, incluez-les dans la partie 'files' du formulaire.\n- Pour scraper des URL, fournissez une chaîne de caractères séparée par des virgules dans le champ de formulaire 'urls'.\n- Spécifiez les ID d'espace de travail pour associer les documents ingérés à des espaces de travail spécifiques.",
+        "operationId": "ingest_documents_documents_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_ingest_documents_documents_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicDocument"
+                  },
+                  "title": "Response Ingest Documents Documents Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Obtenir les détails du document",
+        "description": "Récupère les détails d'un document spécifique, à condition que l'utilisateur y ait accès.",
+        "operationId": "get_document_documents__document_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicDocument"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Supprimer un document",
+        "description": "Supprimer un document. Cela supprimera le document de l'espace de travail par défaut de l'utilisateur\net, s'il est le dernier propriétaire, le supprimera entièrement du système.",
+        "operationId": "delete_document_documents__document_id__delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/workspaces": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Ajouter un document aux espaces de travail",
+        "description": "Ajoute un document à un ou plusieurs espaces de travail.",
+        "operationId": "add_document_to_workspaces_documents__document_id__workspaces_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchWorkspaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Supprimer un document des espaces de travail",
+        "description": "Supprime un document d'un ou plusieurs espaces de travail.",
+        "operationId": "remove_document_from_workspaces_documents__document_id__workspaces_delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchWorkspaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspace_id}/documents/{document_id}": {
+      "delete": {
+        "tags": [
+          "Public API",
+          "Public API - Workspaces"
+        ],
+        "summary": "Supprimer un document d'un espace de travail",
+        "description": "Supprime l'association d'un document d'un espace de travail spécifique sans supprimer le document lui-même.",
+        "operationId": "remove_document_from_workspace_workspaces__workspace_id__documents__document_id__delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Tools"
+        ],
+        "summary": "Lister les outils disponibles",
+        "description": "Récupère une liste paginée de tous les outils accessibles à l'utilisateur.",
+        "operationId": "get_public_tools_tools_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPaginatedToolsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/{tool_id}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Tools"
+        ],
+        "summary": "Obtenir les détails de l'outil",
+        "description": "Récupère les détails d'un outil spécifique, à condition que l'utilisateur y ait accès.",
+        "operationId": "get_public_tool_tools__tool_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tool Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTool"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/{tool_id}/execute": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Tool Executions"
+        ],
+        "summary": "Exécuter un outil",
+        "description": "Démarre de manière asynchrone une exécution d'outil et renvoie un ID d'exécution pour suivre les résultats.",
+        "operationId": "execute_public_tool_tools__tool_id__execute_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tool Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicToolExecutionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicToolExecutionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool-executions/{execution_id}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Tool Executions"
+        ],
+        "summary": "Obtenir le résultat de l'exécution",
+        "description": "Récupère le statut et le résultat d'une exécution d'outil spécifique.",
+        "operationId": "get_public_tool_execution_tool_executions__execution_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicToolExecutionResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool-executions/{execution_id}/stream": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Tool Executions"
+        ],
+        "summary": "Diffuser les événements d'exécution",
+        "description": "Diffuse des événements envoyés par le serveur (SSE) pour une exécution d'outil.",
+        "operationId": "stream_public_tool_execution_tool_executions__execution_id__stream_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool-executions/{execution_id}/provide-input": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Tool Executions"
+        ],
+        "summary": "Fournir une entrée à un outil en attente",
+        "description": "Fournit l'entrée requise à une exécution d'outil qui est dans l'état 'waiting_for_input'.",
+        "operationId": "provide_public_tool_input_tool_executions__execution_id__provide_input_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_provide_public_tool_input_tool_executions__execution_id__provide_input_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BatchWorkspaceRequest": {
+        "properties": {
+          "workspace_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Workspace Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "workspace_ids"
+        ],
+        "title": "BatchWorkspaceRequest"
+      },
+      "Body_ingest_documents_documents_post": {
+        "properties": {
+          "files": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Files",
+            "description": "A list of files to upload."
+          },
+          "urls": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Urls",
+            "description": "A comma-separated list of URLs to scrape."
+          },
+          "workspace_ids": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Ids",
+            "description": "A comma-separated list of workspace IDs to add the documents to."
+          },
+          "scraping_mode": {
+            "type": "string",
+            "title": "Scraping Mode",
+            "description": "Scraping mode ('Simple Scraping' or 'Crawling').",
+            "default": "Simple Scraping"
+          },
+          "crawl_depth": {
+            "type": "integer",
+            "title": "Crawl Depth",
+            "default": 2
+          },
+          "same_domain_only": {
+            "type": "boolean",
+            "title": "Same Domain Only",
+            "default": true
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "default": 10
+          },
+          "delay": {
+            "type": "number",
+            "title": "Delay",
+            "default": 1.0
+          },
+          "youtube_download_format": {
+            "type": "string",
+            "title": "Youtube Download Format",
+            "default": "audio"
+          }
+        },
+        "type": "object",
+        "title": "Body_ingest_documents_documents_post"
+      },
+      "Body_provide_public_tool_input_tool_executions__execution_id__provide_input_post": {
+        "properties": {
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File",
+            "description": "An optional file to upload as input."
+          },
+          "input_data_json": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Data Json",
+            "description": "Optional JSON data to provide as input."
+          }
+        },
+        "type": "object",
+        "title": "Body_provide_public_tool_input_tool_executions__execution_id__provide_input_post"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "PublicDocument": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "file_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "processing_pipeline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing Pipeline"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name"
+          },
+          "markdown_content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Markdown Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PublicDocument"
+      },
+      "PublicDocumentListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "file_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "processing_pipeline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing Pipeline"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PublicDocumentListItem"
+      },
+      "PublicPaginatedDocumentsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDocumentListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "has_more"
+        ],
+        "title": "PublicPaginatedDocumentsResponse"
+      },
+      "PublicPaginatedToolsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PublicToolListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "has_more"
+        ],
+        "title": "PublicPaginatedToolsResponse"
+      },
+      "PublicPaginatedWorkspacesResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PublicWorkspace"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "has_more"
+        ],
+        "title": "PublicPaginatedWorkspacesResponse"
+      },
+      "PublicTool": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "input_schema": {
+            "$ref": "#/components/schemas/ToolInputSchema"
+          },
+          "media_output_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Media Output Keys"
+          },
+          "example_responses": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Example Responses"
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/ToolPricingConfig"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "input_schema",
+          "media_output_keys",
+          "example_responses",
+          "pricing_config"
+        ],
+        "title": "PublicTool"
+      },
+      "PublicToolExecutionRequest": {
+        "properties": {
+          "inputs": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Inputs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "title": "PublicToolExecutionRequest"
+      },
+      "PublicToolExecutionResponse": {
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "title": "Execution Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "tool_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tool Id"
+          },
+          "details_url": {
+            "type": "string",
+            "title": "Details Url"
+          },
+          "stream_url": {
+            "type": "string",
+            "title": "Stream Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "execution_id",
+          "status",
+          "tool_id",
+          "details_url",
+          "stream_url"
+        ],
+        "title": "PublicToolExecutionResponse"
+      },
+      "PublicToolExecutionResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tool_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tool Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "inputs": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Inputs"
+          },
+          "outputs": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outputs"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tool_id",
+          "user_id",
+          "status",
+          "inputs",
+          "created_at"
+        ],
+        "title": "PublicToolExecutionResult"
+      },
+      "PublicToolListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PublicToolListItem"
+      },
+      "PublicUserResponse": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "uuid_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Uuid Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "balance": {
+            "type": "number",
+            "title": "Balance"
+          },
+          "chat_session_count": {
+            "type": "integer",
+            "title": "Chat Session Count"
+          },
+          "document_count": {
+            "type": "integer",
+            "title": "Document Count"
+          },
+          "workspace_count": {
+            "type": "integer",
+            "title": "Workspace Count"
+          },
+          "assistant_count": {
+            "type": "integer",
+            "title": "Assistant Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "uuid_id",
+          "created_at",
+          "balance",
+          "chat_session_count",
+          "document_count",
+          "workspace_count",
+          "assistant_count"
+        ],
+        "title": "PublicUserResponse",
+        "description": "Schema for publicly exposed user information."
+      },
+      "PublicWorkspace": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "is_default": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Default",
+            "default": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "document_count": {
+            "type": "integer",
+            "title": "Document Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "updated_at",
+          "document_count"
+        ],
+        "title": "PublicWorkspace"
+      },
+      "ToolInputSchema": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "default": "object"
+          },
+          "properties": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ToolPropertySchema"
+            },
+            "type": "object",
+            "title": "Properties"
+          },
+          "required": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Required"
+          }
+        },
+        "type": "object",
+        "title": "ToolInputSchema"
+      },
+      "ToolPricingConfig": {
+        "properties": {
+          "fixed_cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fixed Cost"
+          },
+          "variable_cost_per_unit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variable Cost Per Unit"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "type": "object",
+        "title": "ToolPricingConfig"
+      },
+      "ToolPropertySchema": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "enum": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enum"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "description"
+        ],
+        "title": "ToolPropertySchema"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WorkspaceCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "is_default": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Default",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "WorkspaceCreate"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    }
+  }
+}
