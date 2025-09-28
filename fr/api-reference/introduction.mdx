@@ -1,0 +1,34 @@
+---
+title: 'Introduction'
+description: 'Section d''exemple pour la présentation des points de terminaison de l''API'
+---
+
+<Note>
+Si vous ne souhaitez pas créer de documentation de référence pour l'API, vous pouvez supprimer cette section en supprimant le dossier api-reference.
+</Note>
+
+## Bienvenue
+
+Il existe deux manières de créer une documentation d'API : [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) et les [composants MDX](https://mintlify.com/docs/api-playground/mdx/configuration). Pour ce kit de démarrage, nous utilisons la spécification OpenAPI suivante.
+
+<Card
+  title="Points de terminaison de l'API UBIK"
+  icon="cubes"
+  href="/api-reference/openapi.fr.json"
+>
+  Voir le fichier de spécification OpenAPI
+</Card>
+
+## Authentification
+
+Tous les points de terminaison de l'API sont authentifiés à l'aide de clés d'API (`X-API-KEY`) et sont définis dans le fichier de spécification.
+
+```json
+"securitySchemes": {
+    "APIKeyHeader": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-API-KEY"
+    }
+}
+```

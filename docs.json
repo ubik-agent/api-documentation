@@ -20,15 +20,15 @@
           {
             "group": "Getting Started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "en/index",
+              "en/quickstart",
+              "en/development"
             ]
           },
           {
             "group": "API Reference",
             "pages": [
-              "api-reference/introduction",
+              "en/api-reference/introduction",
               {
                 "group": "Endpoints",
                 "openapi": "api-reference/openapi.en.json"
@@ -43,15 +43,15 @@
           {
             "group": "Pour commencer",
             "pages": [
-              "index.fr",
-              "quickstart.fr",
-              "development.fr"
+              "fr/index",
+              "fr/demarrage-rapide",
+              "fr/guide-developpement"
             ]
           },
           {
             "group": "Référence API",
             "pages": [
-              "api-reference/introduction",
+              "fr/api-reference/introduction",
               {
                 "group": "Ressources API",
                 "openapi": "api-reference/openapi.fr.json"
