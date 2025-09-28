@@ -35,22 +35,32 @@
     "languages": [
       {
         "language": "en",
-        "groups": [
+        "tabs": [
           {
-            "group": "Getting Started",
-            "pages": [
-              "/en/index",
-              "/en/quickstart",
-              "/en/development"
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "/en/index",
+                  "/en/quickstart",
+                  "/en/development"
+                ]
+              }
             ]
           },
           {
-            "group": "API Reference",
-            "pages": [
-              "/en/api-reference/introduction",
+            "tab": "API Reference",
+            "groups": [
               {
-                "group": "Endpoints",
-                "openapi": "api-reference/openapi.en.json"
+                "group": "API Reference",
+                "pages": [
+                  "/en/api-reference/introduction",
+                  {
+                    "group": "Endpoints",
+                    "openapi": "api-reference/openapi.en.json"
+                  }
+                ]
               }
             ]
           }
@@ -58,22 +68,32 @@
       },
       {
         "language": "fr",
-        "groups": [
+        "tabs": [
           {
-            "group": "Pour commencer",
-            "pages": [
-              "/fr/index",
-              "/fr/demarrage-rapide",
-              "/fr/guide-developpement"
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Pour commencer",
+                "pages": [
+                  "/fr/index",
+                  "/fr/demarrage-rapide",
+                  "/fr/guide-developpement"
+                ]
+              }
             ]
           },
           {
-            "group": "Référence API",
-            "pages": [
-              "/fr/api-reference/introduction",
+            "tab": "Référence API",
+            "groups": [
               {
-                "group": "Ressources API",
-                "openapi": "api-reference/openapi.fr.json"
+                "group": "Référence API",
+                "pages": [
+                  "/fr/api-reference/introduction",
+                  {
+                    "group": "Ressources API",
+                    "openapi": "api-reference/openapi.fr.json"
+                  }
+                ]
               }
             ]
           }
@@ -112,6 +132,7 @@
     ]
   },
   "banner": {
-    "content": "UBIK Agent will launch soon, [join the waitlist to get access!](https://ubik-agent.com/)"
+    "content": "UBIK Agent will launch soon, [join the waitlist to get access!](https://ubik-agent.com/)",
+    "dismissible": true
   }
 }
