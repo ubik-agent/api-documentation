@@ -44,8 +44,8 @@
             "group": "Pour commencer",
             "pages": [
               "/fr/index",
-              "/fr/quickstart",
-              "/fr/development"
+              "/fr/demarrage-rapide",
+              "/fr/guide-developpement"
             ]
           },
           {
