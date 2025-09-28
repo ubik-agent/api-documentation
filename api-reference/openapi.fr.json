@@ -17,15 +17,19 @@
           "Public API",
           "Public API"
         ],
-        "summary": "Health Check",
-        "description": "Health check endpoint for the public API.",
+        "summary": "État du service",
+        "description": "Route pour la vérification de l'état du service de l'API publique.",
         "operationId": "health_check_health_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {},
+                "example": {
+                  "status": "ok",
+                  "user": "testuser"
+                }
               }
             }
           }
@@ -44,8 +48,8 @@
           "Public API",
           "Users"
         ],
-        "summary": "Lire l'Utilisateur Actuel",
-        "description": "Obtenir les détails de l'utilisateur actuel.",
+        "summary": "Consulter l'utilisateur actuel",
+        "description": "Récupère les informations détaillées de l'utilisateur currently authentifié.",
         "operationId": "read_current_user_users_me_get",
         "responses": {
           "200": {
@@ -54,6 +58,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicUserResponse"
+                },
+                "example": {
+                  "username": "testuser",
+                  "full_name": "Test User",
+                  "uuid_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                  "created_at": "2025-09-28T12:00:00Z",
+                  "balance": 100.0,
+                  "chat_session_count": 5,
+                  "document_count": 42,
+                  "workspace_count": 3,
+                  "assistant_count": 2
                 }
               }
             }
@@ -73,7 +88,7 @@
           "Public API - Workspaces"
         ],
         "summary": "Lister les espaces de travail",
-        "description": "Récupère une liste paginée de tous les espaces de travail accessibles à l'utilisateur.\nCela inclut les espaces de travail personnels et les espaces de travail partagés de l'entreprise.",
+        "description": "Récupère une liste paginée de tous les espaces de travail accessibles à l'utilisateur, incluant les espaces personnels et ceux partagés via l'entreprise.",
         "operationId": "get_workspaces_workspaces_get",
         "security": [
           {
@@ -112,6 +127,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicPaginatedWorkspacesResponse"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                      "name": "My Project Workspace",
+                      "description": "Contains all documents related to the Q1 sales report.",
+                      "is_default": true,
+                      "created_at": "2025-09-28T10:00:00Z",
+                      "updated_at": "2025-09-28T11:00:00Z",
+                      "document_count": 42
+                    }
+                  ],
+                  "total": 1,
+                  "page": 1,
+                  "limit": 20,
+                  "has_more": false
                 }
               }
             }
@@ -147,6 +179,11 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/WorkspaceCreate"
+              },
+              "example": {
+                "name": "New Project Workspace",
+                "description": "Workspace for the new project.",
+                "is_default": false
               }
             }
           }
@@ -168,6 +205,18 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                },
+                "example": {
+                  "detail": [
+                    {
+                      "loc": [
+                        "body",
+                        "name"
+                      ],
+                      "msg": "field required",
+                      "type": "value_error.missing"
+                    }
+                  ]
                 }
               }
             }
@@ -181,8 +230,8 @@
           "Public API",
           "Public API - Workspaces"
         ],
-        "summary": "Obtenir les détails de l'espace de travail",
-        "description": "Récupère les détails d'un espace de travail spécifique, à condition que l'utilisateur y ait accès.",
+        "summary": "Détails d'un espace de travail",
+        "description": "Récupère les informations détaillées d'un espace de travail spécifique, si l'utilisateur dispose des permissions nécessaires.",
         "operationId": "get_workspace_workspaces__workspace_id__get",
         "security": [
           {
@@ -208,6 +257,15 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicWorkspace"
+                },
+                "example": {
+                  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                  "name": "My Project Workspace",
+                  "description": "Contains all documents related to the Q1 sales report.",
+                  "is_default": true,
+                  "created_at": "2025-09-28T10:00:00Z",
+                  "updated_at": "2025-09-28T11:00:00Z",
+                  "document_count": 42
                 }
               }
             }
@@ -230,7 +288,7 @@
           "Public API - Workspaces"
         ],
         "summary": "Supprimer un espace de travail",
-        "description": "Supprime un espace de travail, à condition que l'utilisateur en soit le propriétaire.",
+        "description": "Supprime un espace de travail, si l'utilisateur en est le propriétaire.",
         "operationId": "delete_workspace_workspaces__workspace_id__delete",
         "security": [
           {
@@ -273,7 +331,7 @@
           "Public API - Workspaces"
         ],
         "summary": "Lister les documents dans un espace de travail",
-        "description": "Récupère une liste paginée de documents au sein d'un espace de travail spécifique.",
+        "description": "Récupère une liste paginée de documents dans un espace de travail spécifique.",
         "operationId": "get_workspace_documents_workspaces__workspace_id__documents_get",
         "security": [
           {
@@ -322,6 +380,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicPaginatedDocumentsResponse"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
+                      "name": "Q1 Sales Report.pdf",
+                      "file_type": "application/pdf",
+                      "status": "completed",
+                      "created_at": "2025-09-28T10:05:00Z",
+                      "updated_at": "2025-09-28T10:05:00Z",
+                      "processing_pipeline": "default-pipeline"
+                    }
+                  ],
+                  "total": 1,
+                  "page": 1,
+                  "limit": 20,
+                  "has_more": false
                 }
               }
             }
@@ -385,6 +460,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicPaginatedDocumentsResponse"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
+                      "name": "Q1 Sales Report.pdf",
+                      "file_type": "application/pdf",
+                      "status": "completed",
+                      "created_at": "2025-09-28T10:05:00Z",
+                      "updated_at": "2025-09-28T10:05:00Z",
+                      "processing_pipeline": "default-pipeline"
+                    }
+                  ],
+                  "total": 256,
+                  "page": 1,
+                  "limit": 20,
+                  "has_more": true
                 }
               }
             }
@@ -406,8 +498,8 @@
           "Public API",
           "Public API - Documents"
         ],
-        "summary": "Ingérer des documents à partir de fichiers ou d'URL",
-        "description": "Point de terminaison unifié pour ingérer des documents à partir de diverses sources.\n\nCe point de terminaison peut gérer les téléversements de fichiers et le scraping d'URL en une seule requête.\nIl utilise multipart/form-data.\n\n- Pour téléverser des fichiers, incluez-les dans la partie 'files' du formulaire.\n- Pour scraper des URL, fournissez une chaîne de caractères séparée par des virgules dans le champ de formulaire 'urls'.\n- Spécifiez les ID d'espace de travail pour associer les documents ingérés à des espaces de travail spécifiques.",
+        "summary": "Ingestion de documents (fichiers ou URLs)",
+        "description": "Route unifiée pour ingérer des documents depuis diverses sources.\n\nCette route gère le téléversement de fichiers et le scraping d'URLs en une seule requête (multipart/form-data).\n\n- Pour téléverser des fichiers, utilisez le champ 'files'.\n- Pour scraper des URLs, utilisez le champ 'urls' (liste séparée par des virgules).\n- Associez les documents à des espaces de travail via 'workspace_ids'.",
         "operationId": "ingest_documents_documents_post",
         "security": [
           {
@@ -447,6 +539,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Either 'files' or 'urls' must be provided."
+                }
+              }
+            }
           }
         }
       }
@@ -457,8 +559,8 @@
           "Public API",
           "Public API - Documents"
         ],
-        "summary": "Obtenir les détails du document",
-        "description": "Récupère les détails d'un document spécifique, à condition que l'utilisateur y ait accès.",
+        "summary": "Détails d'un document",
+        "description": "Récupère les informations détaillées d'un document spécifique, si l'utilisateur dispose des permissions nécessaires.",
         "operationId": "get_document_documents__document_id__get",
         "security": [
           {
@@ -484,6 +586,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicDocument"
+                },
+                "example": {
+                  "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
+                  "name": "Q1 Sales Report.pdf",
+                  "file_type": "application/pdf",
+                  "status": "completed",
+                  "created_at": "2025-09-28T10:05:00Z",
+                  "updated_at": "2025-09-28T10:05:00Z",
+                  "processing_pipeline": "default-pipeline",
+                  "file_name": "2024_Q1_Sales_Final_v2.pdf",
+                  "markdown_content": "# Q1 Sales Report..."
                 }
               }
             }
@@ -506,7 +619,7 @@
           "Public API - Documents"
         ],
         "summary": "Supprimer un document",
-        "description": "Supprimer un document. Cela supprimera le document de l'espace de travail par défaut de l'utilisateur\net, s'il est le dernier propriétaire, le supprimera entièrement du système.",
+        "description": "Supprime un document. Cette action le retire de l'espace de travail par défaut de l'utilisateur et le supprime définitivement du système si l'utilisateur en est le dernier propriétaire.",
         "operationId": "delete_document_documents__document_id__delete",
         "security": [
           {
@@ -599,8 +712,8 @@
           "Public API",
           "Public API - Documents"
         ],
-        "summary": "Supprimer un document des espaces de travail",
-        "description": "Supprime un document d'un ou plusieurs espaces de travail.",
+        "summary": "Retirer un document d'espaces de travail",
+        "description": "Retire un document d'un ou de plusieurs espaces de travail.",
         "operationId": "remove_document_from_workspaces_documents__document_id__workspaces_delete",
         "security": [
           {
@@ -652,8 +765,8 @@
           "Public API",
           "Public API - Workspaces"
         ],
-        "summary": "Supprimer un document d'un espace de travail",
-        "description": "Supprime l'association d'un document d'un espace de travail spécifique sans supprimer le document lui-même.",
+        "summary": "Retirer un document d'un espace de travail",
+        "description": "Retire un document d'un espace de travail spécifique, sans supprimer le document lui-même.",
         "operationId": "remove_document_from_workspace_workspaces__workspace_id__documents__document_id__delete",
         "security": [
           {
@@ -745,6 +858,19 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicPaginatedToolsResponse"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+                      "name": "Financial Data Extractor",
+                      "description": "Extracts key financial metrics from annual reports."
+                    }
+                  ],
+                  "total": 35,
+                  "page": 1,
+                  "limit": 20,
+                  "has_more": true
                 }
               }
             }
@@ -768,8 +894,8 @@
           "Public API",
           "Public API - Tools"
         ],
-        "summary": "Obtenir les détails de l'outil",
-        "description": "Récupère les détails d'un outil spécifique, à condition que l'utilisateur y ait accès.",
+        "summary": "Détails d'un outil",
+        "description": "Récupère les informations détaillées d'un outil spécifique, si l'utilisateur dispose des permissions nécessaires.",
         "operationId": "get_public_tool_tools__tool_id__get",
         "security": [
           {
@@ -794,6 +920,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicTool"
+                },
+                "example": {
+                  "id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+                  "name": "Financial Data Extractor",
+                  "description": "Extracts key financial metrics from annual reports.",
+                  "input_schema": {
+                    "type": "object",
+                    "properties": {
+                      "stock_symbol": {
+                        "type": "string",
+                        "description": "The stock symbol of the company."
+                      },
+                      "report_year": {
+                        "type": "integer",
+                        "description": "The year of the financial report."
+                      }
+                    },
+                    "required": [
+                      "stock_symbol",
+                      "report_year"
+                    ]
+                  },
+                  "media_output_keys": [],
+                  "example_responses": [
+                    {
+                      "revenue": 1000000,
+                      "profit": 250000
+                    }
+                  ],
+                  "pricing_config": {
+                    "fixed_cost": 0.01
+                  }
                 }
               }
             }
@@ -818,7 +976,7 @@
           "Public API - Tool Executions"
         ],
         "summary": "Exécuter un outil",
-        "description": "Démarre de manière asynchrone une exécution d'outil et renvoie un ID d'exécution pour suivre les résultats.",
+        "description": "Démarre de manière asynchrone l'exécution d'un outil et renvoie un ID pour suivre les résultats.",
         "operationId": "execute_public_tool_tools__tool_id__execute_post",
         "security": [
           {
@@ -842,6 +1000,12 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PublicToolExecutionRequest"
+              },
+              "example": {
+                "inputs": {
+                  "stock_symbol": "ACME",
+                  "report_year": 2023
+                }
               }
             }
           }
@@ -863,6 +1027,18 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                },
+                "example": {
+                  "detail": [
+                    {
+                      "loc": [
+                        "body",
+                        "inputs"
+                      ],
+                      "msg": "field required",
+                      "type": "value_error.missing"
+                    }
+                  ]
                 }
               }
             }
@@ -876,7 +1052,7 @@
           "Public API",
           "Public API - Tool Executions"
         ],
-        "summary": "Obtenir le résultat de l'exécution",
+        "summary": "Résultat d'une exécution",
         "description": "Récupère le statut et le résultat d'une exécution d'outil spécifique.",
         "operationId": "get_public_tool_execution_tool_executions__execution_id__get",
         "security": [
@@ -902,6 +1078,22 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PublicToolExecutionResult"
+                },
+                "example": {
+                  "id": "exec_123456789",
+                  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+                  "user_id": 123,
+                  "status": "completed",
+                  "inputs": {
+                    "stock_symbol": "ACME"
+                  },
+                  "outputs": {
+                    "revenue": 1000000,
+                    "profit": 250000
+                  },
+                  "created_at": "2025-09-28T12:00:00Z",
+                  "started_at": "2025-09-28T12:00:01Z",
+                  "completed_at": "2025-09-28T12:00:05Z"
                 }
               }
             }
@@ -925,8 +1117,8 @@
           "Public API",
           "Public API - Tool Executions"
         ],
-        "summary": "Diffuser les événements d'exécution",
-        "description": "Diffuse des événements envoyés par le serveur (SSE) pour une exécution d'outil.",
+        "summary": "Streaming des événements d'exécution",
+        "description": "Permet de s'abonner en temps réel aux événements (Server-Sent Events) d'une exécution d'outil.",
         "operationId": "stream_public_tool_execution_tool_executions__execution_id__stream_get",
         "security": [
           {
@@ -972,8 +1164,8 @@
           "Public API",
           "Public API - Tool Executions"
         ],
-        "summary": "Fournir une entrée à un outil en attente",
-        "description": "Fournit l'entrée requise à une exécution d'outil qui est dans l'état 'waiting_for_input'.",
+        "summary": "Soumettre des données à un outil en attente",
+        "description": "Permet de fournir les données requises par une exécution d'outil actuellement en état 'waiting_for_input'.",
         "operationId": "provide_public_tool_input_tool_executions__execution_id__provide_input_post",
         "security": [
           {
@@ -1033,7 +1225,13 @@
               "format": "uuid"
             },
             "type": "array",
-            "title": "Workspace Ids"
+            "title": "Workspace Ids",
+            "description": "A list of workspace unique identifiers.",
+            "x-translations": {
+              "fr": {
+                "description": "Une liste d'identifiants uniques d'espaces de travail."
+              }
+            }
           }
         },
         "type": "object",
@@ -1168,11 +1366,23 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "title": "Id"
+            "title": "Id",
+            "description": "The unique identifier for the document.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique du document."
+              }
+            }
           },
           "name": {
             "type": "string",
-            "title": "Name"
+            "title": "Name",
+            "description": "The display name of the document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom d'affichage du document."
+              }
+            }
           },
           "file_type": {
             "anyOf": [
@@ -1183,21 +1393,45 @@
                 "type": "null"
               }
             ],
-            "title": "File Type"
+            "title": "File Type",
+            "description": "The MIME type of the document file.",
+            "x-translations": {
+              "fr": {
+                "description": "Le type MIME du fichier du document."
+              }
+            }
           },
           "status": {
             "type": "string",
-            "title": "Status"
+            "title": "Status",
+            "description": "The current processing status of the document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le statut de traitement actuel du document."
+              }
+            }
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Created At",
+            "description": "The timestamp when the document was created.",
+            "x-translations": {
+              "fr": {
+                "description": "L'horodatage de la création du document."
+              }
+            }
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Updated At"
+            "title": "Updated At",
+            "description": "The timestamp when the document was last updated.",
+            "x-translations": {
+              "fr": {
+                "description": "L'horodatage de la dernière mise à jour du document."
+              }
+            }
           },
           "processing_pipeline": {
             "anyOf": [
@@ -1208,7 +1442,13 @@
                 "type": "null"
               }
             ],
-            "title": "Processing Pipeline"
+            "title": "Processing Pipeline",
+            "description": "The name of the processing pipeline used for this document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom du pipeline de traitement utilisé pour ce document."
+              }
+            }
           },
           "error_message": {
             "anyOf": [
@@ -1219,7 +1459,13 @@
                 "type": "null"
               }
             ],
-            "title": "Error Message"
+            "title": "Error Message",
+            "description": "If processing failed, this field will contain the error message.",
+            "x-translations": {
+              "fr": {
+                "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
+              }
+            }
           },
           "file_name": {
             "anyOf": [
@@ -1230,7 +1476,13 @@
                 "type": "null"
               }
             ],
-            "title": "File Name"
+            "title": "File Name",
+            "description": "The original file name of the document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom de fichier original du document."
+              }
+            }
           },
           "markdown_content": {
             "anyOf": [
@@ -1241,7 +1493,13 @@
                 "type": "null"
               }
             ],
-            "title": "Markdown Content"
+            "title": "Markdown Content",
+            "description": "The full content of the document converted to Markdown format.",
+            "x-translations": {
+              "fr": {
+                "description": "Le contenu complet du document converti au format Markdown."
+              }
+            }
           }
         },
         "type": "object",
@@ -1259,11 +1517,23 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "title": "Id"
+            "title": "Id",
+            "description": "The unique identifier for the document.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique du document."
+              }
+            }
           },
           "name": {
             "type": "string",
-            "title": "Name"
+            "title": "Name",
+            "description": "The display name of the document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom d'affichage du document."
+              }
+            }
           },
           "file_type": {
             "anyOf": [
@@ -1274,21 +1544,45 @@
                 "type": "null"
               }
             ],
-            "title": "File Type"
+            "title": "File Type",
+            "description": "The MIME type of the document file.",
+            "x-translations": {
+              "fr": {
+                "description": "Le type MIME du fichier du document."
+              }
+            }
           },
           "status": {
             "type": "string",
-            "title": "Status"
+            "title": "Status",
+            "description": "The current processing status of the document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le statut de traitement actuel du document."
+              }
+            }
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Created At",
+            "description": "The timestamp when the document was created.",
+            "x-translations": {
+              "fr": {
+                "description": "L'horodatage de la création du document."
+              }
+            }
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Updated At"
+            "title": "Updated At",
+            "description": "The timestamp when the document was last updated.",
+            "x-translations": {
+              "fr": {
+                "description": "L'horodatage de la dernière mise à jour du document."
+              }
+            }
           },
           "processing_pipeline": {
             "anyOf": [
@@ -1299,7 +1593,13 @@
                 "type": "null"
               }
             ],
-            "title": "Processing Pipeline"
+            "title": "Processing Pipeline",
+            "description": "The name of the processing pipeline used for this document.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom du pipeline de traitement utilisé pour ce document."
+              }
+            }
           },
           "error_message": {
             "anyOf": [
@@ -1310,7 +1610,13 @@
                 "type": "null"
               }
             ],
-            "title": "Error Message"
+            "title": "Error Message",
+            "description": "If processing failed, this field will contain the error message.",
+            "x-translations": {
+              "fr": {
+                "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
+              }
+            }
           }
         },
         "type": "object",
@@ -1334,19 +1640,43 @@
           },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Total number of documents available.",
+            "x-translations": {
+              "fr": {
+                "description": "Nombre total de documents disponibles."
+              }
+            }
           },
           "page": {
             "type": "integer",
-            "title": "Page"
+            "title": "Page",
+            "description": "The current page number.",
+            "x-translations": {
+              "fr": {
+                "description": "Le numéro de la page actuelle."
+              }
+            }
           },
           "limit": {
             "type": "integer",
-            "title": "Limit"
+            "title": "Limit",
+            "description": "The number of items per page.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nombre d'éléments par page."
+              }
+            }
           },
           "has_more": {
             "type": "boolean",
-            "title": "Has More"
+            "title": "Has More",
+            "description": "Indicates if there are more pages available.",
+            "x-translations": {
+              "fr": {
+                "description": "Indique s'il y a d'autres pages disponibles."
+              }
+            }
           }
         },
         "type": "object",
@@ -1370,19 +1700,43 @@
           },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Total number of tools available.",
+            "x-translations": {
+              "fr": {
+                "description": "Nombre total d'outils disponibles."
+              }
+            }
           },
           "page": {
             "type": "integer",
-            "title": "Page"
+            "title": "Page",
+            "description": "The current page number.",
+            "x-translations": {
+              "fr": {
+                "description": "Le numéro de la page actuelle."
+              }
+            }
           },
           "limit": {
             "type": "integer",
-            "title": "Limit"
+            "title": "Limit",
+            "description": "The number of items per page.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nombre d'éléments par page."
+              }
+            }
           },
           "has_more": {
             "type": "boolean",
-            "title": "Has More"
+            "title": "Has More",
+            "description": "Indicates if there are more pages available.",
+            "x-translations": {
+              "fr": {
+                "description": "Indique s'il y a d'autres pages disponibles."
+              }
+            }
           }
         },
         "type": "object",
@@ -1406,19 +1760,43 @@
           },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Total number of workspaces available.",
+            "x-translations": {
+              "fr": {
+                "description": "Nombre total d'espaces de travail disponibles."
+              }
+            }
           },
           "page": {
             "type": "integer",
-            "title": "Page"
+            "title": "Page",
+            "description": "The current page number.",
+            "x-translations": {
+              "fr": {
+                "description": "Le numéro de la page actuelle."
+              }
+            }
           },
           "limit": {
             "type": "integer",
-            "title": "Limit"
+            "title": "Limit",
+            "description": "The number of items per page.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nombre d'éléments par page."
+              }
+            }
           },
           "has_more": {
             "type": "boolean",
-            "title": "Has More"
+            "title": "Has More",
+            "description": "Indicates if there are more pages available.",
+            "x-translations": {
+              "fr": {
+                "description": "Indique s'il y a d'autres pages disponibles."
+              }
+            }
           }
         },
         "type": "object",
@@ -1436,11 +1814,23 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "title": "Id"
+            "title": "Id",
+            "description": "The unique identifier for the tool.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique de l'outil."
+              }
+            }
           },
           "name": {
             "type": "string",
-            "title": "Name"
+            "title": "Name",
+            "description": "The name of the tool.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom de l'outil."
+              }
+            }
           },
           "description": {
             "anyOf": [
@@ -1451,7 +1841,13 @@
                 "type": "null"
               }
             ],
-            "title": "Description"
+            "title": "Description",
+            "description": "A brief description of what the tool does.",
+            "x-translations": {
+              "fr": {
+                "description": "Une brève description de ce que fait l'outil."
+              }
+            }
           },
           "input_schema": {
             "$ref": "#/components/schemas/ToolInputSchema"
@@ -1491,7 +1887,13 @@
           "inputs": {
             "additionalProperties": true,
             "type": "object",
-            "title": "Inputs"
+            "title": "Inputs",
+            "description": "A dictionary of inputs for the tool, matching its input_schema.",
+            "x-translations": {
+              "fr": {
+                "description": "Un dictionnaire d'entrées pour l'outil, correspondant à son input_schema."
+              }
+            }
           }
         },
         "type": "object",
@@ -1504,24 +1906,54 @@
         "properties": {
           "execution_id": {
             "type": "string",
-            "title": "Execution Id"
+            "title": "Execution Id",
+            "description": "The unique identifier for this tool execution instance.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique de cette instance d'exécution d'outil."
+              }
+            }
           },
           "status": {
             "type": "string",
-            "title": "Status"
+            "title": "Status",
+            "description": "The current status of the execution.",
+            "x-translations": {
+              "fr": {
+                "description": "Le statut actuel de l'exécution."
+              }
+            }
           },
           "tool_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Tool Id"
+            "title": "Tool Id",
+            "description": "The ID of the tool being executed.",
+            "x-translations": {
+              "fr": {
+                "description": "L'ID de l'outil en cours d'exécution."
+              }
+            }
           },
           "details_url": {
             "type": "string",
-            "title": "Details Url"
+            "title": "Details Url",
+            "description": "The URL to poll for the final execution result.",
+            "x-translations": {
+              "fr": {
+                "description": "L'URL pour interroger le résultat final de l'exécution."
+              }
+            }
           },
           "stream_url": {
             "type": "string",
-            "title": "Stream Url"
+            "title": "Stream Url",
+            "description": "The URL to stream real-time events for this execution.",
+            "x-translations": {
+              "fr": {
+                "description": "L'URL pour diffuser en temps réel les événements de cette exécution."
+              }
+            }
           }
         },
         "type": "object",
@@ -1538,12 +1970,24 @@
         "properties": {
           "id": {
             "type": "string",
-            "title": "Id"
+            "title": "Id",
+            "description": "The unique identifier for the execution instance.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique de l'instance d'exécution."
+              }
+            }
           },
           "tool_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Tool Id"
+            "title": "Tool Id",
+            "description": "The ID of the tool that was executed.",
+            "x-translations": {
+              "fr": {
+                "description": "L'ID de l'outil qui a été exécuté."
+              }
+            }
           },
           "user_id": {
             "anyOf": [
@@ -1554,16 +1998,34 @@
                 "type": "null"
               }
             ],
-            "title": "User Id"
+            "title": "User Id",
+            "description": "The ID of the user who initiated the execution.",
+            "x-translations": {
+              "fr": {
+                "description": "L'ID de l'utilisateur qui a initié l'exécution."
+              }
+            }
           },
           "status": {
             "type": "string",
-            "title": "Status"
+            "title": "Status",
+            "description": "The final status of the execution.",
+            "x-translations": {
+              "fr": {
+                "description": "Le statut final de l'exécution."
+              }
+            }
           },
           "inputs": {
             "additionalProperties": true,
             "type": "object",
-            "title": "Inputs"
+            "title": "Inputs",
+            "description": "The original inputs provided to the tool.",
+            "x-translations": {
+              "fr": {
+                "description": "Les entrées originales fournies à l'outil."
+              }
+            }
           },
           "outputs": {
             "anyOf": [
@@ -1575,7 +2037,13 @@
                 "type": "null"
               }
             ],
-            "title": "Outputs"
+            "title": "Outputs",
+            "description": "The outputs generated by the tool.",
+            "x-translations": {
+              "fr": {
+                "description": "Les sorties générées par l'outil."
+              }
+            }
           },
           "error": {
             "anyOf": [
@@ -1586,12 +2054,24 @@
                 "type": "null"
               }
             ],
-            "title": "Error"
+            "title": "Error",
+            "description": "If the execution failed, this contains the error message.",
+            "x-translations": {
+              "fr": {
+                "description": "Si l'exécution a échoué, ce champ contient le message d'erreur."
+              }
+            }
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Created At",
+            "description": "Timestamp when the execution was created.",
+            "x-translations": {
+              "fr": {
+                "description": "Horodatage de la création de l'exécution."
+              }
+            }
           },
           "started_at": {
             "anyOf": [
@@ -1602,7 +2082,13 @@
                 "type": "null"
               }
             ],
-            "title": "Started At"
+            "title": "Started At",
+            "description": "Timestamp when the execution started processing.",
+            "x-translations": {
+              "fr": {
+                "description": "Horodatage du début du traitement de l'exécution."
+              }
+            }
           },
           "completed_at": {
             "anyOf": [
@@ -1613,14 +2099,19 @@
                 "type": "null"
               }
             ],
-            "title": "Completed At"
+            "title": "Completed At",
+            "description": "Timestamp when the execution completed or failed.",
+            "x-translations": {
+              "fr": {
+                "description": "Horodatage de la fin (succès ou échec) de l'exécution."
+              }
+            }
           }
         },
         "type": "object",
         "required": [
           "id",
           "tool_id",
-          "user_id",
           "status",
           "inputs",
           "created_at"
@@ -1632,11 +2123,23 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "title": "Id"
+            "title": "Id",
+            "description": "The unique identifier for the tool.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique de l'outil."
+              }
+            }
           },
           "name": {
             "type": "string",
-            "title": "Name"
+            "title": "Name",
+            "description": "The name of the tool.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom de l'outil."
+              }
+            }
           },
           "description": {
             "anyOf": [
@@ -1647,7 +2150,13 @@
                 "type": "null"
               }
             ],
-            "title": "Description"
+            "title": "Description",
+            "description": "A brief description of what the tool does.",
+            "x-translations": {
+              "fr": {
+                "description": "Une brève description de ce que fait l'outil."
+              }
+            }
           }
         },
         "type": "object",
@@ -1724,11 +2233,23 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "title": "Id"
+            "title": "Id",
+            "description": "The unique identifier for the workspace.",
+            "x-translations": {
+              "fr": {
+                "description": "L'identifiant unique de l'espace de travail."
+              }
+            }
           },
           "name": {
             "type": "string",
-            "title": "Name"
+            "title": "Name",
+            "description": "The name of the workspace.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nom de l'espace de travail."
+              }
+            }
           },
           "description": {
             "anyOf": [
@@ -1739,7 +2260,13 @@
                 "type": "null"
               }
             ],
-            "title": "Description"
+            "title": "Description",
+            "description": "A brief description of the workspace's purpose.",
+            "x-translations": {
+              "fr": {
+                "description": "Une brève description de l'objectif de l'espace de travail."
+              }
+            }
           },
           "is_default": {
             "anyOf": [
@@ -1751,21 +2278,45 @@
               }
             ],
             "title": "Is Default",
-            "default": false
+            "description": "Indicates if this is the default workspace for the user.",
+            "default": false,
+            "x-translations": {
+              "fr": {
+                "description": "Indique s'il s'agit de l'espace de travail par défaut pour l'utilisateur."
+              }
+            }
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Created At",
+            "description": "The timestamp when the workspace was created.",
+            "x-translations": {
+              "fr": {
+                "description": "L'horodatage de la création de l'espace de travail."
+              }
+            }
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Updated At"
+            "title": "Updated At",
+            "description": "The timestamp when the workspace was last updated.",
+            "x-translations": {
+              "fr": {
+                "description": "L'horodatage de la dernière mise à jour de l'espace de travail."
+              }
+            }
           },
           "document_count": {
             "type": "integer",
-            "title": "Document Count"
+            "title": "Document Count",
+            "description": "The number of documents contained within the workspace.",
+            "x-translations": {
+              "fr": {
+                "description": "Le nombre de documents contenus dans l'espace de travail."
+              }
+            }
           }
         },
         "type": "object",
