@@ -1226,12 +1226,7 @@
             },
             "type": "array",
             "title": "Workspace Ids",
-            "description": "A list of workspace unique identifiers.",
-            "x-translations": {
-              "fr": {
-                "description": "Une liste d'identifiants uniques d'espaces de travail."
-              }
-            }
+            "description": "A list of workspace unique identifiers."
           }
         },
         "type": "object",
@@ -1367,22 +1362,12 @@
             "type": "string",
             "format": "uuid",
             "title": "Id",
-            "description": "The unique identifier for the document.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique du document."
-              }
-            }
+            "description": "The unique identifier for the document."
           },
           "name": {
             "type": "string",
             "title": "Name",
-            "description": "The display name of the document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom d'affichage du document."
-              }
-            }
+            "description": "The display name of the document."
           },
           "file_type": {
             "anyOf": [
@@ -1394,44 +1379,24 @@
               }
             ],
             "title": "File Type",
-            "description": "The MIME type of the document file.",
-            "x-translations": {
-              "fr": {
-                "description": "Le type MIME du fichier du document."
-              }
-            }
+            "description": "The MIME type of the document file."
           },
           "status": {
             "type": "string",
             "title": "Status",
-            "description": "The current processing status of the document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le statut de traitement actuel du document."
-              }
-            }
+            "description": "The current processing status of the document."
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At",
-            "description": "The timestamp when the document was created.",
-            "x-translations": {
-              "fr": {
-                "description": "L'horodatage de la création du document."
-              }
-            }
+            "description": "The timestamp when the document was created."
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
             "title": "Updated At",
-            "description": "The timestamp when the document was last updated.",
-            "x-translations": {
-              "fr": {
-                "description": "L'horodatage de la dernière mise à jour du document."
-              }
-            }
+            "description": "The timestamp when the document was last updated."
           },
           "processing_pipeline": {
             "anyOf": [
@@ -1443,12 +1408,7 @@
               }
             ],
             "title": "Processing Pipeline",
-            "description": "The name of the processing pipeline used for this document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom du pipeline de traitement utilisé pour ce document."
-              }
-            }
+            "description": "The name of the processing pipeline used for this document."
           },
           "error_message": {
             "anyOf": [
@@ -1460,12 +1420,7 @@
               }
             ],
             "title": "Error Message",
-            "description": "If processing failed, this field will contain the error message.",
-            "x-translations": {
-              "fr": {
-                "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
-              }
-            }
+            "description": "If processing failed, this field will contain the error message."
           },
           "file_name": {
             "anyOf": [
@@ -1477,12 +1432,7 @@
               }
             ],
             "title": "File Name",
-            "description": "The original file name of the document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom de fichier original du document."
-              }
-            }
+            "description": "The original file name of the document."
           },
           "markdown_content": {
             "anyOf": [
@@ -1494,12 +1444,7 @@
               }
             ],
             "title": "Markdown Content",
-            "description": "The full content of the document converted to Markdown format.",
-            "x-translations": {
-              "fr": {
-                "description": "Le contenu complet du document converti au format Markdown."
-              }
-            }
+            "description": "The full content of the document converted to Markdown format."
           }
         },
         "type": "object",
@@ -1518,22 +1463,12 @@
             "type": "string",
             "format": "uuid",
             "title": "Id",
-            "description": "The unique identifier for the document.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique du document."
-              }
-            }
+            "description": "The unique identifier for the document."
           },
           "name": {
             "type": "string",
             "title": "Name",
-            "description": "The display name of the document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom d'affichage du document."
-              }
-            }
+            "description": "The display name of the document."
           },
           "file_type": {
             "anyOf": [
@@ -1545,44 +1480,24 @@
               }
             ],
             "title": "File Type",
-            "description": "The MIME type of the document file.",
-            "x-translations": {
-              "fr": {
-                "description": "Le type MIME du fichier du document."
-              }
-            }
+            "description": "The MIME type of the document file."
           },
           "status": {
             "type": "string",
             "title": "Status",
-            "description": "The current processing status of the document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le statut de traitement actuel du document."
-              }
-            }
+            "description": "The current processing status of the document."
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At",
-            "description": "The timestamp when the document was created.",
-            "x-translations": {
-              "fr": {
-                "description": "L'horodatage de la création du document."
-              }
-            }
+            "description": "The timestamp when the document was created."
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
             "title": "Updated At",
-            "description": "The timestamp when the document was last updated.",
-            "x-translations": {
-              "fr": {
-                "description": "L'horodatage de la dernière mise à jour du document."
-              }
-            }
+            "description": "The timestamp when the document was last updated."
           },
           "processing_pipeline": {
             "anyOf": [
@@ -1594,12 +1509,7 @@
               }
             ],
             "title": "Processing Pipeline",
-            "description": "The name of the processing pipeline used for this document.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom du pipeline de traitement utilisé pour ce document."
-              }
-            }
+            "description": "The name of the processing pipeline used for this document."
           },
           "error_message": {
             "anyOf": [
@@ -1611,12 +1521,7 @@
               }
             ],
             "title": "Error Message",
-            "description": "If processing failed, this field will contain the error message.",
-            "x-translations": {
-              "fr": {
-                "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
-              }
-            }
+            "description": "If processing failed, this field will contain the error message."
           }
         },
         "type": "object",
@@ -1641,42 +1546,22 @@
           "total": {
             "type": "integer",
             "title": "Total",
-            "description": "Total number of documents available.",
-            "x-translations": {
-              "fr": {
-                "description": "Nombre total de documents disponibles."
-              }
-            }
+            "description": "Total number of documents available."
           },
           "page": {
             "type": "integer",
             "title": "Page",
-            "description": "The current page number.",
-            "x-translations": {
-              "fr": {
-                "description": "Le numéro de la page actuelle."
-              }
-            }
+            "description": "The current page number."
           },
           "limit": {
             "type": "integer",
             "title": "Limit",
-            "description": "The number of items per page.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nombre d'éléments par page."
-              }
-            }
+            "description": "The number of items per page."
           },
           "has_more": {
             "type": "boolean",
             "title": "Has More",
-            "description": "Indicates if there are more pages available.",
-            "x-translations": {
-              "fr": {
-                "description": "Indique s'il y a d'autres pages disponibles."
-              }
-            }
+            "description": "Indicates if there are more pages available."
           }
         },
         "type": "object",
@@ -1701,42 +1586,22 @@
           "total": {
             "type": "integer",
             "title": "Total",
-            "description": "Total number of tools available.",
-            "x-translations": {
-              "fr": {
-                "description": "Nombre total d'outils disponibles."
-              }
-            }
+            "description": "Total number of tools available."
           },
           "page": {
             "type": "integer",
             "title": "Page",
-            "description": "The current page number.",
-            "x-translations": {
-              "fr": {
-                "description": "Le numéro de la page actuelle."
-              }
-            }
+            "description": "The current page number."
           },
           "limit": {
             "type": "integer",
             "title": "Limit",
-            "description": "The number of items per page.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nombre d'éléments par page."
-              }
-            }
+            "description": "The number of items per page."
           },
           "has_more": {
             "type": "boolean",
             "title": "Has More",
-            "description": "Indicates if there are more pages available.",
-            "x-translations": {
-              "fr": {
-                "description": "Indique s'il y a d'autres pages disponibles."
-              }
-            }
+            "description": "Indicates if there are more pages available."
           }
         },
         "type": "object",
@@ -1761,42 +1626,22 @@
           "total": {
             "type": "integer",
             "title": "Total",
-            "description": "Total number of workspaces available.",
-            "x-translations": {
-              "fr": {
-                "description": "Nombre total d'espaces de travail disponibles."
-              }
-            }
+            "description": "Total number of workspaces available."
           },
           "page": {
             "type": "integer",
             "title": "Page",
-            "description": "The current page number.",
-            "x-translations": {
-              "fr": {
-                "description": "Le numéro de la page actuelle."
-              }
-            }
+            "description": "The current page number."
           },
           "limit": {
             "type": "integer",
             "title": "Limit",
-            "description": "The number of items per page.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nombre d'éléments par page."
-              }
-            }
+            "description": "The number of items per page."
           },
           "has_more": {
             "type": "boolean",
             "title": "Has More",
-            "description": "Indicates if there are more pages available.",
-            "x-translations": {
-              "fr": {
-                "description": "Indique s'il y a d'autres pages disponibles."
-              }
-            }
+            "description": "Indicates if there are more pages available."
           }
         },
         "type": "object",
@@ -1815,22 +1660,12 @@
             "type": "string",
             "format": "uuid",
             "title": "Id",
-            "description": "The unique identifier for the tool.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique de l'outil."
-              }
-            }
+            "description": "The unique identifier for the tool."
           },
           "name": {
             "type": "string",
             "title": "Name",
-            "description": "The name of the tool.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom de l'outil."
-              }
-            }
+            "description": "The name of the tool."
           },
           "description": {
             "anyOf": [
@@ -1842,12 +1677,7 @@
               }
             ],
             "title": "Description",
-            "description": "A brief description of what the tool does.",
-            "x-translations": {
-              "fr": {
-                "description": "Une brève description de ce que fait l'outil."
-              }
-            }
+            "description": "A brief description of what the tool does."
           },
           "input_schema": {
             "$ref": "#/components/schemas/ToolInputSchema"
@@ -1888,12 +1718,7 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Inputs",
-            "description": "A dictionary of inputs for the tool, matching its input_schema.",
-            "x-translations": {
-              "fr": {
-                "description": "Un dictionnaire d'entrées pour l'outil, correspondant à son input_schema."
-              }
-            }
+            "description": "A dictionary of inputs for the tool, matching its input_schema."
           }
         },
         "type": "object",
@@ -1907,53 +1732,28 @@
           "execution_id": {
             "type": "string",
             "title": "Execution Id",
-            "description": "The unique identifier for this tool execution instance.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique de cette instance d'exécution d'outil."
-              }
-            }
+            "description": "The unique identifier for this tool execution instance."
           },
           "status": {
             "type": "string",
             "title": "Status",
-            "description": "The current status of the execution.",
-            "x-translations": {
-              "fr": {
-                "description": "Le statut actuel de l'exécution."
-              }
-            }
+            "description": "The current status of the execution."
           },
           "tool_id": {
             "type": "string",
             "format": "uuid",
             "title": "Tool Id",
-            "description": "The ID of the tool being executed.",
-            "x-translations": {
-              "fr": {
-                "description": "L'ID de l'outil en cours d'exécution."
-              }
-            }
+            "description": "The ID of the tool being executed."
           },
           "details_url": {
             "type": "string",
             "title": "Details Url",
-            "description": "The URL to poll for the final execution result.",
-            "x-translations": {
-              "fr": {
-                "description": "L'URL pour interroger le résultat final de l'exécution."
-              }
-            }
+            "description": "The URL to poll for the final execution result."
           },
           "stream_url": {
             "type": "string",
             "title": "Stream Url",
-            "description": "The URL to stream real-time events for this execution.",
-            "x-translations": {
-              "fr": {
-                "description": "L'URL pour diffuser en temps réel les événements de cette exécution."
-              }
-            }
+            "description": "The URL to stream real-time events for this execution."
           }
         },
         "type": "object",
@@ -1971,23 +1771,13 @@
           "id": {
             "type": "string",
             "title": "Id",
-            "description": "The unique identifier for the execution instance.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique de l'instance d'exécution."
-              }
-            }
+            "description": "The unique identifier for the execution instance."
           },
           "tool_id": {
             "type": "string",
             "format": "uuid",
             "title": "Tool Id",
-            "description": "The ID of the tool that was executed.",
-            "x-translations": {
-              "fr": {
-                "description": "L'ID de l'outil qui a été exécuté."
-              }
-            }
+            "description": "The ID of the tool that was executed."
           },
           "user_id": {
             "anyOf": [
@@ -1999,33 +1789,18 @@
               }
             ],
             "title": "User Id",
-            "description": "The ID of the user who initiated the execution.",
-            "x-translations": {
-              "fr": {
-                "description": "L'ID de l'utilisateur qui a initié l'exécution."
-              }
-            }
+            "description": "The ID of the user who initiated the execution."
           },
           "status": {
             "type": "string",
             "title": "Status",
-            "description": "The final status of the execution.",
-            "x-translations": {
-              "fr": {
-                "description": "Le statut final de l'exécution."
-              }
-            }
+            "description": "The final status of the execution."
           },
           "inputs": {
             "additionalProperties": true,
             "type": "object",
             "title": "Inputs",
-            "description": "The original inputs provided to the tool.",
-            "x-translations": {
-              "fr": {
-                "description": "Les entrées originales fournies à l'outil."
-              }
-            }
+            "description": "The original inputs provided to the tool."
           },
           "outputs": {
             "anyOf": [
@@ -2038,12 +1813,7 @@
               }
             ],
             "title": "Outputs",
-            "description": "The outputs generated by the tool.",
-            "x-translations": {
-              "fr": {
-                "description": "Les sorties générées par l'outil."
-              }
-            }
+            "description": "The outputs generated by the tool."
           },
           "error": {
             "anyOf": [
@@ -2055,23 +1825,13 @@
               }
             ],
             "title": "Error",
-            "description": "If the execution failed, this contains the error message.",
-            "x-translations": {
-              "fr": {
-                "description": "Si l'exécution a échoué, ce champ contient le message d'erreur."
-              }
-            }
+            "description": "If the execution failed, this contains the error message."
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At",
-            "description": "Timestamp when the execution was created.",
-            "x-translations": {
-              "fr": {
-                "description": "Horodatage de la création de l'exécution."
-              }
-            }
+            "description": "Timestamp when the execution was created."
           },
           "started_at": {
             "anyOf": [
@@ -2083,12 +1843,7 @@
               }
             ],
             "title": "Started At",
-            "description": "Timestamp when the execution started processing.",
-            "x-translations": {
-              "fr": {
-                "description": "Horodatage du début du traitement de l'exécution."
-              }
-            }
+            "description": "Timestamp when the execution started processing."
           },
           "completed_at": {
             "anyOf": [
@@ -2100,12 +1855,7 @@
               }
             ],
             "title": "Completed At",
-            "description": "Timestamp when the execution completed or failed.",
-            "x-translations": {
-              "fr": {
-                "description": "Horodatage de la fin (succès ou échec) de l'exécution."
-              }
-            }
+            "description": "Timestamp when the execution completed or failed."
           }
         },
         "type": "object",
@@ -2124,22 +1874,12 @@
             "type": "string",
             "format": "uuid",
             "title": "Id",
-            "description": "The unique identifier for the tool.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique de l'outil."
-              }
-            }
+            "description": "The unique identifier for the tool."
           },
           "name": {
             "type": "string",
             "title": "Name",
-            "description": "The name of the tool.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom de l'outil."
-              }
-            }
+            "description": "The name of the tool."
           },
           "description": {
             "anyOf": [
@@ -2151,12 +1891,7 @@
               }
             ],
             "title": "Description",
-            "description": "A brief description of what the tool does.",
-            "x-translations": {
-              "fr": {
-                "description": "Une brève description de ce que fait l'outil."
-              }
-            }
+            "description": "A brief description of what the tool does."
           }
         },
         "type": "object",
@@ -2234,22 +1969,12 @@
             "type": "string",
             "format": "uuid",
             "title": "Id",
-            "description": "The unique identifier for the workspace.",
-            "x-translations": {
-              "fr": {
-                "description": "L'identifiant unique de l'espace de travail."
-              }
-            }
+            "description": "The unique identifier for the workspace."
           },
           "name": {
             "type": "string",
             "title": "Name",
-            "description": "The name of the workspace.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nom de l'espace de travail."
-              }
-            }
+            "description": "The name of the workspace."
           },
           "description": {
             "anyOf": [
@@ -2261,12 +1986,7 @@
               }
             ],
             "title": "Description",
-            "description": "A brief description of the workspace's purpose.",
-            "x-translations": {
-              "fr": {
-                "description": "Une brève description de l'objectif de l'espace de travail."
-              }
-            }
+            "description": "A brief description of the workspace's purpose."
           },
           "is_default": {
             "anyOf": [
@@ -2279,44 +1999,24 @@
             ],
             "title": "Is Default",
             "description": "Indicates if this is the default workspace for the user.",
-            "default": false,
-            "x-translations": {
-              "fr": {
-                "description": "Indique s'il s'agit de l'espace de travail par défaut pour l'utilisateur."
-              }
-            }
+            "default": false
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At",
-            "description": "The timestamp when the workspace was created.",
-            "x-translations": {
-              "fr": {
-                "description": "L'horodatage de la création de l'espace de travail."
-              }
-            }
+            "description": "The timestamp when the workspace was created."
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
             "title": "Updated At",
-            "description": "The timestamp when the workspace was last updated.",
-            "x-translations": {
-              "fr": {
-                "description": "L'horodatage de la dernière mise à jour de l'espace de travail."
-              }
-            }
+            "description": "The timestamp when the workspace was last updated."
           },
           "document_count": {
             "type": "integer",
             "title": "Document Count",
-            "description": "The number of documents contained within the workspace.",
-            "x-translations": {
-              "fr": {
-                "description": "Le nombre de documents contenus dans l'espace de travail."
-              }
-            }
+            "description": "The number of documents contained within the workspace."
           }
         },
         "type": "object",

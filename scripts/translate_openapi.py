@@ -38,14 +38,14 @@ def process_openapi_spec(base_spec_path, output_dir, languages):
                 for schema_name, schema_def in spec_copy['components']['schemas'].items():
                     if 'properties' in schema_def:
                         for prop_name, prop_def in schema_def['properties'].items():
-                            if lang != 'en' and 'json_schema_extra' in prop_def and 'x-translations' in prop_def['json_schema_extra'] and lang in prop_def['json_schema_extra']['x-translations']:
-                                translations = prop_def['json_schema_extra']['x-translations'][lang]
+                            if lang != 'en' and 'x-translations' in prop_def and lang in prop_def['x-translations']:
+                                translations = prop_def['x-translations'][lang]
                                 if 'description' in translations:
                                     prop_def['description'] = translations['description']
                             
-                            # Clean up our custom field from the final output
-                            if 'json_schema_extra' in prop_def:
-                                del prop_def['json_schema_extra']
+                            # Clean up x-translations from the final output
+                            if 'x-translations' in prop_def:
+                                del prop_def['x-translations']
 
             # Define output path
             output_filename = f"openapi.{lang}.json"
