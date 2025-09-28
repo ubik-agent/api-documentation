@@ -112,6 +112,6 @@
     ]
   },
   "banner": {
-    "content": "UBIK Agent will launch soon, <a href='https://ubik-agent.com/'>join the waitlist to get access!</a>"
+    "content": "UBIK Agent will launch soon, [join the waitlist to get access!](https://ubik-agent.com/)"
   }
 }
