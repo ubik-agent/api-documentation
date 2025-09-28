@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "UBIK Public API",
-  "theme": "maple",
+  "theme": "aspen",
   "logo": {
     "light": "/logo/logo-light.png",
     "dark": "/logo/logo-dark.png"
