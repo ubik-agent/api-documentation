@@ -18,12 +18,9 @@
       "dark": "#0F172A"
     }
   },
-  "fonts": [
-    {
-      "family": "Inter",
-      "source": "google"
-    }
-  ],
+  "fonts": {
+    "family": "Inter"
+  },
   "navigation": {
     "languages": [
       {
