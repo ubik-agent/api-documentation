@@ -304,14 +304,9 @@
               "type": "string",
               "format": "uuid",
               "description": "The unique identifier of the workspace.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique de l'espace de travail."
-                }
-              },
               "title": "Workspace Id"
             },
-            "description": "The unique identifier of the workspace."
+            "description": "L'identifiant unique de l'espace de travail."
           }
         ],
         "responses": {
@@ -789,14 +784,9 @@
               "type": "string",
               "format": "uuid",
               "description": "The unique identifier of the workspace.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique de l'espace de travail."
-                }
-              },
               "title": "Workspace Id"
             },
-            "description": "The unique identifier of the workspace."
+            "description": "L'identifiant unique de l'espace de travail."
           },
           {
             "name": "document_id",
@@ -806,14 +796,9 @@
               "type": "string",
               "format": "uuid",
               "description": "The unique identifier of the document.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique du document."
-                }
-              },
               "title": "Document Id"
             },
-            "description": "The unique identifier of the document."
+            "description": "L'identifiant unique du document."
           }
         ],
         "responses": {
@@ -931,14 +916,9 @@
             "schema": {
               "type": "string",
               "description": "The unique identifier or name of the tool.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique ou le nom de l'outil."
-                }
-              },
               "title": "Tool Id"
             },
-            "description": "The unique identifier or name of the tool."
+            "description": "L'identifiant unique ou le nom de l'outil."
           }
         ],
         "responses": {
@@ -1019,14 +999,9 @@
             "schema": {
               "type": "string",
               "description": "The unique identifier or name of the tool to execute.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique ou le nom de l'outil à exécuter."
-                }
-              },
               "title": "Tool Id"
             },
-            "description": "The unique identifier or name of the tool to execute."
+            "description": "L'identifiant unique ou le nom de l'outil à exécuter."
           }
         ],
         "requestBody": {
@@ -1103,14 +1078,9 @@
             "schema": {
               "type": "string",
               "description": "The unique identifier of the tool execution.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique de l'exécution de l'outil."
-                }
-              },
               "title": "Execution Id"
             },
-            "description": "The unique identifier of the tool execution."
+            "description": "L'identifiant unique de l'exécution de l'outil."
           }
         ],
         "responses": {
@@ -1175,14 +1145,9 @@
             "schema": {
               "type": "string",
               "description": "The unique identifier of the tool execution.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique de l'exécution de l'outil."
-                }
-              },
               "title": "Execution Id"
             },
-            "description": "The unique identifier of the tool execution."
+            "description": "L'identifiant unique de l'exécution de l'outil."
           }
         ],
         "responses": {
@@ -1229,14 +1194,9 @@
             "schema": {
               "type": "string",
               "description": "The unique identifier of the tool execution that is waiting for input.",
-              "x-translations": {
-                "fr": {
-                  "description": "L'identifiant unique de l'exécution de l'outil qui attend une entrée."
-                }
-              },
               "title": "Execution Id"
             },
-            "description": "The unique identifier of the tool execution that is waiting for input."
+            "description": "L'identifiant unique de l'exécution de l'outil qui attend une entrée."
           }
         ],
         "requestBody": {
