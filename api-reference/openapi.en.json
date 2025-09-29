@@ -977,6 +977,85 @@
         }
       }
     },
+    "/tools/{tool_id}/embed-info": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Tools"
+        ],
+        "summary": "Get tool embedding information",
+        "description": "Retrieves the necessary details for embedding a tool's UI, including its schema and allowed domains.",
+        "operationId": "get_public_tool_embed_info_tools__tool_id__embed_info_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier or name of the tool.",
+              "title": "Tool Id"
+            },
+            "description": "The unique identifier or name of the tool."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicToolEmbedInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Authentication"
+        ],
+        "summary": "Get JWT from API Key",
+        "description": "Exchange a valid API Key for a short-lived JWT access token.",
+        "operationId": "create_token_from_api_key_auth_token_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
     "/tools/{tool_id}/execute": {
       "post": {
         "tags": [
@@ -1701,14 +1780,16 @@
             "description": "A brief description of what the tool does."
           },
           "input_schema": {
-            "$ref": "#/components/schemas/ToolInputSchema"
+            "$ref": "#/components/schemas/ToolInputSchema",
+            "description": "The JSON schema defining the inputs for the tool."
           },
           "media_output_keys": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Media Output Keys"
+            "title": "Media Output Keys",
+            "description": "A list of keys in the output that contain media URLs."
           },
           "example_responses": {
             "items": {
@@ -1716,10 +1797,25 @@
               "type": "object"
             },
             "type": "array",
-            "title": "Example Responses"
+            "title": "Example Responses",
+            "description": "A list of example inputs and their corresponding outputs for the tool."
           },
           "pricing_config": {
-            "$ref": "#/components/schemas/ToolPricingConfig"
+            "$ref": "#/components/schemas/ToolPricingConfig",
+            "description": "The pricing configuration for executing the tool."
+          },
+          "ui_location": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ui Location",
+            "description": "Configuration for a custom UI to render for this tool."
           }
         },
         "type": "object",
@@ -1732,6 +1828,90 @@
           "pricing_config"
         ],
         "title": "PublicTool"
+      },
+      "PublicToolEmbedInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "The unique identifier for the tool."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the tool."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "A brief description of what the tool does."
+          },
+          "input_schema": {
+            "$ref": "#/components/schemas/ToolInputSchema",
+            "description": "The JSON schema defining the inputs for the tool."
+          },
+          "media_output_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Media Output Keys",
+            "description": "A list of keys in the output that contain media URLs."
+          },
+          "example_responses": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Example Responses",
+            "description": "A list of example inputs and their corresponding outputs for the tool."
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/ToolPricingConfig",
+            "description": "The pricing configuration for executing the tool."
+          },
+          "ui_location": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ui Location",
+            "description": "Configuration for a custom UI to render for this tool."
+          },
+          "allowed_origins": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Origins",
+            "description": "A list of allowed domains for embedding this tool."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "input_schema",
+          "media_output_keys",
+          "example_responses",
+          "pricing_config",
+          "allowed_origins"
+        ],
+        "title": "PublicToolEmbedInfo"
       },
       "PublicToolExecutionRequest": {
         "properties": {
@@ -2058,6 +2238,24 @@
           "document_count"
         ],
         "title": "PublicWorkspace"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "token_type"
+        ],
+        "title": "Token"
       },
       "ToolInputSchema": {
         "properties": {
