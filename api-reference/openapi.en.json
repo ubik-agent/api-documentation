@@ -303,8 +303,15 @@
             "schema": {
               "type": "string",
               "format": "uuid",
+              "description": "The unique identifier of the workspace.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique de l'espace de travail."
+                }
+              },
               "title": "Workspace Id"
-            }
+            },
+            "description": "The unique identifier of the workspace."
           }
         ],
         "responses": {
@@ -781,8 +788,15 @@
             "schema": {
               "type": "string",
               "format": "uuid",
+              "description": "The unique identifier of the workspace.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique de l'espace de travail."
+                }
+              },
               "title": "Workspace Id"
-            }
+            },
+            "description": "The unique identifier of the workspace."
           },
           {
             "name": "document_id",
@@ -791,8 +805,15 @@
             "schema": {
               "type": "string",
               "format": "uuid",
+              "description": "The unique identifier of the document.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique du document."
+                }
+              },
               "title": "Document Id"
-            }
+            },
+            "description": "The unique identifier of the document."
           }
         ],
         "responses": {
@@ -909,8 +930,15 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "The unique identifier or name of the tool.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique ou le nom de l'outil."
+                }
+              },
               "title": "Tool Id"
-            }
+            },
+            "description": "The unique identifier or name of the tool."
           }
         ],
         "responses": {
@@ -990,8 +1018,15 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "The unique identifier or name of the tool to execute.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique ou le nom de l'outil à exécuter."
+                }
+              },
               "title": "Tool Id"
-            }
+            },
+            "description": "The unique identifier or name of the tool to execute."
           }
         ],
         "requestBody": {
@@ -1067,8 +1102,15 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "The unique identifier of the tool execution.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique de l'exécution de l'outil."
+                }
+              },
               "title": "Execution Id"
-            }
+            },
+            "description": "The unique identifier of the tool execution."
           }
         ],
         "responses": {
@@ -1132,8 +1174,15 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "The unique identifier of the tool execution.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique de l'exécution de l'outil."
+                }
+              },
               "title": "Execution Id"
-            }
+            },
+            "description": "The unique identifier of the tool execution."
           }
         ],
         "responses": {
@@ -1179,8 +1228,15 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "The unique identifier of the tool execution that is waiting for input.",
+              "x-translations": {
+                "fr": {
+                  "description": "L'identifiant unique de l'exécution de l'outil qui attend une entrée."
+                }
+              },
               "title": "Execution Id"
-            }
+            },
+            "description": "The unique identifier of the tool execution that is waiting for input."
           }
         ],
         "requestBody": {
@@ -1286,26 +1342,31 @@
           "crawl_depth": {
             "type": "integer",
             "title": "Crawl Depth",
+            "description": "The maximum depth for crawling links.",
             "default": 2
           },
           "same_domain_only": {
             "type": "boolean",
             "title": "Same Domain Only",
+            "description": "Whether to only crawl links on the same domain.",
             "default": true
           },
           "limit": {
             "type": "integer",
             "title": "Limit",
+            "description": "The maximum number of pages to crawl.",
             "default": 10
           },
           "delay": {
             "type": "number",
             "title": "Delay",
+            "description": "The delay in seconds between requests.",
             "default": 1.0
           },
           "youtube_download_format": {
             "type": "string",
             "title": "Youtube Download Format",
+            "description": "The format to download YouTube videos in ('audio' or 'video').",
             "default": "audio"
           }
         },
@@ -1905,7 +1966,8 @@
         "properties": {
           "username": {
             "type": "string",
-            "title": "Username"
+            "title": "Username",
+            "description": "The username of the user."
           },
           "full_name": {
             "anyOf": [
@@ -1916,37 +1978,45 @@
                 "type": "null"
               }
             ],
-            "title": "Full Name"
+            "title": "Full Name",
+            "description": "The full name of the user."
           },
           "uuid_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Uuid Id"
+            "title": "Uuid Id",
+            "description": "The unique identifier for the user."
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Created At",
+            "description": "The timestamp when the user account was created."
           },
           "balance": {
             "type": "number",
-            "title": "Balance"
+            "title": "Balance",
+            "description": "The current balance of the user's account."
           },
           "chat_session_count": {
             "type": "integer",
-            "title": "Chat Session Count"
+            "title": "Chat Session Count",
+            "description": "The total number of chat sessions initiated by the user."
           },
           "document_count": {
             "type": "integer",
-            "title": "Document Count"
+            "title": "Document Count",
+            "description": "The total number of documents accessible to the user."
           },
           "workspace_count": {
             "type": "integer",
-            "title": "Workspace Count"
+            "title": "Workspace Count",
+            "description": "The total number of workspaces accessible to the user."
           },
           "assistant_count": {
             "type": "integer",
-            "title": "Assistant Count"
+            "title": "Assistant Count",
+            "description": "The total number of assistants accessible to the user."
           }
         },
         "type": "object",
@@ -2041,14 +2111,16 @@
               "$ref": "#/components/schemas/ToolPropertySchema"
             },
             "type": "object",
-            "title": "Properties"
+            "title": "Properties",
+            "description": "An object defining the properties of the input object."
           },
           "required": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Required"
+            "title": "Required",
+            "description": "A list of property names that are required."
           }
         },
         "type": "object",
@@ -2065,7 +2137,8 @@
                 "type": "null"
               }
             ],
-            "title": "Fixed Cost"
+            "title": "Fixed Cost",
+            "description": "Fixed cost per execution."
           },
           "variable_cost_per_unit": {
             "anyOf": [
@@ -2076,7 +2149,8 @@
                 "type": "null"
               }
             ],
-            "title": "Variable Cost Per Unit"
+            "title": "Variable Cost Per Unit",
+            "description": "Variable cost per unit."
           },
           "unit": {
             "anyOf": [
@@ -2087,7 +2161,8 @@
                 "type": "null"
               }
             ],
-            "title": "Unit"
+            "title": "Unit",
+            "description": "Unit for variable cost (e.g., 'token', 'page', 'minute')."
           }
         },
         "type": "object",
@@ -2097,11 +2172,13 @@
         "properties": {
           "type": {
             "type": "string",
-            "title": "Type"
+            "title": "Type",
+            "description": "The data type of the property (e.g., 'string', 'integer')."
           },
           "description": {
             "type": "string",
-            "title": "Description"
+            "title": "Description",
+            "description": "A description of what the property represents."
           },
           "enum": {
             "anyOf": [
@@ -2115,7 +2192,8 @@
                 "type": "null"
               }
             ],
-            "title": "Enum"
+            "title": "Enum",
+            "description": "A list of possible values if the property is an enumeration."
           }
         },
         "type": "object",
@@ -2162,7 +2240,8 @@
         "properties": {
           "name": {
             "type": "string",
-            "title": "Name"
+            "title": "Name",
+            "description": "The name of the workspace."
           },
           "description": {
             "anyOf": [
@@ -2173,7 +2252,8 @@
                 "type": "null"
               }
             ],
-            "title": "Description"
+            "title": "Description",
+            "description": "A brief description of the workspace's purpose."
           },
           "is_default": {
             "anyOf": [
@@ -2185,6 +2265,7 @@
               }
             ],
             "title": "Is Default",
+            "description": "Indicates if this is the default workspace for the user.",
             "default": false
           }
         },
