@@ -29,6 +29,20 @@ def process_openapi_spec(base_spec_path, output_dir, languages):
                             operation['summary'] = translations.get('summary', operation.get('summary'))
                             operation['description'] = translations.get('description', operation.get('description'))
                         
+                        # Translate parameters (e.g., in path, query)
+                        if 'parameters' in operation:
+                            for param in operation['parameters']:
+                                if 'schema' in param:
+                                    schema = param['schema']
+                                    if lang != 'en' and 'x-translations' in schema and lang in schema['x-translations']:
+                                        translations = schema['x-translations'][lang]
+                                        if 'description' in translations:
+                                            schema['description'] = translations.get('description', schema.get('description'))
+                                    
+                                    # Clean up x-translations from the parameter schema
+                                    if 'x-translations' in schema:
+                                        del schema['x-translations']
+
                         # Clean up x-translations from the final output
                         if 'x-translations' in operation:
                             del operation['x-translations']
