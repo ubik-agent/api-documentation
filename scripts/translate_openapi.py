@@ -37,7 +37,7 @@ def process_openapi_spec(base_spec_path, output_dir, languages):
                                     if lang != 'en' and 'x-translations' in schema and lang in schema['x-translations']:
                                         translations = schema['x-translations'][lang]
                                         if 'description' in translations:
-                                            schema['description'] = translations.get('description', schema.get('description'))
+                                            param['description'] = translations.get('description', param.get('description'))
                                     
                                     # Clean up x-translations from the parameter schema
                                     if 'x-translations' in schema:
