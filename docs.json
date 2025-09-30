@@ -35,9 +35,9 @@
     "languages": [
       {
         "language": "en",
-        "dropdowns": [
+        "tabs": [
           {
-            "dropdown": "Guides",
+            "tab": "Guides",
             "groups": [
               {
                 "group": "Getting Started",
@@ -62,17 +62,17 @@
             ]
           },
           {
-            "dropdown": "API Reference",
+            "tab": "API Reference",
             "groups": [
               {
                 "group": "API Reference",
                 "pages": [
-                  "/en/api-reference/introduction"
+                  "/en/api-reference/introduction",
+                  {
+                    "group": "Endpoints",
+                    "openapi": "api-reference/openapi.en.json"
+                  }
                 ]
-              },
-              {
-                "group": "Endpoints",
-                "openapi": "api-reference/openapi.en.json"
               }
             ]
           }
@@ -80,9 +80,9 @@
       },
       {
         "language": "fr",
-        "dropdowns": [
+        "tabs": [
           {
-            "dropdown": "Guides",
+            "tab": "Guides",
             "groups": [
               {
                 "group": "Pour commencer",
@@ -107,17 +107,17 @@
             ]
           },
           {
-            "dropdown": "Référence API",
+            "tab": "Référence API",
             "groups": [
               {
                 "group": "Référence API",
                 "pages": [
-                  "/fr/api-reference/introduction"
+                  "/fr/api-reference/introduction",
+                  {
+                    "group": "Ressources API",
+                    "openapi": "api-reference/openapi.fr.json"
+                  }
                 ]
-              },
-              {
-                "group": "Points de terminaison",
-                "openapi": "api-reference/openapi.fr.json"
               }
             ]
           }
