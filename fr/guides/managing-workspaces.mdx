@@ -271,6 +271,58 @@ Ce guide vous expliquera un flux de travail courant : créer un nouvel espace de
 
 </Step>
 
+<Step title="Récupérer le Contenu du Document">
+  Une fois qu'un document a été traité avec succès (`status: "completed"`), vous pouvez récupérer son contenu. L'API fournit une représentation Markdown du document, ce qui est utile pour l'envoyer à des LLMs ou pour l'afficher.
+
+  <CodeGroup title="GET /documents/{document_id}">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/documents/VOTRE_ID_DOCUMENT" \
+       -H "X-API-KEY: VOTRE_CLE_API"
+  ```
+  ```python Python
+  import requests
+
+  api_key = "VOTRE_CLE_API"
+  document_id = "VOTRE_ID_DOCUMENT" # Remplacez par l'ID d'un document traité
+  
+  headers = {"X-API-KEY": api_key}
+  
+  response = requests.get(
+      f"https://app.ubik-agent.com/api/v1/documents/{document_id}",
+      headers=headers
+  )
+
+  if response.status_code == 200:
+      document_details = response.json()
+      print(document_details['markdown_content'])
+  else:
+      print(f"Erreur: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const documentId = "VOTRE_ID_DOCUMENT"; // Remplacez par l'ID d'un document traité
+  
+  fetch(`https://app.ubik-agent.com/api/v1/documents/${documentId}`, {
+    method: "GET",
+    headers: { "X-API-KEY": apiKey },
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(documentDetails => {
+      console.log(documentDetails.markdown_content);
+    })
+    .catch(error => console.error("Erreur:", error));
+  ```
+  </CodeGroup>
+
+  La réponse inclura les détails complets du document, y compris le `markdown_content`.
+
+</Step>
+
 </Steps>
 
-Félicitations ! Vous avez correctement créé un espace de travail, y avez ajouté un document et vérifié son contenu. Vous êtes maintenant prêt à gérer l'organisation du contenu dans vos projets UBIK.
+Félicitations ! Vous avez correctement créé un espace de travail, y avez ajouté un document, vérifié son contenu et récupéré son rendu traité. Vous êtes maintenant prêt à gérer l'organisation du contenu dans vos projets UBIK.

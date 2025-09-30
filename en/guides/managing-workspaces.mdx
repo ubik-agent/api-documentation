@@ -268,6 +268,58 @@ This guide will walk you through a common workflow: creating a new workspace, ad
 
 </Step>
 
+<Step title="Retrieve Document Content">
+  Once a document has been successfully processed (`status: "completed"`), you can retrieve its content. The API provides a Markdown representation of the document, which is useful for feeding into LLMs or for display.
+
+  <CodeGroup title="GET /documents/{document_id}">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/documents/YOUR_DOCUMENT_ID" \
+       -H "X-API-KEY: YOUR_API_KEY"
+  ```
+  ```python Python
+  import requests
+
+  api_key = "YOUR_API_KEY"
+  document_id = "YOUR_DOCUMENT_ID" # Replace with a processed document's ID
+  
+  headers = {"X-API-KEY": api_key}
+  
+  response = requests.get(
+      f"https://app.ubik-agent.com/api/v1/documents/{document_id}",
+      headers=headers
+  )
+
+  if response.status_code == 200:
+      document_details = response.json()
+      print(document_details['markdown_content'])
+  else:
+      print(f"Error: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const documentId = "YOUR_DOCUMENT_ID"; // Replace with a processed document's ID
+  
+  fetch(`https://app.ubik-agent.com/api/v1/documents/${documentId}`, {
+    method: "GET",
+    headers: { "X-API-KEY": apiKey },
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(documentDetails => {
+      console.log(documentDetails.markdown_content);
+    })
+    .catch(error => console.error("Error:", error));
+  ```
+  </CodeGroup>
+
+  The response will include the full document details, including the `markdown_content`.
+
+</Step>
+
 </Steps>
 
-Congratulations! You've successfully created a workspace, added a document to it, and verified its content. You're now equipped to manage content organization within your UBIK projects.
+Congratulations! You've successfully created a workspace, added a document, verified its content, and retrieved its processed output. You're now equipped to manage content organization within your UBIK projects.
