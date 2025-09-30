@@ -1899,6 +1899,18 @@
             "type": "array",
             "title": "Allowed Origins",
             "description": "Une liste de domaines autorisés pour l'intégration de cet outil."
+          },
+          "access_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Token",
+            "description": "Un jeton d'accès JWT de courte durée pour authentifier les appels API depuis l'interface utilisateur intégrée."
           }
         },
         "type": "object",

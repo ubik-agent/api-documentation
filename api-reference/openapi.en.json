@@ -1899,6 +1899,18 @@
             "type": "array",
             "title": "Allowed Origins",
             "description": "A list of allowed domains for embedding this tool."
+          },
+          "access_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Token",
+            "description": "A short-lived JWT access token for authenticating API calls from the embedded UI."
           }
         },
         "type": "object",
