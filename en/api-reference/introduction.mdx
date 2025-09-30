@@ -1,33 +1,46 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Get started with the UBIK API.'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+Welcome to the UBIK API Reference. This documentation provides detailed information about all the available endpoints, parameters, and responses.
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+For more goal-oriented tutorials and step-by-step guides, please see our [Guides section](/en/index).
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All requests to the UBIK API must be authenticated. Authentication is handled by providing your secret API key in the `X-API-KEY` header of every request.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+You can find and manage your API keys in the UBIK dashboard under your user settings.
+
+```bash cURL
+-H "X-API-KEY: YOUR_API_KEY"
 ```
+
+<Tip>
+  Keep your API key secure as if it were a password and do not expose it in any client-side code.
+</Tip>
+
+## API Endpoint
+
+The base URL for all API endpoints is:
+
+```
+https://app.ubik-agent.com/api/v1
+```
+
+## Core Resources
+
+The UBIK API is organized around a few core resources:
+
+<CardGroup cols={3}>
+  <Card title="Workspaces" icon="layout-dashboard" href="/en/api-reference/introduction#tag/Public-API-Workspaces">
+    High-level containers for organizing your projects, documents, and tools.
+  </Card>
+  <Card title="Documents" icon="files" href="/en/api-reference/introduction#tag/Public-API-Documents">
+    The raw information you provide, like PDFs, text files, or web pages, which are ingested and processed by UBIK.
+  </Card>
+  <Card title="Tools" icon="wrench" href="/en/api-reference/introduction#tag/Public-API-Tools">
+    Powerful, pre-built functions that perform complex, asynchronous tasks on your documents.
+  </Card>
+</CardGroup>

@@ -1,34 +1,46 @@
 ---
 title: 'Introduction'
-description: 'Section d''exemple pour la présentation des points de terminaison de l''API'
+description: 'Démarrez avec l''API UBIK.'
 ---
 
-<Note>
-Si vous ne souhaitez pas créer de documentation de référence pour l'API, vous pouvez supprimer cette section en supprimant le dossier api-reference.
-</Note>
+Bienvenue dans la Référence API d'UBIK. Cette documentation fournit des informations détaillées sur tous les points de terminaison, paramètres et réponses disponibles.
 
-## Bienvenue
-
-Il existe deux manières de créer une documentation d'API : [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) et les [composants MDX](https://mintlify.com/docs/api-playground/mdx/configuration). Pour ce kit de démarrage, nous utilisons la spécification OpenAPI suivante.
-
-<Card
-  title="Points de terminaison de l'API UBIK"
-  icon="cubes"
-  href="/api-reference/openapi.fr.json"
->
-  Voir le fichier de spécification OpenAPI
-</Card>
+Pour des tutoriels plus orientés objectifs et des guides étape par étape, veuillez consulter notre [section Guides](/fr/index).
 
 ## Authentification
 
-Tous les points de terminaison de l'API sont authentifiés à l'aide de clés d'API (`X-API-KEY`) et sont définis dans le fichier de spécification.
+Toutes les requêtes vers l'API UBIK doivent être authentifiées. L'authentification est gérée en fournissant votre clé d'API secrète dans l'en-tête `X-API-KEY` de chaque requête.
 
-```json
-"securitySchemes": {
-    "APIKeyHeader": {
-    "type": "apiKey",
-    "in": "header",
-    "name": "X-API-KEY"
-    }
-}
+Vous pouvez trouver et gérer vos clés d'API dans le tableau de bord UBIK, dans les paramètres de votre utilisateur.
+
+```bash cURL
+-H "X-API-KEY: VOTRE_CLE_API"
 ```
+
+<Tip>
+  Gardez votre clé d'API en sécurité comme s'il s'agissait d'un mot de passe et ne l'exposez dans aucun code côté client.
+</Tip>
+
+## Point de Terminaison de l'API
+
+L'URL de base pour tous les points de terminaison de l'API est :
+
+```
+https://app.ubik-agent.com/api/v1
+```
+
+## Ressources Principales
+
+L'API UBIK est organisée autour de quelques ressources principales :
+
+<CardGroup cols={3}>
+  <Card title="Espaces de travail" icon="layout-dashboard" href="/fr/api-reference/introduction#tag/Public-API-Workspaces">
+    Conteneurs de haut niveau pour organiser vos projets, documents et outils.
+  </Card>
+  <Card title="Documents" icon="files" href="/fr/api-reference/introduction#tag/Public-API-Documents">
+    Les informations brutes que vous fournissez, comme des PDF, des fichiers texte ou des pages web, qui sont ingérées et traitées par UBIK.
+  </Card>
+  <Card title="Outils" icon="wrench" href="/fr/api-reference/introduction#tag/Public-API-Tools">
+    Fonctions puissantes et pré-construites qui effectuent des tâches complexes et asynchrones sur vos documents.
+  </Card>
+</CardGroup>
