@@ -1001,7 +1001,7 @@
               "description": "The unique identifier or name of the tool.",
               "title": "Tool Id"
             },
-            "description": "The unique identifier or name of the tool."
+            "description": "L'identifiant unique ou le nom de l'outil."
           }
         ],
         "responses": {
