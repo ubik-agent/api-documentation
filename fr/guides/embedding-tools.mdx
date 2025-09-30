@@ -1,0 +1,79 @@
+---
+title: "Guide : Intégrer UBIK avec un iframe"
+description: "Apprenez à intégrer en toute sécurité l'interface utilisateur d'un outil UBIK directement dans votre application web pour une expérience utilisateur transparente."
+---
+
+L'intégration des outils UBIK dans votre propre application offre un moyen puissant d'étendre les capacités de votre produit. Ce guide vous guidera à travers le processus d'intégration sécurisée d'un outil à l'aide d'un `<iframe>`.
+
+## La Sécurité d'Abord : Origines Autorisées
+
+Pour empêcher les domaines non autorisés d'intégrer vos outils, vous devez d'abord configurer une liste d'**Origines Autorisées** pour votre clé API. C'est une étape de sécurité essentielle.
+
+Une "origine" est la combinaison d'un protocole, d'un domaine et d'un port (par exemple, `https://votreapp.com`). Lorsqu'une requête est effectuée depuis un iframe intégré, UBIK vérifiera l'en-tête `Origin` de la requête par rapport à la liste que vous avez configurée pour votre clé API.
+
+Vous pouvez définir les origines autorisées pour vos clés API dans la page des paramètres de votre compte sur le tableau de bord UBIK.
+
+<Card
+  title="Accéder aux paramètres de la clé API"
+  href="https://app.ubik-agent.com/user/api-keys"
+/>
+
+## Étape 1 : Obtenir les Informations d'Intégration (Côté Serveur)
+
+Pour initialiser l'outil intégré en toute sécurité, le backend de votre application doit effectuer un appel de serveur à serveur vers le point de terminaison `GET /tools/{tool_id}/embed-info`. Ce point de terminaison fournit tous les détails nécessaires, y compris un JSON Web Token (JWT) de courte durée qui authentifiera l'iframe.
+
+**Cet appel doit être effectué depuis votre serveur, et non depuis le navigateur de l'utilisateur, pour garder votre clé API en sécurité.**
+
+```bash
+curl -X GET "https://app.ubik-agent.com/api/v1/tools/VOTRE_ID_OUTIL/embed-info" \
+     -H "X-API-KEY: VOTRE_CLE_API" \
+     -H "Origin: https://votreapp.com"
+```
+
+La réponse contiendra les détails de l'outil ainsi qu'un `access_token`.
+
+```json
+{
+  "id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+  "name": "Financial Data Extractor",
+  "input_schema": { ... },
+  // ... autres détails de l'outil
+  "allowed_origins": ["https://votreapp.com"],
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+Votre serveur doit ensuite transmettre cet `access_token` à votre application frontend.
+
+## Étape 2 : Afficher l'Iframe (Côté Client)
+
+Sur votre frontend, vous pouvez maintenant construire l'URL de l'`<iframe>`. L'URL doit pointer vers `https://app.ubik-agent.com/embed/tools/{tool_id}` et inclure l'`access_token` en tant que paramètre d'URL.
+
+Voici un exemple simple en JavaScript pour créer et ajouter l'iframe à votre page :
+
+```javascript
+// Ces données doivent être récupérées depuis votre serveur
+const embedInfo = {
+  toolId: "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+};
+
+// Créer l'élément iframe
+const iframe = document.createElement("iframe");
+
+// Construire l'URL avec le jeton d'accès
+const embedUrl = new URL(`https://app.ubik-agent.com/embed/tools/${embedInfo.toolId}`);
+embedUrl.searchParams.append("authToken", embedInfo.accessToken);
+
+iframe.src = embedUrl.toString();
+iframe.width = "100%";
+iframe.height = "600px";
+iframe.style.border = "none";
+
+// Ajouter l'iframe à un conteneur dans votre document
+document.getElementById("ubik-embed-container").appendChild(iframe);
+```
+
+<Check>
+C'est tout ! L'interface utilisateur de l'outil UBIK s'affichera maintenant dans votre application, entièrement authentifiée et prête à l'emploi.
+</Check>

@@ -1,0 +1,87 @@
+---
+title: "Guide: Managing Content with Workspaces"
+description: "Learn how to organize your documents by creating and managing workspaces using the UBIK API."
+---
+
+This guide will walk you through a common workflow: creating a new workspace, adding a document to it from a URL, and then verifying that the document is correctly associated with the workspace.
+
+## Step 1: Create a New Workspace
+
+First, let's create a new workspace to hold our documents. We'll make a `POST` request to the `/workspaces` endpoint. You can give it a name and a description to keep things organized.
+
+```bash
+curl -X POST "https://app.ubik-agent.com/api/v1/workspaces" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+          "name": "My First Project",
+          "description": "Workspace for my first project using the UBIK API."
+        }'
+```
+
+The API will respond with the details of the newly created workspace, including its unique `id`. Make sure to copy this `id` for the next step.
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "name": "My First Project",
+  "description": "Workspace for my first project using the UBIK API.",
+  "is_default": false,
+  "created_at": "2025-09-29T10:00:00Z",
+  "updated_at": "2025-09-29T10:00:00Z",
+  "document_count": 0
+}
+```
+
+## Step 2: Ingest a Document into the Workspace
+
+Now that we have a workspace, let's add a document to it. We'll use the `/documents` endpoint to ingest content from a URL. We'll also pass the `workspace_ids` form field to associate the new document with the workspace we just created.
+
+Replace `YOUR_WORKSPACE_ID` with the `id` you copied from the previous step.
+
+```bash
+curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -F "urls=https://www.ubik-agent.com/" \
+     -F "workspace_ids=YOUR_WORKSPACE_ID"
+```
+
+The API will respond with an array of document objects that have been created.
+
+## Step 3: Verify the Document in the Workspace
+
+Finally, let's confirm that our document has been successfully added to the workspace. We'll make a `GET` request to the `/workspaces/{workspace_id}/documents` endpoint, using the same workspace ID.
+
+```bash
+curl -X GET "https://app.ubik-agent.com/api/v1/workspaces/YOUR_WORKSPACE_ID/documents" \
+     -H "X-API-KEY: YOUR_API_KEY"
+```
+
+The response will be a paginated list of all documents in that workspace. You should see the document you just ingested.
+
+```json
+{
+  "items": [
+    {
+      "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
+      "name": "UBIK Agent",
+      "file_type": "text/html",
+      "status": "completed",
+      "created_at": "2025-09-29T10:05:00Z",
+      "updated_at": "2025-09-29T10:05:00Z",
+      "processing_pipeline": "default-pipeline",
+      "error_message": null
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 20,
+  "has_more": false
+}
+```
+
+<Check>
+That's it! You've successfully created a workspace, added a document to it, and verified the result.
+</Check>
+
+You are now equipped to manage content organization within your UBIK projects.

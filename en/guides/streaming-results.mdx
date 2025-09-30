@@ -1,0 +1,102 @@
+---
+title: "Guide: Getting Real-Time Results with SSE"
+description: "Learn how to stream events in real-time from a tool execution using Server-Sent Events (SSE)."
+---
+
+Polling for results is effective, but for a more responsive, real-time experience, you can stream events directly from a running tool. This guide shows you how to connect to a tool's event stream using Server-Sent Events (SSE).
+
+This guide assumes you have already started a tool execution as shown in the [Executing Your First Tool](/en/guides/executing-tools) guide.
+
+## Step 1: Start a Tool Execution
+
+First, execute a tool as you normally would. The initial response will contain a `stream_url`, which is the endpoint we'll use to receive live events.
+
+```json
+{
+  "execution_id": "exec_123456789",
+  "status": "pending",
+  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+  "details_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789",
+  "stream_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
+}
+```
+
+## Step 2: Connect to the Event Stream
+
+You can connect to the `stream_url` using any SSE-compatible client. The connection will stay open, and the server will push events to you as they happen.
+
+Here is an example using `curl`. Note the `-N` flag, which disables buffering, allowing you to see events as soon as they arrive.
+
+```bash
+curl -N -X GET "https://app.ubik-agent.com/api/v1/tool-executions/YOUR_EXECUTION_ID/stream" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Accept: text/event-stream"
+```
+
+## Step 3: Handle the Events
+
+As the tool executes, the server will send a stream of events. Each event has a name (`event`) and a payload (`data`). Here are some common events you might receive:
+
+- `execution_status_update`: Sent when the overall status of the execution changes (e.g., from `pending` to `running`).
+- `tool_step_start`: Indicates the beginning of a specific step within the tool.
+- `tool_step_end`: Indicates the completion of a step.
+- `tool_log`: Provides a log message from the tool.
+- `execution_result`: The final event, containing the complete output of the tool.
+
+Here is an example of what the raw event stream might look like:
+
+```
+event: execution_status_update
+data: {"status": "running"}
+
+event: tool_step_start
+data: {"step_name": "Fetching financial data"}
+
+event: tool_log
+data: {"message": "Connected to data provider."}
+
+event: tool_step_end
+data: {"step_name": "Fetching financial data", "result": "Success"}
+
+event: execution_result
+data: {"outputs": {"revenue": 1000000, "profit": 250000}}
+```
+
+## Example: JavaScript Client
+
+In a web application, you can use the native `EventSource` API to easily handle SSE.
+
+```javascript
+const eventSource = new EventSource(
+  "https://app.ubik-agent.com/api/v1/tool-executions/YOUR_EXECUTION_ID/stream",
+  {
+    headers: {
+      "X-API-KEY": "YOUR_API_KEY",
+    },
+  }
+);
+
+eventSource.onopen = () => {
+  console.log("Connection to stream opened.");
+};
+
+eventSource.addEventListener("tool_log", (event) => {
+  const logData = JSON.parse(event.data);
+  console.log("Tool Log:", logData.message);
+});
+
+eventSource.addEventListener("execution_result", (event) => {
+  const resultData = JSON.parse(event.data);
+  console.log("Final Result:", resultData.outputs);
+  eventSource.close(); // Close the connection once we have the result
+});
+
+eventSource.onerror = (error) => {
+  console.error("EventSource failed:", error);
+  eventSource.close();
+};
+```
+
+<Check>
+You now know how to get real-time feedback from your tool executions, enabling you to build dynamic and responsive applications.
+</Check>

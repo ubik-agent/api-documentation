@@ -1,25 +1,59 @@
 ---
 title: "Quickstart"
-description: "Follow this guide to get started with our API."
+description: "Make your first API call and see UBIK in action in less than 5 minutes."
 ---
 
-## Getting Started
+Welcome to the UBIK API! This guide will walk you through the essential steps to get you up and running. You'll learn how to authenticate and make your first request to retrieve your user details.
 
-This quickstart guide will walk you through the essential steps to make your first API call.
+## 1. Get your API Key
 
-### 1. Get your API Key
+Your API key is your passport to the UBIK ecosystem. You'll need it to authenticate all of your API requests.
 
-You can find your API key in your user settings in the application.
+You can find your API key in your user settings page on the UBIK dashboard.
 
-### 2. Make your first request
+<Card
+  title="Go to API Key Settings"
+  href="https://app.ubik-agent.com/user/api-keys"
+/>
 
-Here is an example of how to make a request to the `/users/me` endpoint to get your user details.
+Keep your API key secure and do not share it publicly.
+
+## 2. Make Your First Request
+
+Let's verify that your API key is working correctly by fetching your user details. We'll use the `/users/me` endpoint, which provides information about the authenticated user.
+
+Open your terminal and run the following command, replacing `YOUR_API_KEY` with the key you just copied.
 
 ```bash
 curl -X GET "https://app.ubik-agent.com/api/v1/users/me" \
      -H "X-API-KEY: YOUR_API_KEY"
 ```
 
-### 3. Next Steps
+## 3. Check Your Response
 
-Now that you've made your first API call, you can explore the rest of our API documentation to learn more about what you can do.
+If everything is correct, you'll receive a `200 OK` response with a JSON object containing your user information. It should look something like this:
+
+```json
+{
+  "username": "testuser",
+  "full_name": "Test User",
+  "uuid_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "created_at": "2025-09-28T12:00:00Z",
+  "balance": 100.0,
+  "chat_session_count": 5,
+  "document_count": 42,
+  "workspace_count": 3,
+  "assistant_count": 2
+}
+```
+
+<Check>
+Congratulations! You've successfully made your first API call.
+</Check>
+
+## Next Steps
+
+You're now ready to explore the full potential of the UBIK API. Here are a few suggestions for what to do next:
+
+- **Core Concepts**: Learn about the fundamental building blocks of our API in the [Development Guide](/en/development).
+- **API Reference**: Dive deep into all available endpoints in the [API Reference](/en/api-reference/introduction).

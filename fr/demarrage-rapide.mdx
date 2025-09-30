@@ -1,25 +1,59 @@
 ---
 title: "Démarrage Rapide"
-description: "Suivez ce guide pour démarrer avec notre API."
+description: "Effectuez votre premier appel API et découvrez UBIK en moins de 5 minutes."
 ---
 
-## Pour commencer
+Bienvenue dans l'API UBIK ! Ce guide vous accompagnera à travers les étapes essentielles pour être rapidement opérationnel. Vous apprendrez à vous authentifier et à effectuer votre première requête pour récupérer les détails de votre utilisateur.
 
-Ce guide de démarrage rapide vous guidera à travers les étapes essentielles pour effectuer votre premier appel API.
+## 1. Obtenez votre clé API
 
-### 1. Obtenez votre clé API
+Votre clé API est votre passeport pour l'écosystème UBIK. Vous en aurez besoin pour authentifier toutes vos requêtes API.
 
-Vous pouvez trouver votre clé API dans les paramètres de votre utilisateur dans l'application.
+Vous pouvez trouver votre clé API sur la page des paramètres de votre compte dans le tableau de bord UBIK.
 
-### 2. Effectuez votre première requête
+<Card
+  title="Accéder aux paramètres de la clé API"
+  href="https://app.ubik-agent.com/user/api-keys"
+/>
 
-Voici un exemple de comment effectuer une requête vers le point de terminaison `/users/me` pour obtenir les détails de votre utilisateur.
+Gardez votre clé API en sécurité et ne la partagez pas publiquement.
+
+## 2. Effectuez Votre Première Requête
+
+Vérifions que votre clé API fonctionne correctement en récupérant les détails de votre utilisateur. Nous utiliserons le point de terminaison `/users/me`, qui fournit des informations sur l'utilisateur authentifié.
+
+Ouvrez votre terminal et exécutez la commande suivante, en remplaçant `VOTRE_CLE_API` par la clé que vous venez de copier.
 
 ```bash
 curl -X GET "https://app.ubik-agent.com/api/v1/users/me" \
      -H "X-API-KEY: VOTRE_CLE_API"
 ```
 
-### 3. Prochaines étapes
+## 3. Vérifiez Votre Réponse
 
-Maintenant que vous avez effectué votre premier appel API, vous pouvez explorer le reste de notre documentation API pour en savoir plus sur ce que vous pouvez faire.
+Si tout est correct, vous recevrez une réponse `200 OK` avec un objet JSON contenant vos informations utilisateur. Cela devrait ressembler à ceci :
+
+```json
+{
+  "username": "testuser",
+  "full_name": "Test User",
+  "uuid_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "created_at": "2025-09-28T12:00:00Z",
+  "balance": 100.0,
+  "chat_session_count": 5,
+  "document_count": 42,
+  "workspace_count": 3,
+  "assistant_count": 2
+}
+```
+
+<Check>
+Félicitations ! Vous avez réussi votre premier appel API.
+</Check>
+
+## Prochaines Étapes
+
+Vous êtes maintenant prêt à explorer tout le potentiel de l'API UBIK. Voici quelques suggestions pour la suite :
+
+- **Concepts Clés**: Découvrez les éléments fondamentaux de notre API dans le [Guide de Développement](/fr/guide-developpement).
+- **Référence API**: Plongez dans tous les points de terminaison disponibles dans la [Référence API](/fr/api-reference/introduction).

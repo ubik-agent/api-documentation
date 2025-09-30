@@ -1,16 +1,36 @@
 ---
-title: "Development Guide"
-description: "Information for developing with our platform."
+title: "Core Concepts"
+description: "Understand the fundamental building blocks of the UBIK API."
 ---
 
-## Local Development
+To make the most of the UBIK API, it's helpful to understand the key concepts that you'll be working with. This guide introduces the core components of our platform.
 
-To set up your local development environment, you will need to have the following installed:
-- Docker
-- Node.js
+## Workspaces
 
-Follow the instructions in the main `README.md` of the project to get the development environment up and running.
+Think of a **Workspace** as a high-level container for your projects. It's the primary way to organize and segregate your data. Each workspace can contain its own set of documents, tools, and assistants.
 
-## Contributing
+- **Organization**: Group related documents for a specific project, team, or customer.
+- **Isolation**: Data within one workspace is kept separate from others, ensuring privacy and control.
+- **Default Workspace**: Every user has a default workspace where new documents are added if no other workspace is specified.
 
-We welcome contributions! Please follow our contribution guidelines when submitting pull requests.
+You can manage your workspaces through the [`/workspaces`](/en/api-reference/introduction#tag/Public-API-Workspaces) endpoints.
+
+## Documents
+
+A **Document** is the fundamental unit of content in UBIK. It represents any piece of data that you ingest into the system, whether it's from a file upload (like a PDF or text file) or a scraped URL.
+
+- **Ingestion**: UBIK can process a wide variety of file types and online content.
+- **Processing**: Once ingested, documents go through a processing pipeline where content is extracted, converted to Markdown, and indexed for retrieval.
+- **Association**: Documents can be associated with one or more workspaces, allowing for flexible content management.
+
+Explore what you can do with documents via the [`/documents`](/en/api-reference/introduction#tag/Public-API-Documents) endpoints.
+
+## Tools
+
+**Tools** are one of the most powerful features of the UBIK API. They are pre-built, specialized agents that can perform complex tasks on your data.
+
+- **Functionality**: A tool can do anything from extracting specific financial data from a report to summarizing a long article.
+- **Asynchronous Execution**: Tools run asynchronously. You start an execution, and the API returns an `execution_id` that you can use to poll for the results.
+- **Extensibility**: The list of available tools is constantly growing, enabling you to add powerful new capabilities to your applications with minimal effort.
+
+Discover and execute tools using the [`/tools`](/en/api-reference/introduction#tag/Public-API-Tools) and [`/tool-executions`](/en/api-reference/introduction#tag/Public-API-Tool-Executions) endpoints.

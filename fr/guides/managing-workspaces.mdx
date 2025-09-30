@@ -1,0 +1,87 @@
+---
+title: "Guide : Gérer le Contenu avec les Espaces de Travail"
+description: "Apprenez à organiser vos documents en créant et en gérant des espaces de travail avec l'API UBIK."
+---
+
+Ce guide vous expliquera un flux de travail courant : créer un nouvel espace de travail, y ajouter un document à partir d'une URL, puis vérifier que le document est correctement associé à l'espace de travail.
+
+## Étape 1 : Créer un Nouvel Espace de Travail
+
+Tout d'abord, créons un nouvel espace de travail pour contenir nos documents. Nous effectuerons une requête `POST` vers le point de terminaison `/workspaces`. Vous pouvez lui donner un nom et une description pour garder les choses organisées.
+
+```bash
+curl -X POST "https://app.ubik-agent.com/api/v1/workspaces" \
+     -H "X-API-KEY: VOTRE_CLE_API" \
+     -H "Content-Type: application/json" \
+     -d '{
+          "name": "Mon Premier Projet",
+          "description": "Espace de travail pour mon premier projet avec l'API UBIK."
+        }'
+```
+
+L'API répondra avec les détails de l'espace de travail nouvellement créé, y compris son `id` unique. Assurez-vous de copier cet `id` pour l'étape suivante.
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "name": "Mon Premier Projet",
+  "description": "Espace de travail pour mon premier projet avec l'API UBIK.",
+  "is_default": false,
+  "created_at": "2025-09-29T10:00:00Z",
+  "updated_at": "2025-09-29T10:00:00Z",
+  "document_count": 0
+}
+```
+
+## Étape 2 : Ingérer un Document dans l'Espace de Travail
+
+Maintenant que nous avons un espace de travail, ajoutons-y un document. Nous utiliserons le point de terminaison `/documents` pour ingérer du contenu à partir d'une URL. Nous transmettrons également le champ de formulaire `workspace_ids` pour associer le nouveau document à l'espace de travail que nous venons de créer.
+
+Remplacez `VOTRE_ID_ESPACE_DE_TRAVAIL` par l'`id` que vous avez copié à l'étape précédente.
+
+```bash
+curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
+     -H "X-API-KEY: VOTRE_CLE_API" \
+     -F "urls=https://www.ubik-agent.com/" \
+     -F "workspace_ids=VOTRE_ID_ESPACE_DE_TRAVAIL"
+```
+
+L'API répondra avec un tableau d'objets document qui ont été créés.
+
+## Étape 3 : Vérifier le Document dans l'Espace de Travail
+
+Enfin, confirmons que notre document a été ajouté avec succès à l'espace de travail. Nous effectuerons une requête `GET` vers le point de terminaison `/workspaces/{workspace_id}/documents`, en utilisant le même ID d'espace de travail.
+
+```bash
+curl -X GET "https://app.ubik-agent.com/api/v1/workspaces/VOTRE_ID_ESPACE_DE_TRAVAIL/documents" \
+     -H "X-API-KEY: VOTRE_CLE_API"
+```
+
+La réponse sera une liste paginée de tous les documents de cet espace de travail. Vous devriez y voir le document que vous venez d'ingérer.
+
+```json
+{
+  "items": [
+    {
+      "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
+      "name": "UBIK Agent",
+      "file_type": "text/html",
+      "status": "completed",
+      "created_at": "2025-09-29T10:05:00Z",
+      "updated_at": "2025-09-29T10:05:00Z",
+      "processing_pipeline": "default-pipeline",
+      "error_message": null
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 20,
+  "has_more": false
+}
+```
+
+<Check>
+C'est tout ! Vous avez créé avec succès un espace de travail, y avez ajouté un document et vérifié le résultat.
+</Check>
+
+Vous êtes maintenant équipé pour gérer l'organisation du contenu au sein de vos projets UBIK.

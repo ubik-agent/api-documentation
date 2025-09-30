@@ -1,0 +1,99 @@
+---
+title: "Guide: Executing Your First Tool"
+description: "Learn how to discover, execute, and retrieve results from UBIK's powerful asynchronous tools."
+---
+
+This guide demonstrates how to leverage UBIK's tools to perform complex tasks. You will learn how to list available tools, execute one with the required inputs, and then poll for the execution results.
+
+## Step 1: Discover Available Tools
+
+First, let's see what tools are available. We can get a list of all tools accessible to us by making a `GET` request to the `/tools` endpoint.
+
+```bash
+curl -X GET "https://app.ubik-agent.com/api/v1/tools" \
+     -H "X-API-KEY: YOUR_API_KEY"
+```
+
+The response will be a paginated list of tools. For this guide, let's assume we want to use a tool named "Financial Data Extractor". Copy its `id` from the response.
+
+```json
+{
+  "items": [
+    {
+      "id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+      "name": "Financial Data Extractor",
+      "description": "Extracts key financial metrics from annual reports."
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 20,
+  "has_more": false
+}
+```
+
+## Step 2: Asynchronously Execute the Tool
+
+Tools in UBIK run asynchronously. You start a job by making a `POST` request to the `/tools/{tool_id}/execute` endpoint, providing the necessary `inputs`. This allows you to fire off a long-running task without blocking your application.
+
+Replace `YOUR_TOOL_ID` with the `id` you copied.
+
+```bash
+curl -X POST "https://app.ubik-agent.com/api/v1/tools/YOUR_TOOL_ID/execute" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+          "inputs": {
+            "stock_symbol": "ACME",
+            "report_year": 2023
+          }
+        }'
+```
+
+The API will immediately respond with a `202 Accepted` status code. The response body will contain an `execution_id` and a `details_url` that you can use to check the status and get the result later.
+
+```json
+{
+  "execution_id": "exec_123456789",
+  "status": "pending",
+  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+  "details_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789",
+  "stream_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
+}
+```
+
+## Step 3: Poll for the Results
+
+Now that the tool is running, you can periodically check the `details_url` (or make a `GET` request to `/tool-executions/{execution_id}`) to get the final result.
+
+Replace `YOUR_EXECUTION_ID` with the `execution_id` from the previous step.
+
+```bash
+curl -X GET "https://app.ubik-agent.com/api/v1/tool-executions/YOUR_EXECUTION_ID" \
+     -H "X-API-KEY: YOUR_API_KEY"
+```
+
+Initially, the `status` might be `running`. Once the execution is finished, the status will change to `completed` and the `outputs` field will be populated with the result.
+
+```json
+{
+  "id": "exec_123456789",
+  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+  "status": "completed",
+  "inputs": {
+    "stock_symbol": "ACME",
+    "report_year": 2023
+  },
+  "outputs": {
+    "revenue": 1000000,
+    "profit": 250000
+  },
+  "created_at": "2025-09-29T12:00:00Z",
+  "started_at": "2025-09-29T12:00:01Z",
+  "completed_at": "2025-09-29T12:00:05Z"
+}
+```
+
+<Check>
+Success! You've just executed your first tool and retrieved its result.
+</Check>

@@ -1,0 +1,102 @@
+---
+title: "Guide : Obtenir des Résultats en Temps Réel avec SSE"
+description: "Apprenez à streamer des événements en temps réel depuis une exécution d'outil en utilisant les Server-Sent Events (SSE)."
+---
+
+L'interrogation des résultats est efficace, mais pour une expérience plus réactive et en temps réel, vous pouvez streamer les événements directement depuis un outil en cours d'exécution. Ce guide montre comment se connecter au flux d'événements d'un outil en utilisant les Server-Sent Events (SSE).
+
+Ce guide suppose que vous avez déjà lancé une exécution d'outil comme indiqué dans le guide [Exécuter Votre Premier Outil](/fr/guides/executing-tools).
+
+## Étape 1 : Lancer une Exécution d'Outil
+
+Tout d'abord, exécutez un outil comme vous le feriez normalement. La réponse initiale contiendra une `stream_url`, qui est le point de terminaison que nous utiliserons pour recevoir les événements en direct.
+
+```json
+{
+  "execution_id": "exec_123456789",
+  "status": "pending",
+  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+  "details_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789",
+  "stream_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
+}
+```
+
+## Étape 2 : Se Connecter au Flux d'Événements
+
+Vous pouvez vous connecter à la `stream_url` en utilisant n'importe quel client compatible SSE. La connexion restera ouverte et le serveur vous enverra des événements au fur et à mesure qu'ils se produisent.
+
+Voici un exemple avec `curl`. Notez l'option `-N`, qui désactive la mise en mémoire tampon, vous permettant de voir les événements dès leur arrivée.
+
+```bash
+curl -N -X GET "https://app.ubik-agent.com/api/v1/tool-executions/VOTRE_ID_EXECUTION/stream" \
+     -H "X-API-KEY: VOTRE_CLE_API" \
+     -H "Accept: text/event-stream"
+```
+
+## Étape 3 : Gérer les Événements
+
+Pendant l'exécution de l'outil, le serveur enverra un flux d'événements. Chaque événement a un nom (`event`) et une charge utile (`data`). Voici quelques événements courants que vous pourriez recevoir :
+
+- `execution_status_update` : Envoyé lorsque le statut global de l'exécution change (par exemple, de `pending` à `running`).
+- `tool_step_start` : Indique le début d'une étape spécifique au sein de l'outil.
+- `tool_step_end` : Indique la fin d'une étape.
+- `tool_log` : Fournit un message de log de l'outil.
+- `execution_result` : L'événement final, contenant le résultat complet de l'outil.
+
+Voici un exemple de ce à quoi le flux d'événements brut pourrait ressembler :
+
+```
+event: execution_status_update
+data: {"status": "running"}
+
+event: tool_step_start
+data: {"step_name": "Fetching financial data"}
+
+event: tool_log
+data: {"message": "Connected to data provider."}
+
+event: tool_step_end
+data: {"step_name": "Fetching financial data", "result": "Success"}
+
+event: execution_result
+data: {"outputs": {"revenue": 1000000, "profit": 250000}}
+```
+
+## Exemple : Client JavaScript
+
+Dans une application web, vous pouvez utiliser l'API native `EventSource` pour gérer facilement les SSE.
+
+```javascript
+const eventSource = new EventSource(
+  "https://app.ubik-agent.com/api/v1/tool-executions/VOTRE_ID_EXECUTION/stream",
+  {
+    headers: {
+      "X-API-KEY": "VOTRE_CLE_API",
+    },
+  }
+);
+
+eventSource.onopen = () => {
+  console.log("Connexion au flux ouverte.");
+};
+
+eventSource.addEventListener("tool_log", (event) => {
+  const logData = JSON.parse(event.data);
+  console.log("Log de l'outil :", logData.message);
+});
+
+eventSource.addEventListener("execution_result", (event) => {
+  const resultData = JSON.parse(event.data);
+  console.log("Résultat final :", resultData.outputs);
+  eventSource.close(); // Fermer la connexion une fois le résultat obtenu
+});
+
+eventSource.onerror = (error) => {
+  console.error("Erreur EventSource :", error);
+  eventSource.close();
+};
+```
+
+<Check>
+Vous savez maintenant comment obtenir un retour en temps réel de vos exécutions d'outils, ce qui vous permet de créer des applications dynamiques et réactives.
+</Check>

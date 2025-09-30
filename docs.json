@@ -44,7 +44,19 @@
                 "pages": [
                   "/en/index",
                   "/en/quickstart",
-                  "/en/development"
+                  {
+                    "page": "/en/development",
+                    "title": "Core Concepts"
+                  }
+                ]
+              },
+              {
+                "group": "Step-by-Step Guides",
+                "pages": [
+                  "/en/guides/managing-workspaces",
+                  "/en/guides/executing-tools",
+                  "/en/guides/streaming-results",
+                  "/en/guides/embedding-tools"
                 ]
               }
             ]
@@ -77,7 +89,19 @@
                 "pages": [
                   "/fr/index",
                   "/fr/demarrage-rapide",
-                  "/fr/guide-developpement"
+                  {
+                    "page": "/fr/guide-developpement",
+                    "title": "Concepts Clés"
+                  }
+                ]
+              },
+              {
+                "group": "Guides Pas-à-Pas",
+                "pages": [
+                  "/fr/guides/managing-workspaces",
+                  "/fr/guides/executing-tools",
+                  "/fr/guides/streaming-results",
+                  "/fr/guides/embedding-tools"
                 ]
               }
             ]
