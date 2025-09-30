@@ -77,59 +77,144 @@ This guide will walk you through a common workflow: creating a new workspace, ad
   ```
 </Step>
 
-<Step title="Add a Document via URL">
-  Now, let's add a document to our new workspace. We'll use the `/documents` endpoint to ingest a document from a URL. We'll pass the `workspace_ids` in the form data to associate it with the workspace we just created.
+<Step title="Add a Document to the Workspace">
+  Now that we have a workspace, let's add a document to it. You can ingest content from a URL or by uploading a file directly. By passing the `workspace_ids` in the request, the new document will automatically be associated with our newly created workspace.
 
-  <CodeGroup title="POST /documents">
+  <CodeGroup title="POST /documents (from URL)">
   ```bash cURL
   curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
        -H "X-API-KEY: YOUR_API_KEY" \
-       -F "urls=https://www.orimi.com/pdf-test.pdf" \
+       -F "urls=https://www.ubik-agent.com/" \
        -F "workspace_ids=YOUR_WORKSPACE_ID"
   ```
   ```python Python
   import requests
 
   api_key = "YOUR_API_KEY"
-  workspace_id = "YOUR_WORKSPACE_ID"
-  headers = {
-      "X-API-KEY": api_key,
-  }
+  workspace_id = "YOUR_WORKSPACE_ID" # Replace with the ID from Step 1
+
+  headers = {"X-API-KEY": api_key}
   data = {
-      "urls": "https://www.orimi.com/pdf-test.pdf",
+      "urls": "https://www.ubik-agent.com/",
       "workspace_ids": workspace_id
   }
+
   response = requests.post(
       "https://app.ubik-agent.com/api/v1/documents",
       headers=headers,
       data=data
   )
-  print(response.json())
+
+  if response.status_code == 200:
+      documents = response.json()
+      print("Document being processed:", documents[0]['id'])
+  else:
+      print(f"Error: {response.status_code}", response.text)
   ```
   ```javascript JavaScript
   const apiKey = "YOUR_API_KEY";
-  const workspaceId = "YOUR_WORKSPACE_ID";
-  const headers = {
-    "X-API-KEY": apiKey,
-  };
-  const formData = new FormData();
-  formData.append("urls", "https://www.orimi.com/pdf-test.pdf");
-  formData.append("workspace_ids", workspaceId);
+  const workspaceId = "YOUR_WORKSPACE_ID"; // Replace with the ID from Step 1
+  const url = "https://app.ubik-agent.com/api/v1/documents";
 
-  fetch("https://app.ubik-agent.com/api/v1/documents", {
-    method: "POST",
-    headers: headers,
-    body: formData,
+  const formData = new FormData();
+  formData.append('urls', 'https://www.ubik-agent.com/');
+  formData.append('workspace_ids', workspaceId);
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-API-KEY': apiKey
+    },
+    body: formData
   })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error("Error:", error));
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(documents => {
+    console.log('Document being processed:', documents[0].id);
+  })
+  .catch(error => console.error('Error:', error));
   ```
   </CodeGroup>
+
+  <CodeGroup title="POST /documents (from file)">
+  ```bash cURL
+  curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
+       -H "X-API-KEY: YOUR_API_KEY" \
+       -F "files=@/path/to/your/file.pdf" \
+       -F "workspace_ids=YOUR_WORKSPACE_ID"
+  ```
+  ```python Python
+  import requests
+
+  api_key = "YOUR_API_KEY"
+  workspace_id = "YOUR_WORKSPACE_ID" # Replace with the ID from Step 1
+  file_path = "/path/to/your/file.pdf"
+
+  headers = {"X-API-KEY": api_key}
+  data = {"workspace_ids": workspace_id}
+  
+  with open(file_path, "rb") as f:
+    files = {"files": (file_path, f)}
+    response = requests.post(
+        "https://app.ubik-agent.com/api/v1/documents",
+        headers=headers,
+        data=data,
+        files=files
+    )
+
+  if response.status_code == 200:
+      documents = response.json()
+      print("Document being processed:", documents[0]['id'])
+  else:
+      print(f"Error: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const workspaceId = "YOUR_WORKSPACE_ID"; // Replace with the ID from Step 1
+  const url = "https://app.ubik-agent.com/api/v1/documents";
+
+  // This example assumes you have a File object.
+  // In a browser, you might get this from an <input type="file"> element.
+  const myFile = new File(["This is the file content."], "example.txt", {
+    type: "text/plain",
+  });
+
+  const formData = new FormData();
+  formData.append('files', myFile);
+  formData.append('workspace_ids', workspaceId);
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-API-KEY': apiKey
+    },
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(documents => {
+    console.log('Document being processed:', documents[0].id);
+  })
+  .catch(error => console.error('Error:', error));
+  ```
+  </CodeGroup>
+
+  <Note>
+    Document processing is asynchronous. The API will respond immediately with the document details and its status (`pending` or `processing`). You can poll the document endpoint to check when the status changes to `completed`.
+  </Note>
+
 </Step>
 
-<Step title="Verify the Document">
-  Finally, let's confirm that the document was added to the workspace. We can list the documents in the workspace by making a `GET` request to the `/workspaces/{workspace_id}/documents` endpoint.
+<Step title="Verify Workspace Content">
+  Finally, let's confirm our document has been successfully added to the workspace. We'll make a `GET` request to the `/workspaces/{workspace_id}/documents` endpoint.
 
   <CodeGroup title="GET /workspaces/{workspace_id}/documents">
   ```bash cURL
@@ -148,7 +233,12 @@ This guide will walk you through a common workflow: creating a new workspace, ad
       f"https://app.ubik-agent.com/api/v1/workspaces/{workspace_id}/documents",
       headers=headers
   )
-  print(response.json())
+
+  if response.status_code == 200:
+      workspace_docs = response.json()
+      print(workspace_docs)
+  else:
+      print(f"Error: {response.status_code}", response.text)
   ```
   ```javascript JavaScript
   const apiKey = "YOUR_API_KEY";
@@ -161,34 +251,23 @@ This guide will walk you through a common workflow: creating a new workspace, ad
     method: "GET",
     headers: headers,
   })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((workspaceDocs) => {
+      console.log(workspaceDocs);
+    })
     .catch((error) => console.error("Error:", error));
   ```
   </CodeGroup>
 
-  You should see the document you added in the response.
+  The response will confirm that the document we added in Step 2 is now listed within this workspace.
 
-  ```json Response
-  {
-    "items": [
-      {
-        "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
-        "name": "pdf-test.pdf",
-        "file_type": "application/pdf",
-        "status": "completed",
-        "created_at": "2025-09-28T14:05:00Z",
-        "updated_at": "2025-09-28T14:05:00Z",
-        "processing_pipeline": "default-pipeline",
-        "error_message": null
-      }
-    ],
-    "total": 1,
-    "page": 1,
-    "limit": 20,
-    "has_more": false
-  }
-  ```
 </Step>
 
 </Steps>
+
+Congratulations! You've successfully created a workspace, added a document to it, and verified its content. You're now equipped to manage content organization within your UBIK projects.
