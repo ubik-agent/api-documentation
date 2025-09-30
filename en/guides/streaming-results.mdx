@@ -7,96 +7,119 @@ Polling for results is effective, but for a more responsive, real-time experienc
 
 This guide assumes you have already started a tool execution as shown in the [Executing Your First Tool](/en/guides/executing-tools) guide.
 
-## Step 1: Start a Tool Execution
+<Steps>
 
-First, execute a tool as you normally would. The initial response will contain a `stream_url`, which is the endpoint we'll use to receive live events.
+<Step title="Start a Tool Execution">
+  First, execute a tool as you normally would. The initial `202 Accepted` response will contain a `stream_url`. This is the endpoint we'll use to receive live events.
 
-```json
-{
-  "execution_id": "exec_123456789",
-  "status": "pending",
-  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
-  "details_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789",
-  "stream_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
-}
-```
-
-## Step 2: Connect to the Event Stream
-
-You can connect to the `stream_url` using any SSE-compatible client. The connection will stay open, and the server will push events to you as they happen.
-
-Here is an example using `curl`. Note the `-N` flag, which disables buffering, allowing you to see events as soon as they arrive.
-
-```bash
-curl -N -X GET "https://app.ubik-agent.com/api/v1/tool-executions/YOUR_EXECUTION_ID/stream" \
-     -H "X-API-KEY: YOUR_API_KEY" \
-     -H "Accept: text/event-stream"
-```
-
-## Step 3: Handle the Events
-
-As the tool executes, the server will send a stream of events. Each event has a name (`event`) and a payload (`data`). Here are some common events you might receive:
-
-- `execution_status_update`: Sent when the overall status of the execution changes (e.g., from `pending` to `running`).
-- `tool_step_start`: Indicates the beginning of a specific step within the tool.
-- `tool_step_end`: Indicates the completion of a step.
-- `tool_log`: Provides a log message from the tool.
-- `execution_result`: The final event, containing the complete output of the tool.
-
-Here is an example of what the raw event stream might look like:
-
-```
-event: execution_status_update
-data: {"status": "running"}
-
-event: tool_step_start
-data: {"step_name": "Fetching financial data"}
-
-event: tool_log
-data: {"message": "Connected to data provider."}
-
-event: tool_step_end
-data: {"step_name": "Fetching financial data", "result": "Success"}
-
-event: execution_result
-data: {"outputs": {"revenue": 1000000, "profit": 250000}}
-```
-
-## Example: JavaScript Client
-
-In a web application, you can use the native `EventSource` API to easily handle SSE.
-
-```javascript
-const eventSource = new EventSource(
-  "https://app.ubik-agent.com/api/v1/tool-executions/YOUR_EXECUTION_ID/stream",
+  ```json Response
   {
-    headers: {
-      "X-API-KEY": "YOUR_API_KEY",
-    },
+    "execution_id": "exec_123456789",
+    "status": "pending",
+    "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
+    "details_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789",
+    "stream_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
   }
-);
+  ```
+  
+  Copy the `stream_url` for the next step.
+</Step>
 
-eventSource.onopen = () => {
-  console.log("Connection to stream opened.");
-};
+<Step title="Connect to the Event Stream">
+  Now, you can connect to the `stream_url` using any SSE-compatible client. The connection will remain open, and the server will push events as they happen.
 
-eventSource.addEventListener("tool_log", (event) => {
-  const logData = JSON.parse(event.data);
-  console.log("Tool Log:", logData.message);
-});
+  <CodeGroup title="GET /tool-executions/{execution_id}/stream">
+  ```bash cURL
+  # Use the -N flag to disable buffering
+  curl -X GET "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream" \
+       -H "X-API-KEY: YOUR_API_KEY" \
+       -N
+  ```
+  ```python Python
+  import requests
+  import json
 
-eventSource.addEventListener("execution_result", (event) => {
-  const resultData = JSON.parse(event.data);
-  console.log("Final Result:", resultData.outputs);
-  eventSource.close(); // Close the connection once we have the result
-});
+  api_key = "YOUR_API_KEY"
+  stream_url = "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
+  
+  headers = {"X-API-KEY": api_key, "Accept": "text/event-stream"}
 
-eventSource.onerror = (error) => {
-  console.error("EventSource failed:", error);
-  eventSource.close();
-};
-```
+  with requests.get(stream_url, headers=headers, stream=True) as response:
+      if response.status_code == 200:
+          for line in response.iter_lines():
+              if line:
+                  decoded_line = line.decode('utf-8')
+                  if decoded_line.startswith('data:'):
+                      try:
+                          # Extract the JSON part of the message
+                          json_data = decoded_line[5:].strip()
+                          event_payload = json.loads(json_data)
+                          print("Received event:", event_payload)
+                          
+                          # Check for the end of the stream
+                          if event_payload.get("event_type") == "final_result":
+                              print("Stream finished.")
+                              break
+                      except json.JSONDecodeError:
+                          print(f"Could not decode line: {decoded_line}")
+      else:
+          print(f"Error connecting to stream: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const streamUrl = "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream";
 
-<Check>
-You now know how to get real-time feedback from your tool executions, enabling you to build dynamic and responsive applications.
-</Check>
+  const eventSource = new EventSource(`${streamUrl}?api_key=${apiKey}`);
+
+  eventSource.onopen = () => {
+    console.log("Connection to event stream opened.");
+  };
+
+  eventSource.onmessage = (event) => {
+    const eventPayload = JSON.parse(event.data);
+    console.log("Received event:", eventPayload);
+
+    if (eventPayload.event_type === "final_result") {
+      console.log("Stream finished. Closing connection.");
+      eventSource.close();
+    }
+  };
+
+  eventSource.onerror = (error) => {
+    console.error("EventSource failed:", error);
+    eventSource.close();
+  };
+  ```
+  </CodeGroup>
+  
+  <Note>
+  In the JavaScript `EventSource` example, we pass the API key as a query parameter. Our server is configured to accept the API key from either the `X-API-KEY` header or a query parameter named `api_key` for SSE connections, as `EventSource` does not support custom headers.
+  </Note>
+
+</Step>
+
+<Step title="Understanding the Events">
+  As the tool executes, you will receive a series of JSON objects. Each object contains an `event_type` and a `data` payload. Here are the main event types:
+
+  - **`tool_update`**: A general progress update. The `data` payload often contains `phase` and `message` fields to describe the current state.
+  - **`tool_partial_update`**: A chunk of streaming content. The `data` payload contains a `content` field with the text.
+  - **`final_result`**: The final event of a successful execution, containing the complete `outputs` in the `data` payload.
+  - **`tool_input_required`**: Sent when an interactive tool needs user input.
+  - **`error`**: Indicates that an error occurred during execution.
+
+  ```json Example Event Stream
+  data: {"event_type": "tool_update", "data": {"phase": "retrieval", "message": "Fetching relevant documents..."}}
+
+  data: {"event_type": "tool_update", "data": {"phase": "generation", "message": "Generating response..."}}
+
+  data: {"event_type": "tool_partial_update", "data": {"content": "The financial results show..."}}
+
+  data: {"event_type": "tool_partial_update", "data": {"content": " a significant increase in revenue."}}
+
+  data: {"event_type": "final_result", "data": {"outputs": {"response": "The financial results show a significant increase in revenue."}}}
+  ```
+</Step>
+
+</Steps>
+
+By using Server-Sent Events, you can build highly interactive and responsive applications that react to long-running processes in real-time.

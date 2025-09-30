@@ -5,75 +5,148 @@ description: "Learn how to securely embed a UBIK tool's UI directly into your we
 
 Embedding UBIK tools into your own application provides a powerful way to extend your product's capabilities. This guide will walk you through the process of securely embedding a tool using an `<iframe>`.
 
-## Security First: Allowed Origins
+<Steps>
 
-To prevent unauthorized domains from embedding your tools, you must first configure a list of **Allowed Origins** for your API key. This is a critical security step.
+<Step title="Configure Allowed Origins">
+  To prevent unauthorized domains from embedding your tools, you must first configure a list of **Allowed Origins** for your API key. This is a critical security step. An "origin" is the combination of a protocol, domain, and port (e.g., `https://yourapp.com`).
 
-An "origin" is the combination of a protocol, domain, and port (e.g., `https://yourapp.com`). When a request is made from an embedded iframe, UBIK will check the request's `Origin` header against the list you've configured for your API key.
+  You can set the allowed origins for your API keys in the user settings page on the UBIK dashboard.
 
-You can set the allowed origins for your API keys in the user settings page on the UBIK dashboard.
+  <Card
+    title="Go to API Key Settings"
+    icon="key"
+    href="https://app.ubik-agent.com/user/api-keys"
+  />
 
-<Card
-  title="Go to API Key Settings"
-  href="https://app.ubik-agent.com/user/api-keys"
-/>
+  <Note>
+  For local development, you can add origins like `http://localhost:3000`. For production, ensure you only add the domains where your application is hosted.
+  </Note>
+</Step>
 
-## Step 1: Get Embedding Information (Server-Side)
+<Step title="Fetch Embedding Information">
+  Before you can render the `<iframe>`, your application's frontend needs to fetch the embedding details from the UBIK API. This is done by making a `GET` request to the `/tools/{tool_id}/embed-info` endpoint.
 
-To securely initialize the embedded tool, your application's backend must make a server-to-server call to the `GET /tools/{tool_id}/embed-info` endpoint. This endpoint provides all the necessary details, including a short-lived JSON Web Token (JWT) that will authenticate the iframe.
+  This endpoint provides two crucial pieces of information:
+  1.  **Tool Details**: The schema, name, description, etc.
+  2.  **Access Token**: A short-lived JSON Web Token (JWT) that the embedded `<iframe>` will use to authenticate itself.
 
-**This call must be made from your server, not from the user's browser, to keep your API key secure.**
+  <CodeGroup title="GET /tools/{tool_id}/embed-info">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/tools/YOUR_TOOL_ID/embed-info" \
+       -H "X-API-KEY: YOUR_API_KEY"
+  ```
+  ```python Python (Server-Side)
+  import requests
 
-```bash
-curl -X GET "https://app.ubik-agent.com/api/v1/tools/YOUR_TOOL_ID/embed-info" \
-     -H "X-API-KEY: YOUR_API_KEY" \
-     -H "Origin: https://yourapp.com"
-```
+  api_key = "YOUR_API_KEY"
+  tool_id = "YOUR_TOOL_ID"
+  
+  headers = {"X-API-KEY": api_key}
+  
+  # This call would typically be made from your server, which then passes
+  # the embed info to your frontend client.
+  response = requests.get(
+      f"https://app.ubik-agent.com/api/v1/tools/{tool_id}/embed-info",
+      headers=headers
+  )
 
-The response will contain the tool's details along with an `access_token`.
+  if response.status_code == 200:
+      embed_info = response.json()
+      print(embed_info)
+      # Pass this info to your frontend
+  else:
+      print(f"Error: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript (Client-Side)
+  // This function would typically call an endpoint on YOUR server, 
+  // which then makes the secure call to the UBIK API with your secret API key.
+  
+  async function fetchEmbedInfoFromServer(toolId) {
+    try {
+      // Example: an endpoint on your own backend
+      const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      const embedInfo = await response.json();
+      console.log(embedInfo);
+      // Use this data to render the iframe
+      return embedInfo;
+    } catch (error) {
+      console.error('Error fetching embed info:', error);
+    }
+  }
+  ```
+  </CodeGroup>
+  
+  <Tip icon="shield-check">
+    **Security Best Practice**: Your secret UBIK API key should never be exposed in your frontend application. The call to `/embed-info` should be made from your backend server, which can then pass the resulting short-lived `access_token` and tool details to the client.
+  </Tip>
+</Step>
 
-```json
-{
-  "id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
-  "name": "Financial Data Extractor",
-  "input_schema": { ... },
-  // ... other tool details
-  "allowed_origins": ["https://yourapp.com"],
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+<Step title="Render the iframe">
+  Once your frontend has the embedding information, you can construct the `<iframe>` URL and render it. The URL should be in the format: `/embed/tools/{tool_id}`.
 
-Your server should then pass this `access_token` to your frontend application.
+  You will then need to send the `access_token` to the `<iframe>` using `postMessage` once it has loaded.
 
-## Step 2: Render the Iframe (Client-Side)
+  Here is a simplified example using React:
 
-On your frontend, you can now construct the `<iframe>` URL. The URL should point to `https://app.ubik-agent.com/embed/tools/{tool_id}` and include the `access_token` as a URL parameter.
+  ```jsx React Example
+  import React, { useState, useEffect, useRef } from 'react';
 
-Here is a simple JavaScript example of how to create and append the iframe to your page:
+  const EmbeddedTool = ({ toolId }) => {
+    const [embedInfo, setEmbedInfo] = useState(null);
+    const iframeRef = useRef(null);
 
-```javascript
-// This data should be fetched from your server
-const embedInfo = {
-  toolId: "d1e2f3a4-b5c6-7890-1234-567890abcdef",
-  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-};
+    useEffect(() => {
+      // In a real app, this would fetch from your backend
+      const fetchEmbedInfo = async () => {
+        const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
+        const data = await response.json();
+        setEmbedInfo(data);
+      };
 
-// Create the iframe element
-const iframe = document.createElement("iframe");
+      fetchEmbedInfo();
+    }, [toolId]);
 
-// Construct the URL with the access token
-const embedUrl = new URL(`https://app.ubik-agent.com/embed/tools/${embedInfo.toolId}`);
-embedUrl.searchParams.append("authToken", embedInfo.accessToken);
+    const handleIframeLoad = () => {
+      if (iframeRef.current && embedInfo?.access_token) {
+        // The target origin should be the UBIK app's origin
+        const targetOrigin = "https://app.ubik-agent.com";
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: 'UBIK_EMBED_TOKEN',
+            token: embedInfo.access_token,
+          },
+          targetOrigin
+        );
+      }
+    };
 
-iframe.src = embedUrl.toString();
-iframe.width = "100%";
-iframe.height = "600px";
-iframe.style.border = "none";
+    if (!embedInfo) {
+      return <div>Loading Tool...</div>;
+    }
 
-// Append the iframe to a container in your document
-document.getElementById("ubik-embed-container").appendChild(iframe);
-```
+    const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}`;
 
-<Check>
-That's it! The UBIK tool's UI will now render inside your application, fully authenticated and ready to use.
-</Check>
+    return (
+      <iframe
+        ref={iframeRef}
+        src={iframeSrc}
+        onLoad={handleIframeLoad}
+        title={embedInfo.name}
+        width="100%"
+        height="600px"
+        frameBorder="0"
+      />
+    );
+  };
+
+  export default EmbeddedTool;
+  ```
+
+</Step>
+
+</Steps>
+
+By following these steps, you can securely embed UBIK's powerful tools directly into your application, creating a seamless and integrated experience for your users.

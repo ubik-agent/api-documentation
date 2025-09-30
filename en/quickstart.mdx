@@ -3,57 +3,91 @@ title: "Quickstart"
 description: "Make your first API call and see UBIK in action in less than 5 minutes."
 ---
 
-Welcome to the UBIK API! This guide will walk you through the essential steps to get you up and running. You'll learn how to authenticate and make your first request to retrieve your user details.
+Welcome to the UBIK API! This guide will walk you through making your first API call in just a few minutes.
 
-## 1. Get your API Key
+<Steps>
+<Step title="Get your API Key">
+  Your API key is your passport to the UBIK ecosystem. You'll need it to authenticate all of your API requests. You can find your API key in your user settings page on the UBIK dashboard.
 
-Your API key is your passport to the UBIK ecosystem. You'll need it to authenticate all of your API requests.
+  <Card
+    title="Go to API Key Settings"
+    icon="key"
+    href="https://app.ubik-agent.com/user/api-keys"
+  />
 
-You can find your API key in your user settings page on the UBIK dashboard.
+  <Tip>
+    Keep your API key secure as if it were a password and do not share it publicly.
+  </Tip>
+</Step>
 
-<Card
-  title="Go to API Key Settings"
-  href="https://app.ubik-agent.com/user/api-keys"
-/>
+<Step title="Make Your First Request">
+  Let's verify that your API key is working correctly by fetching your user details. We'll use the `/users/me` endpoint, which provides information about the authenticated user.
 
-Keep your API key secure and do not share it publicly.
+  <CodeGroup title="GET /users/me">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/users/me" \
+       -H "X-API-KEY: YOUR_API_KEY"
+  ```
+  ```python Python
+  import requests
 
-## 2. Make Your First Request
+  api_key = "YOUR_API_KEY"
+  headers = {
+      "X-API-KEY": api_key
+  }
+  response = requests.get(
+      "https://app.ubik-agent.com/api/v1/users/me",
+      headers=headers
+  )
+  print(response.json())
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const headers = {
+    "X-API-KEY": apiKey,
+  };
 
-Let's verify that your API key is working correctly by fetching your user details. We'll use the `/users/me` endpoint, which provides information about the authenticated user.
+  fetch("https://app.ubik-agent.com/api/v1/users/me", {
+    method: "GET",
+    headers: headers,
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+  ```
+  </CodeGroup>
+</Step>
 
-Open your terminal and run the following command, replacing `YOUR_API_KEY` with the key you just copied.
+<Step title="Check the Response">
+  If everything is correct, you'll receive a `200 OK` response with a JSON object containing your user details.
 
-```bash
-curl -X GET "https://app.ubik-agent.com/api/v1/users/me" \
-     -H "X-API-KEY: YOUR_API_KEY"
-```
+  ```json Response
+  {
+    "username": "testuser",
+    "full_name": "Test User",
+    "uuid_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "created_at": "2025-09-28T12:00:00Z",
+    "balance": 100.0,
+    "chat_session_count": 5,
+    "document_count": 42,
+    "workspace_count": 3,
+    "assistant_count": 2
+  }
+  ```
+</Step>
+</Steps>
 
-## 3. Check Your Response
-
-If everything is correct, you'll receive a `200 OK` response with a JSON object containing your user information. It should look something like this:
-
-```json
-{
-  "username": "testuser",
-  "full_name": "Test User",
-  "uuid_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "created_at": "2025-09-28T12:00:00Z",
-  "balance": 100.0,
-  "chat_session_count": 5,
-  "document_count": 42,
-  "workspace_count": 3,
-  "assistant_count": 2
-}
-```
-
-<Check>
 Congratulations! You've successfully made your first API call.
-</Check>
 
 ## Next Steps
 
-You're now ready to explore the full potential of the UBIK API. Here are a few suggestions for what to do next:
+Now that you're set up, you're ready to explore more.
 
-- **Core Concepts**: Learn about the fundamental building blocks of our API in the [Development Guide](/en/development).
-- **API Reference**: Dive deep into all available endpoints in the [API Reference](/en/api-reference/introduction).
+<CardGroup cols={2}>
+  <Card title="Core Concepts" icon="book-open" href="/en/development">
+    Understand the fundamental building blocks of the UBIK API.
+  </Card>
+  <Card title="Step-by-Step Guides" icon="list-checks" href="/en/guides/managing-workspaces">
+    Follow our guides to learn common workflows.
+  </Card>
+</CardGroup>

@@ -5,83 +5,190 @@ description: "Learn how to organize your documents by creating and managing work
 
 This guide will walk you through a common workflow: creating a new workspace, adding a document to it from a URL, and then verifying that the document is correctly associated with the workspace.
 
-## Step 1: Create a New Workspace
+<Steps>
 
-First, let's create a new workspace to hold our documents. We'll make a `POST` request to the `/workspaces` endpoint. You can give it a name and a description to keep things organized.
+<Step title="Create a New Workspace">
+  First, let's create a new workspace to hold our documents. We'll make a `POST` request to the `/workspaces` endpoint. You can give it a name and a description to keep things organized.
 
-```bash
-curl -X POST "https://app.ubik-agent.com/api/v1/workspaces" \
-     -H "X-API-KEY: YOUR_API_KEY" \
-     -H "Content-Type: application/json" \
-     -d '{
-          "name": "My First Project",
-          "description": "Workspace for my first project using the UBIK API."
-        }'
-```
+  <CodeGroup title="POST /workspaces">
+  ```bash cURL
+  curl -X POST "https://app.ubik-agent.com/api/v1/workspaces" \
+       -H "X-API-KEY: YOUR_API_KEY" \
+       -H "Content-Type: application/json" \
+       -d '{
+            "name": "My First Project",
+            "description": "Workspace for my first project using the UBIK API."
+          }'
+  ```
+  ```python Python
+  import requests
+  import json
 
-The API will respond with the details of the newly created workspace, including its unique `id`. Make sure to copy this `id` for the next step.
+  api_key = "YOUR_API_KEY"
+  headers = {
+      "X-API-KEY": api_key,
+      "Content-Type": "application/json"
+  }
+  payload = {
+      "name": "My First Project",
+      "description": "Workspace for my first project using the UBIK API."
+  }
+  response = requests.post(
+      "https://app.ubik-agent.com/api/v1/workspaces",
+      headers=headers,
+      data=json.dumps(payload)
+  )
+  print(response.json())
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const headers = {
+    "X-API-KEY": apiKey,
+    "Content-Type": "application/json",
+  };
+  const body = JSON.stringify({
+    name: "My First Project",
+    description: "Workspace for my first project using the UBIK API.",
+  });
 
-```json
-{
-  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "name": "My First Project",
-  "description": "Workspace for my first project using the UBIK API.",
-  "is_default": false,
-  "created_at": "2025-09-29T10:00:00Z",
-  "updated_at": "2025-09-29T10:00:00Z",
-  "document_count": 0
-}
-```
+  fetch("https://app.ubik-agent.com/api/v1/workspaces", {
+    method: "POST",
+    headers: headers,
+    body: body,
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+  ```
+  </CodeGroup>
 
-## Step 2: Ingest a Document into the Workspace
+  The API will respond with the details of the newly created workspace, including its unique `id`. Copy this `id` for the next step.
 
-Now that we have a workspace, let's add a document to it. We'll use the `/documents` endpoint to ingest content from a URL. We'll also pass the `workspace_ids` form field to associate the new document with the workspace we just created.
+  ```json Response
+  {
+    "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "My First Project",
+    "description": "Workspace for my first project using the UBIK API.",
+    "is_default": false,
+    "created_at": "2025-09-28T14:00:00Z",
+    "updated_at": "2025-09-28T14:00:00Z",
+    "document_count": 0
+  }
+  ```
+</Step>
 
-Replace `YOUR_WORKSPACE_ID` with the `id` you copied from the previous step.
+<Step title="Add a Document via URL">
+  Now, let's add a document to our new workspace. We'll use the `/documents` endpoint to ingest a document from a URL. We'll pass the `workspace_ids` in the form data to associate it with the workspace we just created.
 
-```bash
-curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
-     -H "X-API-KEY: YOUR_API_KEY" \
-     -F "urls=https://www.ubik-agent.com/" \
-     -F "workspace_ids=YOUR_WORKSPACE_ID"
-```
+  <CodeGroup title="POST /documents">
+  ```bash cURL
+  curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
+       -H "X-API-KEY: YOUR_API_KEY" \
+       -F "urls=https://www.orimi.com/pdf-test.pdf" \
+       -F "workspace_ids=YOUR_WORKSPACE_ID"
+  ```
+  ```python Python
+  import requests
 
-The API will respond with an array of document objects that have been created.
+  api_key = "YOUR_API_KEY"
+  workspace_id = "YOUR_WORKSPACE_ID"
+  headers = {
+      "X-API-KEY": api_key,
+  }
+  data = {
+      "urls": "https://www.orimi.com/pdf-test.pdf",
+      "workspace_ids": workspace_id
+  }
+  response = requests.post(
+      "https://app.ubik-agent.com/api/v1/documents",
+      headers=headers,
+      data=data
+  )
+  print(response.json())
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const workspaceId = "YOUR_WORKSPACE_ID";
+  const headers = {
+    "X-API-KEY": apiKey,
+  };
+  const formData = new FormData();
+  formData.append("urls", "https://www.orimi.com/pdf-test.pdf");
+  formData.append("workspace_ids", workspaceId);
 
-## Step 3: Verify the Document in the Workspace
+  fetch("https://app.ubik-agent.com/api/v1/documents", {
+    method: "POST",
+    headers: headers,
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+  ```
+  </CodeGroup>
+</Step>
 
-Finally, let's confirm that our document has been successfully added to the workspace. We'll make a `GET` request to the `/workspaces/{workspace_id}/documents` endpoint, using the same workspace ID.
+<Step title="Verify the Document">
+  Finally, let's confirm that the document was added to the workspace. We can list the documents in the workspace by making a `GET` request to the `/workspaces/{workspace_id}/documents` endpoint.
 
-```bash
-curl -X GET "https://app.ubik-agent.com/api/v1/workspaces/YOUR_WORKSPACE_ID/documents" \
-     -H "X-API-KEY: YOUR_API_KEY"
-```
+  <CodeGroup title="GET /workspaces/{workspace_id}/documents">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/workspaces/YOUR_WORKSPACE_ID/documents" \
+       -H "X-API-KEY: YOUR_API_KEY"
+  ```
+  ```python Python
+  import requests
 
-The response will be a paginated list of all documents in that workspace. You should see the document you just ingested.
+  api_key = "YOUR_API_KEY"
+  workspace_id = "YOUR_WORKSPACE_ID"
+  headers = {
+      "X-API-KEY": api_key
+  }
+  response = requests.get(
+      f"https://app.ubik-agent.com/api/v1/workspaces/{workspace_id}/documents",
+      headers=headers
+  )
+  print(response.json())
+  ```
+  ```javascript JavaScript
+  const apiKey = "YOUR_API_KEY";
+  const workspaceId = "YOUR_WORKSPACE_ID";
+  const headers = {
+    "X-API-KEY": apiKey,
+  };
 
-```json
-{
-  "items": [
-    {
-      "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
-      "name": "UBIK Agent",
-      "file_type": "text/html",
-      "status": "completed",
-      "created_at": "2025-09-29T10:05:00Z",
-      "updated_at": "2025-09-29T10:05:00Z",
-      "processing_pipeline": "default-pipeline",
-      "error_message": null
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "limit": 20,
-  "has_more": false
-}
-```
+  fetch(`https://app.ubik-agent.com/api/v1/workspaces/${workspaceId}/documents`, {
+    method: "GET",
+    headers: headers,
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+  ```
+  </CodeGroup>
 
-<Check>
-That's it! You've successfully created a workspace, added a document to it, and verified the result.
-</Check>
+  You should see the document you added in the response.
 
-You are now equipped to manage content organization within your UBIK projects.
+  ```json Response
+  {
+    "items": [
+      {
+        "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
+        "name": "pdf-test.pdf",
+        "file_type": "application/pdf",
+        "status": "completed",
+        "created_at": "2025-09-28T14:05:00Z",
+        "updated_at": "2025-09-28T14:05:00Z",
+        "processing_pipeline": "default-pipeline",
+        "error_message": null
+      }
+    ],
+    "total": 1,
+    "page": 1,
+    "limit": 20,
+    "has_more": false
+  }
+  ```
+</Step>
+
+</Steps>

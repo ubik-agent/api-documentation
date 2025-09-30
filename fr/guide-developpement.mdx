@@ -5,6 +5,18 @@ description: "Comprendre les éléments fondamentaux de l'API UBIK."
 
 Pour tirer le meilleur parti de l'API UBIK, il est utile de comprendre les concepts clés avec lesquels vous allez travailler. Ce guide présente les composants principaux de notre plateforme.
 
+<CardGroup cols={3}>
+  <Card title="Espaces de Travail" icon="layout-dashboard" href="#espaces-de-travail-workspaces">
+    Conteneurs de haut niveau pour organiser vos projets et vos données.
+  </Card>
+  <Card title="Documents" icon="files" href="#documents">
+    Les informations brutes que vous fournissez, comme des PDF, des fichiers texte ou des pages web.
+  </Card>
+  <Card title="Outils" icon="wrench" href="#outils-tools">
+    Fonctions puissantes et pré-construites qui effectuent des tâches complexes sur vos documents.
+  </Card>
+</CardGroup>
+
 ## Espaces de Travail (Workspaces)
 
 Considérez un **Espace de Travail** comme un conteneur de haut niveau pour vos projets. C'est le principal moyen d'organiser et de séparer vos données. Chaque espace de travail peut contenir son propre ensemble de documents, d'outils et d'assistants.
@@ -13,24 +25,19 @@ Considérez un **Espace de Travail** comme un conteneur de haut niveau pour vos 
 - **Isolation**: Les données au sein d'un espace de travail sont séparées des autres, garantissant confidentialité et contrôle.
 - **Espace de Travail par Défaut**: Chaque utilisateur dispose d'un espace de travail par défaut où les nouveaux documents sont ajoutés si aucun autre n'est spécifié.
 
-Vous pouvez gérer vos espaces de travail via les points de terminaison [`/workspaces`](/fr/api-reference/introduction#tag/Public-API-Workspaces).
+<Info>Vous pouvez gérer vos espaces de travail via les points de terminaison [`/workspaces`](/fr/api-reference/introduction#tag/Public-API-Workspaces).</Info>
 
 ## Documents
 
-Un **Document** est l'unité de contenu fondamentale dans UBIK. Il représente toute donnée que vous ingérez dans le système, qu'il s'agisse d'un fichier téléversé (comme un PDF ou un fichier texte) ou d'une URL "scrapée".
-
-- **Ingestion**: UBIK peut traiter une grande variété de types de fichiers et de contenus en ligne.
-- **Traitement**: Une fois ingérés, les documents passent par un pipeline de traitement où le contenu est extrait, converti en Markdown et indexé pour la recherche.
-- **Association**: Les documents peuvent être associés à un ou plusieurs espaces de travail, permettant une gestion de contenu flexible.
-
-Découvrez ce que vous pouvez faire avec les documents via les points de terminaison [`/documents`](/fr/api-reference/introduction#tag/Public-API-Documents).
+Un **Document** représente tout contenu que vous ingérez sur la plateforme UBIK. Il peut s'agir d'un fichier que vous téléchargez (comme un PDF ou un fichier `.txt`) ou d'une page web que vous scrapez. Une fois ingérés, les documents sont traités et stockés, ce qui les rend prêts à être utilisés par les Outils.
 
 ## Outils (Tools)
 
-Les **Outils** sont l'une des fonctionnalités les plus puissantes de l'API UBIK. Ce sont des agents spécialisés et pré-construits qui peuvent effectuer des tâches complexes sur vos données.
+Un **Outil** est une fonction spécialisée qui effectue une tâche complexe et spécifique. Les outils sont conçus pour être puissants et asynchrones, vous permettant d'exécuter des tâches de longue durée sans bloquer votre application.
 
-- **Fonctionnalité**: Un outil peut tout faire, de l'extraction de données financières spécifiques d'un rapport au résumé d'un long article.
-- **Exécution Asynchrone**: Les outils s'exécutent de manière asynchrone. Vous lancez une exécution et l'API renvoie un `execution_id` que vous pouvez utiliser pour interroger les résultats.
-- **Extensibilité**: La liste des outils disponibles ne cesse de s'allonger, vous permettant d'ajouter de nouvelles fonctionnalités puissantes à vos applications avec un minimum d'effort.
+Exemples d'utilisation :
+- Extraire des données financières d'un rapport.
+- Résumer un long document juridique.
+- Répondre à des questions basées sur le contenu de plusieurs documents.
 
-Découvrez et exécutez des outils à l'aide des points de terminaison [`/tools`](/fr/api-reference/introduction#tag/Public-API-Tools) et [`/tool-executions`](/fr/api-reference/introduction#tag/Public-API-Tool-Executions).
+Vous pouvez découvrir et exécuter des outils à l'aide des points de terminaison [`/tools`](/fr/api-reference/introduction#tag/Public-API-Tools).

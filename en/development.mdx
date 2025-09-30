@@ -5,6 +5,18 @@ description: "Understand the fundamental building blocks of the UBIK API."
 
 To make the most of the UBIK API, it's helpful to understand the key concepts that you'll be working with. This guide introduces the core components of our platform.
 
+<CardGroup cols={3}>
+  <Card title="Workspaces" icon="layout-dashboard" href="#workspaces">
+    High-level containers for organizing your projects and data.
+  </Card>
+  <Card title="Documents" icon="files" href="#documents">
+    The raw information you provide, like PDFs, text files, or web pages.
+  </Card>
+  <Card title="Tools" icon="wrench" href="#tools">
+    Powerful, pre-built functions that perform complex tasks on your documents.
+  </Card>
+</CardGroup>
+
 ## Workspaces
 
 Think of a **Workspace** as a high-level container for your projects. It's the primary way to organize and segregate your data. Each workspace can contain its own set of documents, tools, and assistants.
@@ -13,24 +25,19 @@ Think of a **Workspace** as a high-level container for your projects. It's the p
 - **Isolation**: Data within one workspace is kept separate from others, ensuring privacy and control.
 - **Default Workspace**: Every user has a default workspace where new documents are added if no other workspace is specified.
 
-You can manage your workspaces through the [`/workspaces`](/en/api-reference/introduction#tag/Public-API-Workspaces) endpoints.
+<Info>You can manage your workspaces through the [`/workspaces`](/en/api-reference/introduction#tag/Public-API-Workspaces) endpoints.</Info>
 
 ## Documents
 
-A **Document** is the fundamental unit of content in UBIK. It represents any piece of data that you ingest into the system, whether it's from a file upload (like a PDF or text file) or a scraped URL.
-
-- **Ingestion**: UBIK can process a wide variety of file types and online content.
-- **Processing**: Once ingested, documents go through a processing pipeline where content is extracted, converted to Markdown, and indexed for retrieval.
-- **Association**: Documents can be associated with one or more workspaces, allowing for flexible content management.
-
-Explore what you can do with documents via the [`/documents`](/en/api-reference/introduction#tag/Public-API-Documents) endpoints.
+A **Document** represents any piece of content you ingest into the UBIK platform. This could be a file you upload (like a PDF or `.txt` file) or a web page you scrape. Once ingested, documents are processed and stored, making them ready to be used by Tools.
 
 ## Tools
 
-**Tools** are one of the most powerful features of the UBIK API. They are pre-built, specialized agents that can perform complex tasks on your data.
+A **Tool** is a specialized function that performs a specific, complex task. Tools are designed to be powerful and asynchronous, allowing you to execute long-running jobs without blocking your application.
 
-- **Functionality**: A tool can do anything from extracting specific financial data from a report to summarizing a long article.
-- **Asynchronous Execution**: Tools run asynchronously. You start an execution, and the API returns an `execution_id` that you can use to poll for the results.
-- **Extensibility**: The list of available tools is constantly growing, enabling you to add powerful new capabilities to your applications with minimal effort.
+Examples include:
+- Extracting financial data from a report.
+- Summarizing a long legal document.
+- Answering questions based on the content of multiple documents.
 
-Discover and execute tools using the [`/tools`](/en/api-reference/introduction#tag/Public-API-Tools) and [`/tool-executions`](/en/api-reference/introduction#tag/Public-API-Tool-Executions) endpoints.
+You can discover and execute tools using the [`/tools`](/en/api-reference/introduction#tag/Public-API-Tools) endpoints.

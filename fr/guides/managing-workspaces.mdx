@@ -5,83 +5,205 @@ description: "Apprenez à organiser vos documents en créant et en gérant des e
 
 Ce guide vous expliquera un flux de travail courant : créer un nouvel espace de travail, y ajouter un document à partir d'une URL, puis vérifier que le document est correctement associé à l'espace de travail.
 
-## Étape 1 : Créer un Nouvel Espace de Travail
+<Steps>
 
-Tout d'abord, créons un nouvel espace de travail pour contenir nos documents. Nous effectuerons une requête `POST` vers le point de terminaison `/workspaces`. Vous pouvez lui donner un nom et une description pour garder les choses organisées.
+<Step title="Créer un Nouvel Espace de Travail">
+  Tout d'abord, créons un nouvel espace de travail pour contenir nos documents. Nous effectuerons une requête `POST` vers le point de terminaison `/workspaces`. Vous pouvez lui donner un nom et une description pour garder les choses organisées.
 
-```bash
-curl -X POST "https://app.ubik-agent.com/api/v1/workspaces" \
-     -H "X-API-KEY: VOTRE_CLE_API" \
-     -H "Content-Type: application/json" \
-     -d '{
-          "name": "Mon Premier Projet",
-          "description": "Espace de travail pour mon premier projet avec l'API UBIK."
-        }'
-```
+  <CodeGroup title="POST /workspaces">
+  ```bash cURL
+  curl -X POST "https://app.ubik-agent.com/api/v1/workspaces" \
+       -H "X-API-KEY: VOTRE_CLE_API" \
+       -H "Content-Type: application/json" \
+       -d '{
+            "name": "Mon Premier Projet",
+            "description": "Espace de travail pour mon premier projet avec l''API UBIK."
+          }'
+  ```
+  ```python Python
+  import requests
 
-L'API répondra avec les détails de l'espace de travail nouvellement créé, y compris son `id` unique. Assurez-vous de copier cet `id` pour l'étape suivante.
+  api_key = "VOTRE_CLE_API"
+  headers = {
+      "X-API-KEY": api_key,
+      "Content-Type": "application/json"
+  }
+  payload = {
+      "name": "Mon Premier Projet",
+      "description": "Espace de travail pour mon premier projet avec l''API UBIK."
+  }
+  response = requests.post(
+      "https://app.ubik-agent.com/api/v1/workspaces",
+      headers=headers,
+      json=payload
+  )
 
-```json
-{
-  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  "name": "Mon Premier Projet",
-  "description": "Espace de travail pour mon premier projet avec l'API UBIK.",
-  "is_default": false,
-  "created_at": "2025-09-29T10:00:00Z",
-  "updated_at": "2025-09-29T10:00:00Z",
-  "document_count": 0
-}
-```
+  if response.status_code == 200:
+      workspace = response.json()
+      print(workspace)
+      # Conservez le workspace['id'] pour les étapes suivantes
+  else:
+      print(f"Erreur: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const url = "https://app.ubik-agent.com/api/v1/workspaces";
 
-## Étape 2 : Ingérer un Document dans l'Espace de Travail
+  const payload = {
+    name: "Mon Premier Projet",
+    description: "Espace de travail pour mon premier projet avec l''API UBIK."
+  };
 
-Maintenant que nous avons un espace de travail, ajoutons-y un document. Nous utiliserons le point de terminaison `/documents` pour ingérer du contenu à partir d'une URL. Nous transmettrons également le champ de formulaire `workspace_ids` pour associer le nouveau document à l'espace de travail que nous venons de créer.
-
-Remplacez `VOTRE_ID_ESPACE_DE_TRAVAIL` par l'`id` que vous avez copié à l'étape précédente.
-
-```bash
-curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
-     -H "X-API-KEY: VOTRE_CLE_API" \
-     -F "urls=https://www.ubik-agent.com/" \
-     -F "workspace_ids=VOTRE_ID_ESPACE_DE_TRAVAIL"
-```
-
-L'API répondra avec un tableau d'objets document qui ont été créés.
-
-## Étape 3 : Vérifier le Document dans l'Espace de Travail
-
-Enfin, confirmons que notre document a été ajouté avec succès à l'espace de travail. Nous effectuerons une requête `GET` vers le point de terminaison `/workspaces/{workspace_id}/documents`, en utilisant le même ID d'espace de travail.
-
-```bash
-curl -X GET "https://app.ubik-agent.com/api/v1/workspaces/VOTRE_ID_ESPACE_DE_TRAVAIL/documents" \
-     -H "X-API-KEY: VOTRE_CLE_API"
-```
-
-La réponse sera une liste paginée de tous les documents de cet espace de travail. Vous devriez y voir le document que vous venez d'ingérer.
-
-```json
-{
-  "items": [
-    {
-      "id": "c1d2e3f4-a5b6-7890-1234-567890abcdef",
-      "name": "UBIK Agent",
-      "file_type": "text/html",
-      "status": "completed",
-      "created_at": "2025-09-29T10:05:00Z",
-      "updated_at": "2025-09-29T10:05:00Z",
-      "processing_pipeline": "default-pipeline",
-      "error_message": null
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-API-KEY': apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
     }
-  ],
-  "total": 1,
-  "page": 1,
-  "limit": 20,
-  "has_more": false
-}
-```
+    return response.json();
+  })
+  .then(workspace => {
+    console.log(workspace);
+    // Conservez l'ID de l'espace de travail pour les étapes suivantes
+  })
+  .catch(error => console.error('Erreur:', error));
+  ```
+  </CodeGroup>
 
-<Check>
-C'est tout ! Vous avez créé avec succès un espace de travail, y avez ajouté un document et vérifié le résultat.
-</Check>
+  L'API répondra avec les détails de l'espace de travail nouvellement créé, y compris son `id` unique. Conservez cet `id` car nous en aurons besoin à l'étape suivante.
 
-Vous êtes maintenant équipé pour gérer l'organisation du contenu au sein de vos projets UBIK.
+</Step>
+
+<Step title="Ajouter un Document à l'Espace de Travail">
+  Maintenant que nous avons un espace de travail, ajoutons-y un document. Nous utiliserons le point de terminaison `/documents` pour ingérer un document à partir d'une URL. En passant le `workspace_ids` dans la requête, le document sera automatiquement ajouté à notre nouvel espace de travail.
+
+  <CodeGroup title="POST /documents (depuis une URL)">
+  ```bash cURL
+  curl -X POST "https://app.ubik-agent.com/api/v1/documents" \
+       -H "X-API-KEY: VOTRE_CLE_API" \
+       -F "urls=https://www.orion-fr.com/rapport/ORION_rapport_annuel_2022.pdf" \
+       -F "workspace_ids=VOTRE_ID_ESPACE_DE_TRAVAIL"
+  ```
+  ```python Python
+  import requests
+
+  api_key = "VOTRE_CLE_API"
+  workspace_id = "VOTRE_ID_ESPACE_DE_TRAVAIL"
+  
+  headers = {"X-API-KEY": api_key}
+  data = {
+      "urls": "https://www.orion-fr.com/rapport/ORION_rapport_annuel_2022.pdf",
+      "workspace_ids": workspace_id
+  }
+
+  response = requests.post(
+      "https://app.ubik-agent.com/api/v1/documents",
+      headers=headers,
+      data=data
+  )
+  
+  if response.status_code == 200:
+      documents = response.json()
+      print("Document en cours de traitement :", documents[0]['id'])
+  else:
+      print(f"Erreur: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const workspaceId = "VOTRE_ID_ESPACE_DE_TRAVAIL";
+  const url = "https://app.ubik-agent.com/api/v1/documents";
+
+  const formData = new FormData();
+  formData.append('urls', 'https://www.orion-fr.com/rapport/ORION_rapport_annuel_2022.pdf');
+  formData.append('workspace_ids', workspaceId);
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-API-KEY': apiKey
+    },
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(documents => {
+    console.log('Document en cours de traitement:', documents[0].id);
+  })
+  .catch(error => console.error('Erreur:', error));
+  ```
+  </CodeGroup>
+  
+  <Note>
+    Le traitement des documents est asynchrone. L'API répondra immédiatement avec les détails du document et son statut (`pending` ou `processing`). Vous pouvez interroger le point de terminaison du document pour vérifier quand le statut passe à `completed`.
+  </Note>
+
+</Step>
+
+<Step title="Vérifier le Contenu de l'Espace de Travail">
+  Enfin, vérifions que notre document a bien été ajouté à l'espace de travail. Nous ferons une requête `GET` vers le point de terminaison `/workspaces/{workspace_id}/documents`.
+
+  <CodeGroup title="GET /workspaces/{workspace_id}/documents">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/workspaces/VOTRE_ID_ESPACE_DE_TRAVAIL/documents" \
+       -H "X-API-KEY: VOTRE_CLE_API"
+  ```
+  ```python Python
+  import requests
+
+  api_key = "VOTRE_CLE_API"
+  workspace_id = "VOTRE_ID_ESPACE_DE_TRAVAIL"
+  
+  headers = {"X-API-KEY": api_key}
+
+  response = requests.get(
+      f"https://app.ubik-agent.com/api/v1/workspaces/{workspace_id}/documents",
+      headers=headers
+  )
+  
+  if response.status_code == 200:
+      workspace_docs = response.json()
+      print(workspace_docs)
+  else:
+      print(f"Erreur: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const workspaceId = "VOTRE_ID_ESPACE_DE_TRAVAIL";
+  const url = `https://app.ubik-agent.com/api/v1/workspaces/${workspaceId}/documents`;
+
+  fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-API-KEY': apiKey
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(workspaceDocs => {
+    console.log(workspaceDocs);
+  })
+  .catch(error => console.error('Erreur:', error));
+  ```
+  </CodeGroup>
+
+  La réponse confirmera que le document que nous avons ajouté à l'étape 2 est maintenant listé dans cet espace de travail.
+
+</Step>
+
+</Steps>
+
+Félicitations ! Vous avez appris à créer un espace de travail, à y ajouter un document et à vérifier son contenu. Vous êtes maintenant prêt à explorer des flux de travail plus avancés.

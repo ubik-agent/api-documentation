@@ -5,95 +5,208 @@ description: "Apprenez à découvrir, exécuter et récupérer les résultats de
 
 Ce guide montre comment tirer parti des outils d'UBIK pour effectuer des tâches complexes. Vous apprendrez à lister les outils disponibles, à en exécuter un avec les entrées requises, puis à interroger les résultats de l'exécution.
 
-## Étape 1 : Découvrir les Outils Disponibles
+<Steps>
 
-D'abord, voyons quels outils sont disponibles. Nous pouvons obtenir une liste de tous les outils qui nous sont accessibles en effectuant une requête `GET` vers le point de terminaison `/tools`.
+<Step title="Découvrir les Outils Disponibles">
+  D'abord, voyons quels outils sont disponibles. Nous pouvons obtenir une liste de tous les outils qui nous sont accessibles en effectuant une requête `GET` vers le point de terminaison `/tools`.
 
-```bash
-curl -X GET "https://app.ubik-agent.com/api/v1/tools" \
-     -H "X-API-KEY: VOTRE_CLE_API"
-```
+  <CodeGroup title="GET /tools">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/tools" \
+       -H "X-API-KEY: VOTRE_CLE_API"
+  ```
+  ```python Python
+  import requests
 
-La réponse sera une liste paginée d'outils. Pour ce guide, supposons que nous voulons utiliser un outil nommé "Extracteur de Données Financières". Copiez son `id` depuis la réponse.
+  api_key = "VOTRE_CLE_API"
+  headers = {"X-API-KEY": api_key}
 
-```json
-{
-  "items": [
-    {
-      "id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
-      "name": "Financial Data Extractor",
-      "description": "Extracts key financial metrics from annual reports."
+  response = requests.get("https://app.ubik-agent.com/api/v1/tools", headers=headers)
+
+  if response.status_code == 200:
+      tools = response.json()
+      print(tools['items'])
+  else:
+      print(f"Erreur: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const url = "https://app.ubik-agent.com/api/v1/tools";
+
+  fetch(url, {
+    method: 'GET',
+    headers: { 'X-API-KEY': apiKey }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
     }
-  ],
-  "total": 1,
-  "page": 1,
-  "limit": 20,
-  "has_more": false
-}
-```
+    return response.json();
+  })
+  .then(data => console.log(data.items))
+  .catch(error => console.error('Erreur:', error));
+  ```
+  </CodeGroup>
 
-## Étape 2 : Exécuter l'Outil de Manière Asynchrone
+  La réponse sera une liste paginée d'outils. Pour ce guide, supposons que nous voulons utiliser un outil nommé **"Extracteur de Données Financières"**. Trouvez-le dans la liste et copiez son `id`.
 
-Les outils dans UBIK s'exécutent de manière asynchrone. Vous lancez une tâche en effectuant une requête `POST` vers le point de terminaison `/tools/{tool_id}/execute`, en fournissant les `inputs` nécessaires. Cela vous permet de lancer une tâche de longue durée sans bloquer votre application.
+</Step>
 
-Remplacez `VOTRE_ID_OUTIL` par l'`id` que vous avez copié.
+<Step title="Exécuter l'Outil">
+  Maintenant, nous allons démarrer l'outil en effectuant une requête `POST` vers le point de terminaison `/tools/{tool_id}/execute`. Vous aurez besoin de l'`id` de l'étape précédente. Dans le corps de la requête, nous fournirons les `inputs` requis par l'outil.
 
-```bash
-curl -X POST "https://app.ubik-agent.com/api/v1/tools/VOTRE_ID_OUTIL/execute" \
-     -H "X-API-KEY: VOTRE_CLE_API" \
-     -H "Content-Type: application/json" \
-     -d '{
-          "inputs": {
-            "stock_symbol": "ACME",
-            "report_year": 2023
-          }
-        }'
-```
+  <CodeGroup title="POST /tools/{tool_id}/execute">
+  ```bash cURL
+  curl -X POST "https://app.ubik-agent.com/api/v1/tools/VOTRE_ID_OUTIL/execute" \
+       -H "X-API-KEY: VOTRE_CLE_API" \
+       -H "Content-Type: application/json" \
+       -d '{
+            "inputs": {
+              "document_id": "VOTRE_ID_DOCUMENT",
+              "data_points": ["revenue", "net_income", "ebitda"]
+            }
+          }'
+  ```
+  ```python Python
+  import requests
 
-L'API répondra immédiatement avec un code de statut `202 Accepted`. Le corps de la réponse contiendra un `execution_id` et une `details_url` que vous pourrez utiliser pour vérifier le statut et obtenir le résultat plus tard.
+  api_key = "VOTRE_CLE_API"
+  tool_id = "VOTRE_ID_OUTIL"
+  
+  headers = {
+      "X-API-KEY": api_key,
+      "Content-Type": "application/json"
+  }
+  payload = {
+      "inputs": {
+          "document_id": "VOTRE_ID_DOCUMENT",
+          "data_points": ["revenue", "net_income", "ebitda"]
+      }
+  }
+  
+  response = requests.post(
+      f"https://app.ubik-agent.com/api/v1/tools/{tool_id}/execute",
+      headers=headers,
+      json=payload
+  )
 
-```json
-{
-  "execution_id": "exec_123456789",
-  "status": "pending",
-  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
-  "details_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789",
-  "stream_url": "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream"
-}
-```
+  if response.status_code == 202: # Accepted
+      execution_info = response.json()
+      print(execution_info)
+      # Sauvegardez l'execution_id pour vérifier le statut plus tard
+  else:
+      print(f"Erreur: {response.status_code}", response.text)
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const toolId = "VOTRE_ID_OUTIL";
+  const url = `https://app.ubik-agent.com/api/v1/tools/${toolId}/execute`;
 
-## Étape 3 : Interroger les Résultats
+  const payload = {
+    inputs: {
+      document_id: "VOTRE_ID_DOCUMENT",
+      data_points: ["revenue", "net_income", "ebitda"]
+    }
+  };
 
-Maintenant que l'outil est en cours d'exécution, vous pouvez vérifier périodiquement la `details_url` (ou effectuer une requête `GET` vers `/tool-executions/{execution_id}`) pour obtenir le résultat final.
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-API-KEY': apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (response.status !== 202) { // Accepted
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(executionInfo => {
+    console.log(executionInfo);
+    // Sauvegardez l'execution_id pour vérifier le statut plus tard
+  })
+  .catch(error => console.error('Erreur:', error));
+  ```
+  </CodeGroup>
 
-Remplacez `VOTRE_ID_EXECUTION` par l'`execution_id` de l'étape précédente.
+  L'API répondra avec un statut `202 Accepted`, indiquant que la tâche a été reçue. Le corps de la réponse contient un `execution_id` et une `details_url`. Nous utiliserons cette URL pour obtenir le résultat final.
 
-```bash
-curl -X GET "https://app.ubik-agent.com/api/v1/tool-executions/VOTRE_ID_EXECUTION" \
-     -H "X-API-KEY: VOTRE_CLE_API"
-```
+</Step>
 
-Initialement, le `status` pourrait être `running`. Une fois l'exécution terminée, le statut passera à `completed` et le champ `outputs` sera rempli avec le résultat.
+<Step title="Interroger les Résultats">
+  Comme l'outil s'exécute de manière asynchrone, nous devons interroger la `details_url` pour vérifier le résultat final. Vous devrez vérifier ce point de terminaison périodiquement jusqu'à ce que le `status` passe à `completed` ou `failed`.
 
-```json
-{
-  "id": "exec_123456789",
-  "tool_id": "d1e2f3a4-b5c6-7890-1234-567890abcdef",
-  "status": "completed",
-  "inputs": {
-    "stock_symbol": "ACME",
-    "report_year": 2023
-  },
-  "outputs": {
-    "revenue": 1000000,
-    "profit": 250000
-  },
-  "created_at": "2025-09-29T12:00:00Z",
-  "started_at": "2025-09-29T12:00:01Z",
-  "completed_at": "2025-09-29T12:00:05Z"
-}
-```
+  <CodeGroup title="GET /tool-executions/{execution_id}">
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/tool-executions/VOTRE_ID_EXECUTION" \
+       -H "X-API-KEY: VOTRE_CLE_API"
+  ```
+  ```python Python
+  import requests
+  import time
 
-<Check>
-Succès ! Vous venez d'exécuter votre premier outil et d'en récupérer le résultat.
-</Check>
+  api_key = "VOTRE_CLE_API"
+  execution_id = "VOTRE_ID_EXECUTION"
+  
+  headers = {"X-API-KEY": api_key}
+  url = f"https://app.ubik-agent.com/api/v1/tool-executions/{execution_id}"
+
+  while True:
+      response = requests.get(url, headers=headers)
+      if response.status_code == 200:
+          result = response.json()
+          print(f"Statut actuel: {result['status']}")
+          if result['status'] in ['completed', 'failed']:
+              print("Résultat Final:", result)
+              break
+      else:
+          print(f"Erreur de polling: {response.status_code}", response.text)
+          break
+      time.sleep(5) # Attendre 5 secondes avant de recommencer
+  ```
+  ```javascript JavaScript
+  const apiKey = "VOTRE_CLE_API";
+  const executionId = "VOTRE_ID_EXECUTION";
+  const url = `https://app.ubik-agent.com/api/v1/tool-executions/${executionId}`;
+
+  const pollResult = async () => {
+    try {
+      const response = await fetch(url, {
+        headers: { 'X-API-KEY': apiKey }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log(`Statut actuel: ${result.status}`);
+
+      if (result.status === 'completed' || result.status === 'failed') {
+        console.log('Résultat Final:', result);
+        // Arrêter le polling
+      } else {
+        setTimeout(pollResult, 5000); // Réinterroger dans 5 secondes
+      }
+    } catch (error) {
+      console.error('Erreur de polling:', error);
+    }
+  };
+
+  pollResult();
+  ```
+  </CodeGroup>
+  
+  Une fois que le statut est `completed`, le champ `outputs` contiendra les données extraites par l'outil.
+
+  <Tip>
+    Pour une expérience plus réactive et en temps réel, vous pouvez streamer les événements au lieu de faire du polling. Consultez notre guide sur [l'Obtention de Résultats en Temps Réel avec SSE](/fr/guides/streaming-results).
+  </Tip>
+
+</Step>
+
+</Steps>
+
+Vous savez maintenant comment découvrir et exécuter des outils puissants et pré-construits pour automatiser des flux de travail complexes avec l'API UBIK.
