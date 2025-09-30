@@ -35,20 +35,24 @@
     "languages": [
       {
         "language": "en",
-        "tabs": [
+        "dropdowns": [
           {
-            "tab": "Guides",
+            "dropdown": "Guides",
             "groups": [
               {
-                "group": "Guides",
+                "group": "Getting Started",
                 "pages": [
                   "/en/index",
                   "/en/quickstart",
                   {
                     "page": "/en/development",
                     "title": "Core Concepts"
-                  },
-                  "Step-by-Step Guides",
+                  }
+                ]
+              },
+              {
+                "group": "Step-by-Step Guides",
+                "pages": [
                   "/en/guides/managing-workspaces",
                   "/en/guides/executing-tools",
                   "/en/guides/streaming-results",
@@ -58,17 +62,17 @@
             ]
           },
           {
-            "tab": "API Reference",
+            "dropdown": "API Reference",
             "groups": [
               {
                 "group": "API Reference",
                 "pages": [
-                  "/en/api-reference/introduction",
-                  {
-                    "group": "Endpoints",
-                    "openapi": "api-reference/openapi.en.json"
-                  }
+                  "/en/api-reference/introduction"
                 ]
+              },
+              {
+                "group": "Endpoints",
+                "openapi": "api-reference/openapi.en.json"
               }
             ]
           }
@@ -76,20 +80,24 @@
       },
       {
         "language": "fr",
-        "tabs": [
+        "dropdowns": [
           {
-            "tab": "Guides",
+            "dropdown": "Guides",
             "groups": [
               {
-                "group": "Guides",
+                "group": "Pour commencer",
                 "pages": [
                   "/fr/index",
                   "/fr/demarrage-rapide",
                   {
                     "page": "/fr/guide-developpement",
                     "title": "Concepts Clés"
-                  },
-                  "Guides Pas-à-Pas",
+                  }
+                ]
+              },
+              {
+                "group": "Guides Pas-à-Pas",
+                "pages": [
                   "/fr/guides/managing-workspaces",
                   "/fr/guides/executing-tools",
                   "/fr/guides/streaming-results",
@@ -99,17 +107,17 @@
             ]
           },
           {
-            "tab": "Référence API",
+            "dropdown": "Référence API",
             "groups": [
               {
                 "group": "Référence API",
                 "pages": [
-                  "/fr/api-reference/introduction",
-                  {
-                    "group": "Ressources API",
-                    "openapi": "api-reference/openapi.fr.json"
-                  }
+                  "/fr/api-reference/introduction"
                 ]
+              },
+              {
+                "group": "Points de terminaison",
+                "openapi": "api-reference/openapi.fr.json"
               }
             ]
           }
