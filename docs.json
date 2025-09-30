@@ -40,19 +40,15 @@
             "tab": "Guides",
             "groups": [
               {
-                "group": "Getting Started",
+                "group": "Guides",
                 "pages": [
                   "/en/index",
                   "/en/quickstart",
                   {
                     "page": "/en/development",
                     "title": "Core Concepts"
-                  }
-                ]
-              },
-              {
-                "group": "Step-by-Step Guides",
-                "pages": [
+                  },
+                  "Step-by-Step Guides",
                   "/en/guides/managing-workspaces",
                   "/en/guides/executing-tools",
                   "/en/guides/streaming-results",
@@ -85,19 +81,15 @@
             "tab": "Guides",
             "groups": [
               {
-                "group": "Pour commencer",
+                "group": "Guides",
                 "pages": [
                   "/fr/index",
                   "/fr/demarrage-rapide",
                   {
                     "page": "/fr/guide-developpement",
                     "title": "Concepts Clés"
-                  }
-                ]
-              },
-              {
-                "group": "Guides Pas-à-Pas",
-                "pages": [
+                  },
+                  "Guides Pas-à-Pas",
                   "/fr/guides/managing-workspaces",
                   "/fr/guides/executing-tools",
                   "/fr/guides/streaming-results",
