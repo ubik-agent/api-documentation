@@ -140,6 +140,23 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
   </Note>
 </Step>
 
+<Step title="Personnaliser l'Outil Intégré">
+  Vous pouvez personnaliser l'apparence et le comportement de l'outil intégré en ajoutant des paramètres de requête à l'URL source de l'`<iframe>`.
+
+  Voici une liste des paramètres disponibles :
+
+  - **`jwt`** (string) : Un JSON Web Token de courte durée obtenu depuis le point de terminaison `/tools/{tool_id}/embed-info`. C'est la méthode recommandée pour l'authentification côté client.
+  - **`apiKey`** (string) : Votre clé API UBIK. Elle peut être utilisée pour l'authentification à la place d'un JWT, mais elle est moins sécurisée pour les applications côté client car elle peut exposer votre clé secrète.
+  - **`theme`** ('light' | 'dark') : Définit le thème de couleur par défaut pour l'interface de l'outil. S'il n'est pas fourni, il s'adapte à la préférence système de l'utilisateur.
+  - **`showThemeToggle`** (boolean) : Si défini sur `true`, un sélecteur de thème sera affiché dans l'en-tête de l'outil, permettant aux utilisateurs de basculer entre le mode clair et le mode sombre.
+  - **`showLangToggle`** (boolean) : Si défini sur `true`, un sélecteur de langue sera affiché, permettant aux utilisateurs de changer la langue d'affichage.
+
+  Exemple d'URL avec personnalisation :
+  ```
+  https://app.ubik-agent.com/embed/tools/VOTRE_ID_OUTIL?jwt=VOTRE_JWT&theme=dark&showThemeToggle=true
+  ```
+</Step>
+
 </Steps>
 
 En suivant ces étapes, vous pouvez intégrer en toute sécurité les puissants outils d'UBIK directement dans votre application, créant une expérience transparente et intégrée pour vos utilisateurs.

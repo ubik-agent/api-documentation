@@ -140,6 +140,23 @@ Embedding UBIK tools into your own application provides a powerful way to extend
   </Note>
 </Step>
 
+<Step title="Customize the Embedded Tool">
+  You can customize the appearance and behavior of the embedded tool by adding query parameters to the `<iframe>` source URL.
+
+  Here is a list of available parameters:
+
+  - **`jwt`** (string): A short-lived JSON Web Token obtained from the `/tools/{tool_id}/embed-info` endpoint. This is the recommended method for client-side authentication.
+  - **`apiKey`** (string): Your UBIK API key. This can be used for authentication instead of a JWT, but it is less secure for client-side applications as it may expose your secret key.
+  - **`theme`** ('light' | 'dark'): Sets the default color theme for the tool's UI. If not provided, it defaults to the user's system preference.
+  - **`showThemeToggle`** (boolean): If set to `true`, a theme toggle switch will be displayed in the tool's header, allowing users to switch between light and dark mode.
+  - **`showLangToggle`** (boolean): If set to `true`, a language selector will be displayed, allowing users to change the display language.
+
+  Example URL with customization:
+  ```
+  https://app.ubik-agent.com/embed/tools/YOUR_TOOL_ID?jwt=YOUR_JWT&theme=dark&showThemeToggle=true
+  ```
+</Step>
+
 </Steps>
 
 By following these steps, you can securely embed UBIK's powerful tools directly into your application, creating a seamless and integrated experience for your users.
