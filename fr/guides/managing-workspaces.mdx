@@ -1,14 +1,14 @@
 ---
-title: "Guide : Gérer le Contenu avec les Espaces de Travail"
-description: "Apprenez à organiser vos documents en créant et en gérant des espaces de travail avec l'API UBIK."
+title: "Guide : Gérer les Espaces de Travail"
+description: "Apprenez à organiser vos données avec les espaces de travail en utilisant l'API UBIK."
 ---
 
-Ce guide vous expliquera un flux de travail courant : créer un nouvel espace de travail, y ajouter un document à partir d'une URL, puis vérifier que le document est correctement associé à l'espace de travail.
+Ce guide vous expliquera un scénario d'utilisation courant : créer un nouvel espace de travail, y ajouter un document à partir d'une URL, puis vérifier que le document est correctement associé à l'espace de travail.
 
 <Steps>
 
 <Step title="Créer un Nouvel Espace de Travail">
-  Tout d'abord, créons un nouvel espace de travail pour contenir nos documents. Nous effectuerons une requête `POST` vers le point de terminaison `/workspaces`. Vous pouvez lui donner un nom et une description pour garder les choses organisées.
+  Tout d'abord, créons un nouvel espace de travail pour contenir nos documents. Nous effectuerons une requête `POST` vers l'endpoint `/workspaces`. Vous pouvez lui donner un nom et une description pour garder les choses organisées.
 
   <CodeGroup title="POST /workspaces">
   ```bash cURL
@@ -211,13 +211,13 @@ Ce guide vous expliquera un flux de travail courant : créer un nouvel espace de
   </CodeGroup>
 
   <Note>
-    Le traitement des documents est asynchrone. L'API répondra immédiatement avec les détails du document et son statut (`pending` ou `processing`). Vous pouvez interroger le point de terminaison du document pour vérifier quand le statut passe à `completed`.
+    Le traitement des documents est asynchrone. L'API répondra immédiatement avec les détails du document et son statut (`pending` ou `processing`). Vous pouvez interroger l'endpoint du document pour vérifier quand le statut passe à `completed`.
   </Note>
 
 </Step>
 
 <Step title="Vérifier le Contenu de l'Espace de Travail">
-  Enfin, vérifions que notre document a bien été ajouté à l'espace de travail. Nous ferons une requête `GET` vers le point de terminaison `/workspaces/{workspace_id}/documents`.
+  Enfin, vérifions que notre document a bien été ajouté à l'espace de travail. Nous ferons une requête `GET` vers l'endpoint `/workspaces/{workspace_id}/documents`.
 
   <CodeGroup title="GET /workspaces/{workspace_id}/documents">
   ```bash cURL

@@ -24,9 +24,9 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
 </Step>
 
 <Step title="Récupérer les Informations d'Intégration">
-  Avant de pouvoir afficher l'`<iframe>`, le frontend de votre application doit récupérer les détails d'intégration depuis l'API UBIK. Pour ce faire, effectuez une requête `GET` vers le point de terminaison `/tools/{tool_id}/embed-info`.
+  Avant de pouvoir afficher l'`<iframe>`, le frontend de votre application doit récupérer les détails d'intégration depuis l'API UBIK. Pour ce faire, effectuez une requête `GET` vers l'endpoint `/tools/{tool_id}/embed-info`.
 
-  Ce point de terminaison fournit deux informations cruciales :
+  Cet endpoint fournit deux informations cruciales :
   1.  **Détails de l'Outil**: Le schéma, le nom, la description, etc.
   2.  **Jeton d'Accès**: Un JSON Web Token (JWT) de courte durée que l'`<iframe>` intégré utilisera pour s'authentifier.
 
@@ -58,12 +58,12 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
       print(f"Erreur: {response.status_code}", response.text)
   ```
   ```javascript JavaScript (Côté Client)
-  // Cette fonction appellerait typiquement un point de terminaison sur VOTRE serveur,
+  // Cette fonction appellerait typiquement un endpoint sur VOTRE serveur,
   // qui effectuerait ensuite l'appel sécurisé à l'API UBIK avec votre clé API secrète.
   
   async function fetchEmbedInfoFromServer(toolId) {
     try {
-      // Exemple : un point de terminaison sur votre propre backend
+      // Exemple : un endpoint sur votre propre backend
       const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
@@ -85,7 +85,7 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
 </Step>
 
 <Step title="Afficher l'iframe">
-  Une fois que votre frontend dispose des informations d'intégration, vous pouvez construire l'URL de l'`<iframe>` et l'afficher. Le `access_token` du point de terminaison `embed-info` doit être passé comme paramètre de requête `jwt` à l'URL source de l'`iframe`.
+  Une fois que votre frontend dispose des informations d'intégration, vous pouvez construire l'URL de l'`<iframe>` et l'afficher. Le `access_token` de l'endpoint `embed-info` doit être passé comme paramètre de requête `jwt` à l'URL source de l'`iframe`.
 
   Voici un exemple simplifié avec React :
 
@@ -132,7 +132,7 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
   ```
 
   <Note>
-    **Utiliser une clé API directe :** Pour les scénarios où vous préférez ne pas utiliser le point de terminaison `/embed-info` (par exemple, le rendu côté serveur), vous pouvez également vous authentifier en passant votre clé API UBIK directement en tant que paramètre de requête `apiKey`.
+    **Utiliser une clé API directe :** Pour les scénarios où vous préférez ne pas utiliser l'endpoint `/embed-info` (par exemple, le rendu côté serveur), vous pouvez également vous authentifier en passant votre clé API UBIK directement en tant que paramètre de requête `apiKey`.
     
     `const iframeSrc = \`https://app.ubik-agent.com/embed/tools/VOTRE_ID_OUTIL?apiKey=VOTRE_CLE_API\`;`
     
@@ -145,7 +145,7 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
 
   Voici une liste des paramètres disponibles :
 
-  - **`jwt`** (string) : Un JSON Web Token de courte durée obtenu depuis le point de terminaison `/tools/{tool_id}/embed-info`. C'est la méthode recommandée pour l'authentification côté client.
+  - **`jwt`** (string) : Un JSON Web Token de courte durée obtenu depuis l'endpoint `/tools/{tool_id}/embed-info`. C'est la méthode recommandée pour l'authentification côté client.
   - **`apiKey`** (string) : Votre clé API UBIK. Elle peut être utilisée pour l'authentification à la place d'un JWT, mais elle est moins sécurisée pour les applications côté client car elle peut exposer votre clé secrète.
   - **`theme`** ('light' | 'dark') : Définit le thème de couleur par défaut pour l'interface de l'outil. S'il n'est pas fourni, il s'adapte à la préférence système de l'utilisateur.
   - **`showThemeToggle`** (boolean) : Si défini sur `true`, un sélecteur de thème sera affiché dans l'en-tête de l'outil, permettant aux utilisateurs de basculer entre le mode clair et le mode sombre.

@@ -7,8 +7,8 @@ Ce guide montre comment tirer parti des outils d'UBIK pour effectuer des tâches
 
 <Steps>
 
-<Step title="Découvrir les Outils Disponibles">
-  D'abord, voyons quels outils sont disponibles. Nous pouvons obtenir une liste de tous les outils qui nous sont accessibles en effectuant une requête `GET` vers le point de terminaison `/tools`.
+<Step title="Lister les Outils Disponibles">
+  D'abord, voyons quels outils sont disponibles. Nous pouvons obtenir une liste de tous les outils qui nous sont accessibles en effectuant une requête `GET` vers l'endpoint `/tools`.
 
   <CodeGroup title="GET /tools">
   ```bash cURL
@@ -53,7 +53,7 @@ Ce guide montre comment tirer parti des outils d'UBIK pour effectuer des tâches
 </Step>
 
 <Step title="Exécuter l'Outil">
-  Maintenant, nous allons démarrer l'outil en effectuant une requête `POST` vers le point de terminaison `/tools/{tool_id}/execute`. Vous aurez besoin de l'`id` de l'étape précédente. Dans le corps de la requête, nous fournirons les `inputs` requis par l'outil.
+  Maintenant, nous allons démarrer l'outil en effectuant une requête `POST` vers l'endpoint `/tools/{tool_id}/execute`. Vous aurez besoin de l'`id` de l'étape précédente. Dans le corps de la requête, nous fournirons les `inputs` requis par l'outil.
 
   <CodeGroup title="POST /tools/{tool_id}/execute">
   ```bash cURL
@@ -135,8 +135,8 @@ Ce guide montre comment tirer parti des outils d'UBIK pour effectuer des tâches
 
 </Step>
 
-<Step title="Interroger les Résultats">
-  Comme l'outil s'exécute de manière asynchrone, nous devons interroger la `details_url` pour vérifier le résultat final. Vous devrez vérifier ce point de terminaison périodiquement jusqu'à ce que le `status` passe à `completed` ou `failed`.
+<Step title="Vérifier le Résultat de l'Exécution">
+  Comme l'outil s'exécute de manière asynchrone, nous devons interroger la `details_url` pour vérifier le résultat final. Vous devrez vérifier cet endpoint périodiquement jusqu'à ce que le `status` passe à `completed` ou `failed`.
 
   <CodeGroup title="GET /tool-executions/{execution_id}">
   ```bash cURL
@@ -209,4 +209,4 @@ Ce guide montre comment tirer parti des outils d'UBIK pour effectuer des tâches
 
 </Steps>
 
-Vous savez maintenant comment découvrir et exécuter des outils puissants et pré-construits pour automatiser des flux de travail complexes avec l'API UBIK.
+Vous savez maintenant comment découvrir et exécuter des outils puissants et pré-construits pour automatiser des séquences d'actions complexes avec l'API UBIK.
