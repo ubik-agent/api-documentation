@@ -85,55 +85,41 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
 </Step>
 
 <Step title="Afficher l'iframe">
-  Une fois que votre frontend dispose des informations d'intégration, vous pouvez construire l'URL de l'`<iframe>` et l'afficher. L'URL doit être au format : `/embed/tools/{tool_id}`.
-
-  Vous devrez ensuite envoyer l'`access_token` à l'`<iframe>` en utilisant `postMessage` une fois qu'elle est chargée.
+  Une fois que votre frontend dispose des informations d'intégration, vous pouvez construire l'URL de l'`<iframe>` et l'afficher. Le `access_token` du point de terminaison `embed-info` doit être passé comme paramètre de requête `jwt` à l'URL source de l'`iframe`.
 
   Voici un exemple simplifié avec React :
 
   ```jsx Exemple React
-  import React, { useState, useEffect, useRef } from 'react';
+  import React, { useState, useEffect } from 'react';
 
   const EmbeddedTool = ({ toolId }) => {
     const [embedInfo, setEmbedInfo] = useState(null);
-    const iframeRef = useRef(null);
 
     useEffect(() => {
       // Dans une vraie application, ceci récupérerait les données depuis votre backend
       const fetchEmbedInfo = async () => {
-        const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
-        const data = await response.json();
-        setEmbedInfo(data);
+        try {
+          const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
+          const data = await response.json();
+          setEmbedInfo(data);
+        } catch (error) {
+          console.error("Échec de la récupération des informations d'intégration:", error);
+        }
       };
 
       fetchEmbedInfo();
     }, [toolId]);
 
-    const handleIframeLoad = () => {
-      if (iframeRef.current && embedInfo?.access_token) {
-        // L'origine cible doit être celle de l'application UBIK
-        const targetOrigin = "https://app.ubik-agent.com";
-        iframeRef.current.contentWindow.postMessage(
-          {
-            type: 'UBIK_EMBED_TOKEN',
-            token: embedInfo.access_token,
-          },
-          targetOrigin
-        );
-      }
-    };
-
     if (!embedInfo) {
       return <div>Chargement de l'outil...</div>;
     }
 
-    const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}`;
+    // Ajoutez le jeton d'accès en tant que paramètre de requête.
+    const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}?jwt=${embedInfo.access_token}`;
 
     return (
       <iframe
-        ref={iframeRef}
         src={iframeSrc}
-        onLoad={handleIframeLoad}
         title={embedInfo.name}
         width="100%"
         height="600px"
@@ -145,6 +131,13 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
   export default EmbeddedTool;
   ```
 
+  <Note>
+    **Utiliser une clé API directe :** Pour les scénarios où vous préférez ne pas utiliser le point de terminaison `/embed-info` (par exemple, le rendu côté serveur), vous pouvez également vous authentifier en passant votre clé API UBIK directement en tant que paramètre de requête `apiKey`.
+    
+    `const iframeSrc = \`https://app.ubik-agent.com/embed/tools/VOTRE_ID_OUTIL?apiKey=VOTRE_CLE_API\`;`
+    
+    Cependant, pour les applications côté client, il est fortement recommandé d'utiliser le `access_token` de courte durée pour éviter d'exposer votre clé API secrète.
+  </Note>
 </Step>
 
 </Steps>

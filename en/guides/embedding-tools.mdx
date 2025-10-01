@@ -85,55 +85,41 @@ Embedding UBIK tools into your own application provides a powerful way to extend
 </Step>
 
 <Step title="Render the iframe">
-  Once your frontend has the embedding information, you can construct the `<iframe>` URL and render it. The URL should be in the format: `/embed/tools/{tool_id}`.
-
-  You will then need to send the `access_token` to the `<iframe>` using `postMessage` once it has loaded.
+  Once your frontend has the embedding information, you can construct the `<iframe>` URL and render it. The `access_token` from the `embed-info` endpoint must be passed as a `jwt` query parameter to the `iframe`'s source URL.
 
   Here is a simplified example using React:
 
   ```jsx React Example
-  import React, { useState, useEffect, useRef } from 'react';
+  import React, { useState, useEffect } from 'react';
 
   const EmbeddedTool = ({ toolId }) => {
     const [embedInfo, setEmbedInfo] = useState(null);
-    const iframeRef = useRef(null);
 
     useEffect(() => {
       // In a real app, this would fetch from your backend
       const fetchEmbedInfo = async () => {
-        const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
-        const data = await response.json();
-        setEmbedInfo(data);
+        try {
+          const response = await fetch(`/api/get-tool-embed-info?toolId=${toolId}`);
+          const data = await response.json();
+          setEmbedInfo(data);
+        } catch (error) {
+          console.error("Failed to fetch embed info:", error);
+        }
       };
 
       fetchEmbedInfo();
     }, [toolId]);
 
-    const handleIframeLoad = () => {
-      if (iframeRef.current && embedInfo?.access_token) {
-        // The target origin should be the UBIK app's origin
-        const targetOrigin = "https://app.ubik-agent.com";
-        iframeRef.current.contentWindow.postMessage(
-          {
-            type: 'UBIK_EMBED_TOKEN',
-            token: embedInfo.access_token,
-          },
-          targetOrigin
-        );
-      }
-    };
-
     if (!embedInfo) {
       return <div>Loading Tool...</div>;
     }
 
-    const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}`;
+    // Append the access token as a query parameter.
+    const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}?jwt=${embedInfo.access_token}`;
 
     return (
       <iframe
-        ref={iframeRef}
         src={iframeSrc}
-        onLoad={handleIframeLoad}
         title={embedInfo.name}
         width="100%"
         height="600px"
@@ -145,6 +131,13 @@ Embedding UBIK tools into your own application provides a powerful way to extend
   export default EmbeddedTool;
   ```
 
+  <Note>
+    **Using a direct API Key:** For scenarios where you prefer not to use the `/embed-info` endpoint (e.g., server-side rendering), you can also authenticate by passing your UBIK API key directly as the `apiKey` query parameter.
+    
+    `const iframeSrc = `https://app.ubik-agent.com/embed/tools/YOUR_TOOL_ID?apiKey=YOUR_API_KEY`;`
+    
+    However, for client-side applications, using the short-lived `access_token` is strongly recommended to avoid exposing your secret API key.
+  </Note>
 </Step>
 
 </Steps>
