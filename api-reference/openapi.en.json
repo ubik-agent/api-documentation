@@ -7,9 +7,6 @@
   },
   "servers": [
     {
-      "url": "/api/v1"
-    },
-    {
       "url": "https://app.ubik-agent.com/api/v1",
       "description": "Production Server"
     }

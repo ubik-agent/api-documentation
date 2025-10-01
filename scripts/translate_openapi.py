@@ -19,6 +19,14 @@ def process_openapi_spec(base_spec_path, output_dir, languages):
         for lang in languages:
             spec_copy = copy.deepcopy(base_spec)
             
+            # Set the server URL
+            spec_copy['servers'] = [
+                {
+                    "url": "https://app.ubik-agent.com/api/v1",
+                    "description": "Production Server"
+                }
+            ]
+
             # Translate paths
             if 'paths' in spec_copy:
                 for path, methods in spec_copy['paths'].items():
