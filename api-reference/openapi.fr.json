@@ -2273,7 +2273,6 @@
       "ToolInputSchema": {
         "properties": {
           "type": {
-            "type": "string",
             "title": "Type",
             "default": "object"
           },
@@ -2292,6 +2291,32 @@
             "type": "array",
             "title": "Required",
             "description": "Une liste des noms de propriétés qui sont requis."
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additionalproperties",
+            "default": false
+          },
+          "$defs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/ToolPropertySchema"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "$Defs"
           }
         },
         "type": "object",
@@ -2342,16 +2367,87 @@
       "ToolPropertySchema": {
         "properties": {
           "type": {
-            "type": "string",
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
             "title": "Type",
             "description": "Le type de données de la propriété (par ex., 'string', 'integer')."
           },
           "description": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Description",
             "description": "Une description de ce que représente la propriété."
           },
           "enum": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enum",
+            "description": "Une liste de valeurs possibles si la propriété est une énumération."
+          },
+          "properties": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/ToolPropertySchema"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Properties"
+          },
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ToolPropertySchema"
+              },
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ToolPropertySchema"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Items"
+          },
+          "required": {
             "anyOf": [
               {
                 "items": {
@@ -2363,15 +2459,52 @@
                 "type": "null"
               }
             ],
-            "title": "Enum",
-            "description": "Une liste de valeurs possibles si la propriété est une énumération."
+            "title": "Required"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additionalproperties"
+          },
+          "default": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format"
+          },
+          "$ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "$Ref"
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "description"
-        ],
         "title": "ToolPropertySchema"
       },
       "ValidationError": {
