@@ -502,7 +502,7 @@
           "Public API - Documents"
         ],
         "summary": "Ingest documents from files or URLs",
-        "description": "Unified endpoint to ingest documents from various sources.\n\nThis endpoint can handle file uploads and URL scraping in a single request.\nIt uses multipart/form-data.\n\n- To upload files, include them in the 'files' part of the form.\n- To scrape URLs, provide a comma-separated string in the 'urls' form field.\n- Specify workspace IDs to associate the ingested documents with specific workspaces.",
+        "description": "Unified endpoint to ingest documents from various sources.\n\nThis endpoint can handle file uploads and URL scraping in a single request.\nIt uses multipart/form-data.\n\n- To upload files, include them in the 'files' part of the form.\n- To scrape URLs, provide a comma-separated string in the 'urls' form field.\n- Specify workspace IDs to associate the ingested documents with specific workspaces.\n\n**Note:** Supported file types depend on the server's active capabilities (e.g. audio/video files require transcription to be enabled).",
         "operationId": "ingest_documents_documents_post",
         "security": [
           {

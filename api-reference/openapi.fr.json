@@ -502,7 +502,7 @@
           "Public API - Documents"
         ],
         "summary": "Ingestion de documents (fichiers ou URLs)",
-        "description": "Route unifiée pour ingérer des documents depuis diverses sources.\n\nCette route gère le téléversement de fichiers et le scraping d'URLs en une seule requête (multipart/form-data).\n\n- Pour importer des fichiers, utilisez le champ 'files'.\n- Pour scraper des URLs, utilisez le champ 'urls' (liste séparée par des virgules).\n- Associez les documents à des espaces de travail via 'workspace_ids'.",
+        "description": "Route unifiée pour ingérer des documents depuis diverses sources.\n\nCette route gère le téléversement de fichiers et le scraping d'URLs en une seule requête (multipart/form-data).\n\n- Pour importer des fichiers, utilisez le champ 'files'.\n- Pour scraper des URLs, utilisez le champ 'urls' (liste séparée par des virgules).\n- Associez les documents à des espaces de travail via 'workspace_ids'.\n\n**Note:** Les types de fichiers pris en charge dépendent des capacités actives du serveur (par exemple, les fichiers audio/vidéo nécessitent que la transcription soit activée).",
         "operationId": "ingest_documents_documents_post",
         "security": [
           {
