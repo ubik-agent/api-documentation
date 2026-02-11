@@ -658,6 +658,63 @@
         }
       }
     },
+    "/documents/{document_id}/reprocess": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Reprocess a document",
+        "description": "Reprocess a document using a different pipeline, optionally updating the file content.",
+        "operationId": "reprocess_document_public_documents__document_id__reprocess_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_reprocess_document_public_documents__document_id__reprocess_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/documents/{document_id}/workspaces": {
       "post": {
         "tags": [
@@ -1443,6 +1500,35 @@
         },
         "type": "object",
         "title": "Body_provide_public_tool_input_tool_executions__execution_id__provide_input_post"
+      },
+      "Body_reprocess_document_public_documents__document_id__reprocess_post": {
+        "properties": {
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "pipeline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pipeline"
+          }
+        },
+        "type": "object",
+        "title": "Body_reprocess_document_public_documents__document_id__reprocess_post"
       },
       "HTTPValidationError": {
         "properties": {
