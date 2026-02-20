@@ -168,7 +168,7 @@ The agent requires user input to proceed. This usually happens at a specific che
 
 ### Tool Execution Events
 
-Events related to the agent using tools. Note that the *textual representation* of tool calls (inputs/outputs) appears in the `agent_response_chunk` stream, while these events provide structured status updates.
+Events related to the agent using tools. Note that the *textual representation* of tool calls (inputs/outputs) appears in the `response_chunk` stream, while these events provide structured status updates.
 
 For a detailed tutorial on how to handle these events to build a rich UI, please refer to the **[Handling Tool Streaming](/en/guides/streaming-results)** guide.
 
@@ -276,7 +276,7 @@ This method ensures that structural elements (which are not sent as raw text in 
 
 ### Large Payloads (Chunking)
 
-For very large events that exceed SSE limits, the system may split a single event into multiple chunks. These events have a type ending in `_delta_sse` (e.g., `agent_response_chunk_delta_sse`, `tool_update_delta_sse`, `agent_processing_complete_delta_sse`).
+For very large events that exceed SSE limits, the system may split a single event into multiple chunks. These events have a type ending in `_delta_sse` (e.g., `response_chunk_delta_sse`, `tool_update_delta_sse`, `agent_processing_complete_delta_sse`).
 
 > **Note**: Any event type can be chunked if its payload is large enough. The client should be prepared to handle `_delta_sse` variants for all event types.
 

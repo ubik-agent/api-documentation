@@ -104,15 +104,83 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
 </Step>
 
 <Step title="Comprendre les Événements">
-  Au fur et à mesure que l'outil s'exécute, vous recevrez une série d'objets JSON. Chaque objet contient un `event_type` et une charge utile `data`. Voici les principaux types d'événements :
+  Au fur et à mesure que l'outil s'exécute, vous recevrez une série d'objets JSON. Chaque objet contient un `event_type` et une charge utile `data`. Voici les types d'événements détaillés et leurs structures :
 
-  - **`tool_update`** : Une mise à jour générale de la progression. La charge utile `data` contient souvent des champs `phase` et `message` pour décrire l'état actuel.
-  - **`tool_partial_update`** : Un fragment de contenu en streaming. La charge utile `data` contient un champ `content` avec le morceau de texte.
-  - **`final_result`** : L'événement final d'une exécution réussie, contenant les `outputs` complets dans la charge utile `data`.
-  - **`tool_input_required`** : Envoyé lorsqu'un outil interactif a besoin d'une entrée de l'utilisateur.
-  - **`error`** : Indique qu'une erreur est survenue pendant l'exécution.
+  ### `tool_update`
+  Utilisé pour les mises à jour générales de progression ou les changements de données structurées.
+  
+  ```json
+  {
+    "event_type": "tool_update",
+    "data": {
+      "phase": "processing",        // Optionnel : Phase d'exécution actuelle
+      "message": "Traitement...",   // Optionnel : Statut lisible par l'humain
+      "output_key": "result",       // Optionnel : Clé pour les données structurées
+      "data": { ... }               // Optionnel : Données structurées arbitraires
+    }
+  }
+  ```
 
-  ```json Exemple de Flux d'Événements
+  ### `tool_partial_update`
+  Utilisé pour le contenu en streaming (par exemple, génération de texte, téléchargements partiels d'images).
+  
+  ```json
+  {
+    "event_type": "tool_partial_update",
+    "data": {
+      "content": "texte partiel...", // Le fragment de contenu
+      "output_key": "response",      // Le champ de sortie en cours de streaming
+      "data": { ... }                // Optionnel : Métadonnées supplémentaires
+    }
+  }
+  ```
+
+  ### `tool_input_required`
+  Envoyé lorsqu'un outil interactif met en pause l'exécution pour attendre une entrée de l'utilisateur.
+  
+  ```json
+  {
+    "event_type": "tool_input_required",
+    "data": {
+      "prompt": "Veuillez confirmer...", // Question pour l'utilisateur
+      "input_types": ["text"],           // Types d'entrée autorisés
+      "timeout": 300,                    // Délai d'attente en secondes
+      "state": { ... }                   // État interne (opaque)
+    }
+  }
+  ```
+
+  ### `final_result`
+  L'événement final d'une exécution réussie.
+  
+  ```json
+  {
+    "event_type": "final_result",
+    "data": {
+      "outputs": {                   // Les sorties complètes de l'outil
+        "response": "Texte complet...",
+        "images": [...]
+      }
+    }
+  }
+  ```
+
+  ### `error`
+  Indique qu'une erreur est survenue pendant l'exécution.
+  
+  ```json
+  {
+    "event_type": "error",
+    "data": {
+      "message": "Description de l'erreur",
+      "code": "CODE_ERREUR"
+    }
+  }
+  ```
+
+  ### Exemple de Flux d'Événements
+
+  ```json
   data: {"event_type": "tool_update", "data": {"phase": "retrieval", "message": "Récupération des documents pertinents..."}}
 
   data: {"event_type": "tool_update", "data": {"phase": "generation", "message": "Génération de la réponse..."}}

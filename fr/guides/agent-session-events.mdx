@@ -168,7 +168,7 @@ L'agent nécessite une entrée utilisateur pour continuer. Cela se produit gén�
 
 ### Événements d'Exécution d'Outils
 
-Événements liés à l'utilisation d'outils par l'agent. Notez que la *représentation textuelle* des appels d'outils (entrées/sorties) apparaît dans le flux `agent_response_chunk`, tandis que ces événements fournissent des mises à jour de statut structurées.
+Événements liés à l'utilisation d'outils par l'agent. Notez que la *représentation textuelle* des appels d'outils (entrées/sorties) apparaît dans le flux `response_chunk`, tandis que ces événements fournissent des mises à jour de statut structurées.
 
 Pour un tutoriel détaillé sur la façon de gérer ces événements pour construire une interface utilisateur riche, veuillez consulter le guide **[Gestion du Streaming d'Outils](/fr/guides/streaming-results)**.
 
@@ -276,7 +276,7 @@ Cette méthode garantit que les éléments structurels (qui ne sont pas envoyés
 
 ### Charges Utiles Volumineuses (Chunking)
 
-Pour les événements très volumineux qui dépassent les limites SSE, le système peut diviser un événement unique en plusieurs morceaux. Ces événements ont un type se terminant par `_delta_sse` (par exemple, `agent_response_chunk_delta_sse`, `tool_update_delta_sse`, `agent_processing_complete_delta_sse`).
+Pour les événements très volumineux qui dépassent les limites SSE, le système peut diviser un événement unique en plusieurs morceaux. Ces événements ont un type se terminant par `_delta_sse` (par exemple, `response_chunk_delta_sse`, `tool_update_delta_sse`, `agent_processing_complete_delta_sse`).
 
 > **Note** : Tout type d'événement peut être fragmenté si sa charge utile est suffisamment importante. Le client doit être prêt à gérer les variantes `_delta_sse` pour tous les types d'événements.
 

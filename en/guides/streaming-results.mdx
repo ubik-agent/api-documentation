@@ -104,15 +104,83 @@ This section shows you how to connect to a tool's event stream. This assumes you
 </Step>
 
 <Step title="Tool Execution Events">
-  As the tool executes, you will receive a series of JSON objects. Each object contains an `event_type` and a `data` payload. Here are the main event types:
+  As the tool executes, you will receive a series of JSON objects. Each object contains an `event_type` and a `data` payload. Here are the detailed event types and their structures:
 
-  - **`tool_update`**: A general progress update. The `data` payload often contains `phase` and `message` fields to describe the current state.
-  - **`tool_partial_update`**: A chunk of streaming content. The `data` payload contains a `content` field with the text.
-  - **`final_result`**: The final event of a successful execution, containing the complete `outputs` in the `data` payload.
-  - **`tool_input_required`**: Sent when an interactive tool needs user input.
-  - **`error`**: Indicates that an error occurred during execution.
+  ### `tool_update`
+  Used for general progress updates or structured data changes.
+  
+  ```json
+  {
+    "event_type": "tool_update",
+    "data": {
+      "phase": "processing",        // Optional: Current execution phase
+      "message": "Processing...",   // Optional: Human-readable status
+      "output_key": "result",       // Optional: Key for structured data
+      "data": { ... }               // Optional: Arbitrary structured data
+    }
+  }
+  ```
 
-  ```json Example Event Stream
+  ### `tool_partial_update`
+  Used for streaming content (e.g., text generation, partial image downloads).
+  
+  ```json
+  {
+    "event_type": "tool_partial_update",
+    "data": {
+      "content": "partial text...", // The chunk of content
+      "output_key": "response",     // The output field being streamed
+      "data": { ... }               // Optional: Additional metadata
+    }
+  }
+  ```
+
+  ### `tool_input_required`
+  Sent when an interactive tool pauses execution to wait for user input.
+  
+  ```json
+  {
+    "event_type": "tool_input_required",
+    "data": {
+      "prompt": "Please confirm...", // Question for the user
+      "input_types": ["text"],       // Allowed input types
+      "timeout": 300,                // Timeout in seconds
+      "state": { ... }               // Internal state (opaque)
+    }
+  }
+  ```
+
+  ### `final_result`
+  The final event of a successful execution.
+  
+  ```json
+  {
+    "event_type": "final_result",
+    "data": {
+      "outputs": {                   // The complete tool outputs
+        "response": "Full text...",
+        "images": [...]
+      }
+    }
+  }
+  ```
+
+  ### `error`
+  Indicates that an error occurred during execution.
+  
+  ```json
+  {
+    "event_type": "error",
+    "data": {
+      "message": "Error description",
+      "code": "ERROR_CODE"
+    }
+  }
+  ```
+
+  ### Example Event Stream
+
+  ```json
   data: {"event_type": "tool_update", "data": {"phase": "retrieval", "message": "Fetching relevant documents..."}}
 
   data: {"event_type": "tool_update", "data": {"phase": "generation", "message": "Generating response..."}}

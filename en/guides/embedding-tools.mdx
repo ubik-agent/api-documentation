@@ -179,6 +179,14 @@ Embedding UBIK tools into your own application provides a powerful way to extend
   ```
 </Step>
 
+<Step title="Handling Events (Advanced)">
+  The embedded iframe handles all real-time events, state management, and user interactions internally. You do not need to write any additional code to handle tool progress or results.
+
+  However, if you need to build a completely custom interface that reacts to tool events programmatically (e.g., for deep integration into your own UI framework), you should use the API directly instead of the iframe.
+
+  For details on consuming the raw event stream, please refer to the **[Getting Real-Time Results with SSE](/en/guides/streaming-results)** guide.
+</Step>
+
 </Steps>
 
 By following these steps, you can securely embed UBIK's powerful tools directly into your application, creating a seamless and integrated experience for your users.
