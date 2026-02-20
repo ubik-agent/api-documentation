@@ -3,6 +3,348 @@ title: "Événements de Session d'Agent"
 description: "Référence pour les événements en temps réel dans les Sessions d'Agent."
 ---
 
-<Note>
-  Nous travaillons actuellement à la création de ce guide. Il sera bientôt disponible.
-</Note>
+Lors de l'interaction avec l'API de Session d'Agent, en particulier les points de terminaison de chat, le serveur diffuse les réponses en utilisant les Server-Sent Events (SSE). Cela permet des mises à jour en temps réel sur le processus de réflexion de l'agent, ses étapes et sa réponse finale.
+
+## Vue d'ensemble
+
+Le flux de réponse consiste en une séquence d'événements. Chaque événement a un `type` et une charge utile `data`. Le client doit écouter ces événements pour reconstruire l'activité de l'agent et le contenu final du message.
+
+## Types d'Événements
+
+Voici les principaux types d'événements que vous rencontrerez :
+
+### Événements d'Initialisation
+
+#### `connection_established`
+
+Envoyé immédiatement lorsque la connexion SSE est ouverte avec succès.
+
+```json
+{
+  "type": "connection_established",
+  "session_id": "chaine-uuid",
+  "connection_id": "chaine-uuid",
+  "task_id": "chaine-uuid"
+}
+```
+
+#### `agent_processing_started`
+
+Indique que l'agent a reçu la demande et a commencé le traitement.
+
+```json
+{
+  "type": "agent_processing_started",
+  "task_id": "chaine-uuid",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `response_stream_start`
+
+Signale le début du flux de contenu.
+
+```json
+{
+  "type": "response_stream_start",
+  "message_id": "None", // Peut être None initialement
+  "task_id": "chaine-uuid",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+### Événements d'Exécution
+
+#### `agent_step_started`
+
+Déclenché lorsque l'agent commence une étape spécifique de son plan.
+
+```json
+{
+  "type": "agent_step_started",
+  "step": 1,
+  "description": "Description de l'étape",
+  "single_step_agent": false,
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_step_progress`
+
+Fournit des mises à jour sur la progression de l'étape actuelle.
+
+```json
+{
+  "type": "agent_step_progress",
+  "step": 1,
+  "progress": 50,
+  "message": "Message de statut actuel",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_response_update`
+
+Fournit une mise à jour complète du contenu de la réponse de l'agent. Ceci est souvent utilisé pour la synchronisation ou lorsque la réponse entière doit être rafraîchie.
+
+```json
+{
+  "type": "agent_response_update",
+  "message_id": "chaine-uuid",
+  "content": "Contenu complet mis à jour...",
+  "parent_id": "chaine-uuid",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_step_completed`
+
+Indique qu'une étape spécifique a été complétée avec succès.
+
+```json
+{
+  "type": "agent_step_completed",
+  "step": 1,
+  "progress": 100,
+  "completed": true,
+  "results": { ... },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_progress`
+
+Fournit une mise à jour de la progression globale de la tâche de l'agent.
+
+```json
+{
+  "type": "agent_progress",
+  "step": 1,
+  "total_steps": 1,
+  "description": "Étape 1 terminée : ...",
+  "progress": 100.0,
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `response_chunk`
+
+Contient un fragment de texte partiel de la réponse de l'agent. Ces fragments doivent être concaténés pour former le texte complet. Ce flux inclut à la fois la réponse en langage naturel de l'agent et les balises injectées pour les appels d'outils.
+
+> **Note** : Certaines parties du backend peuvent émettre `agent_response_chunk`. L'implémentation recommandée attend spécifiquement `response_chunk`.
+
+```json
+{
+  "type": "response_chunk",
+  "content": "texte partiel...",
+  "step": 1, // Optionnel : indique à quelle étape appartient ce fragment
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `checkpoint_created`
+
+Indique qu'un point de contrôle a été atteint dans le flux d'exécution de l'agent.
+
+```json
+{
+  "type": "checkpoint_created",
+  "checkpoint_name": "nom_du_point_de_controle",
+  "created_at": "ISO-8601-timestamp"
+}
+```
+
+#### `input_required`
+
+L'agent nécessite une entrée utilisateur pour continuer. Cela se produit généralement à un point de contrôle spécifique.
+
+```json
+{
+  "type": "input_required",
+  "checkpoint_name": "identifiant_point_de_controle",
+  "prompt": "Question pour l'utilisateur",
+  "input_types": ["text", "json"], // Formats d'entrée attendus
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+### Événements d'Exécution d'Outils
+
+Événements liés à l'utilisation d'outils par l'agent. Notez que la *représentation textuelle* des appels d'outils (entrées/sorties) apparaît dans le flux `agent_response_chunk`, tandis que ces événements fournissent des mises à jour de statut structurées.
+
+Pour un tutoriel détaillé sur la façon de gérer ces événements pour construire une interface utilisateur riche, veuillez consulter le guide **[Gestion du Streaming d'Outils](/fr/guides/streaming-results)**.
+
+#### `tool_update`
+
+Mises à jour sur le statut d'exécution de l'outil, les phases ou les métadonnées.
+
+```json
+{
+  "type": "tool_update",
+  "tool_execution_id": "chaine-uuid",
+  "tool_name": "web_search",
+  "data": {
+    "phase": "WEB_SEARCH",
+    "status": "started",
+    "query": "requête de recherche"
+  },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `tool_partial_update`
+
+Sortie en continu d'un outil (par exemple, un processus long, du contenu généré, ou la "pensée" d'un sous-agent).
+
+```json
+{
+  "type": "tool_partial_update",
+  "tool_execution_id": "chaine-uuid",
+  "tool_name": "web_search",
+  "data": {
+    "content": "contenu partiel...",
+    "output_key": "response"
+  },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `tool_input_required`
+
+L'outil nécessite une intervention ou une confirmation humaine.
+
+```json
+{
+  "type": "tool_input_required",
+  "tool_execution_id": "chaine-uuid",
+  "tool_name": "human_confirmation",
+  "tool_input": { "question": "Continuer ?" },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+### Événements de Fin
+
+#### `agent_processing_complete`
+
+Indique que l'agent a terminé sa tâche.
+
+```json
+{
+  "type": "agent_processing_complete",
+  "message_id": "chaine-uuid",
+  "content": "Contenu complet final",
+  "result": { ... },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+## Analyse du Contenu de la Réponse
+
+Les événements `agent_response_chunk` transportent le texte brut généré par l'agent. Ce texte contient souvent des balises structurées (comme `<<TOOL_STEP_START>>`, `<<thinking>>`, etc.) qui représentent l'état interne et les actions de l'agent.
+
+Pour une référence détaillée sur la façon d'analyser ces balises et de structurer le message final, veuillez consulter le guide **[Structure des Messages d'Agent](/fr/guides/agent-message-structure)**.
+
+## Gestion et Reconstruction du Contenu
+
+Pour afficher correctement la réponse de l'agent, vous avez deux options principales :
+
+### Option 1 : Utiliser le SDK Ubik Agent (Recommandé)
+
+La façon la plus simple de gérer le flux d'événements est d'utiliser les SDK officiels, qui gèrent automatiquement la connexion, l'analyse des événements, le réassemblage des morceaux et la reconstruction des messages. Ces SDK fournissent une représentation Markdown propre et prête à être affichée de l'activité de l'agent.
+
+> **Note** : Les SDK `ubik-agent` (JavaScript/TypeScript) et `ubik-agent-py` (Python) sont actuellement en cours de développement.
+
+### Option 2 : Traiter les Événements Bruts (Avancé)
+
+Si vous construisez une interface personnalisée ou ne pouvez pas utiliser les SDK, vous pouvez traiter directement les événements SSE bruts. Cela nécessite d'implémenter vous-même la logique de reconstruction d'état.
+
+Pour refléter fidèlement le comportement de l'agent, il est recommandé d'utiliser une approche de **reconstruction d'état** plutôt qu'un simple flux de concaténation.
+
+### Logique de Reconstruction (Rebuild)
+
+L'implémentation recommandée maintient une liste chronologique de tous les événements et reconstruit le contenu complet du message à chaque mise à jour. Voici la logique :
+
+1.  **Stocker la Séquence** : Ajoutez chaque événement entrant (`step_started`, `response_chunk`, `checkpoint`, etc.) dans un tableau `eventSequence`.
+2.  **Trier** : Assurez-vous que les événements sont triés par horodatage.
+3.  **Générer le Contenu** : Parcourez la séquence pour construire la chaîne finale. Pour les détails sur la construction des éléments de message, consultez le guide **[Structure des Messages d'Agent](/fr/guides/agent-message-structure)** :
+    *   **Étapes (`agent_step_started`)** : Ouvrez un bloc avec `<<STEP_START>>`. Tous les `response_chunk` associés à cette étape doivent être insérés à l'intérieur. Fermez avec `<<STEP_END>>` une fois l'étape terminée ou lors du changement d'étape.
+    *   **Fragments hors étape (`response_chunk`)** : Si un fragment n'est pas associé à une étape, il est ajouté directement au contenu principal (souvent après un saut de ligne).
+    *   **Points de Contrôle (`checkpoint_created`)** : Insérez des balises `<<CHECKPOINT_START>>` ... `<<CHECKPOINT_END>>` à la position chronologique appropriée.
+    *   **Entrées Requises (`input_required`)** : Générez un bloc `<<INPUT_REQUIRED_START>>` contenant l'invite et les types attendus. Si une entrée a été fournie, incluez-la dans un bloc `<<USER_INPUT_PROVIDED_START>>`.
+    *   **Outils (`tool_update`)** : Ces événements fournissent l'état en temps réel. Bien que vous puissiez les injecter dans le texte avec des balises temporaires (comme `<<TOOL_EVENT_START>>`) pour l'affichage, il est recommandé d'utiliser directement les données de l'événement pour rendre des composants d'interface utilisateur réactifs (spinners, journaux d'état) au-dessus du flux de texte. Ces balises temporaires ne sont pas conservées dans l'historique final.
+
+Cette méthode garantit que les éléments structurels (qui ne sont pas envoyés sous forme de texte brut dans les `chunks`) sont correctement représentés dans le message final.
+
+### Charges Utiles Volumineuses (Chunking)
+
+Pour les événements très volumineux qui dépassent les limites SSE, le système peut diviser un événement unique en plusieurs morceaux. Ces événements ont un type se terminant par `_delta_sse` (par exemple, `agent_response_chunk_delta_sse`, `tool_update_delta_sse`, `agent_processing_complete_delta_sse`).
+
+> **Note** : Tout type d'événement peut être fragmenté si sa charge utile est suffisamment importante. Le client doit être prêt à gérer les variantes `_delta_sse` pour tous les types d'événements.
+
+La charge utile pour ces événements comprend :
+*   `chunk_id` : ID unique pour l'événement divisé.
+*   `chunk_index` : Index du morceau actuel (base 0).
+*   `total_chunks` : Nombre total de morceaux à attendre.
+*   `original_event_type` : Le type de l'événement en cours de reconstruction.
+*   `chunk_data` : La chaîne de données partielle.
+
+**Logique de Gestion :**
+1.  Mettre en mémoire tampon les morceaux entrants par `chunk_id`.
+2.  Lorsque `receivedChunks === totalChunks`, joindre les `chunk_data` dans l'ordre.
+3.  Analyser la chaîne jointe en tant que JSON.
+4.  Traiter le résultat comme un événement standard de type `original_event_type`.
+
+### Exemple : Gestionnaire d'Événements JavaScript
+
+Voici un exemple simplifié de la façon dont vous pourriez gérer ces événements dans une application frontend :
+
+```javascript
+const eventSource = new EventSource('/api/chat/stream');
+
+eventSource.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  
+  switch (event.type) {
+    case 'agent_step_started':
+      console.log(`Étape ${data.step}: ${data.description}`);
+      break;
+      
+    case 'agent_response_chunk':
+      // Ajouter le texte à l'étape actuelle ou à la réponse principale
+      // Consultez le guide Structure des Messages d'Agent pour l'analyse des balises dans data.content
+      updateUIWithText(data.content);
+      break;
+      
+    case 'tool_update':
+      // Gérer les mises à jour d'exécution d'outil
+      console.log(`Outil ${data.tool_name}: ${data.data.status}`);
+      break;
+      
+    case 'input_required':
+      // Afficher le formulaire de saisie à l'utilisateur
+      showInputForm(data.prompt, data.input_types);
+      break;
+      
+    case 'agent_processing_complete':
+      console.log('Terminé !');
+      eventSource.close();
+      break;
+  }
+};
+```
+
+## Gestion des Erreurs
+
+Si une erreur survient pendant le traitement, vous pouvez recevoir un événement `agent_processing_error`.
+
+```json
+{
+  "type": "agent_processing_error",
+  "error": "Description du message d'erreur",
+  "traceback": "...",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+Lors de la reconstruction du contenu, si une erreur est présente, elle doit être insérée à la fin du message (ou à l'intérieur du dernier point de contrôle actif) en utilisant les balises `<<ERROR_START>>` et `<<ERROR_END>>`, suivies éventuellement des détails JSON dans `<<ERROR_JSON_START>>`.

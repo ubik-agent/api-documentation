@@ -1,0 +1,159 @@
+---
+title: "Structure des Messages d'Agent"
+description: "Référence pour la structure interne et les balises des messages de Session d'Agent."
+---
+
+Lorsqu'une Session d'Agent traite une demande, elle génère une réponse qui n'est pas simplement du texte brut. Le contenu final du message est une chaîne structurée contenant des balises spéciales qui représentent le processus de réflexion de l'agent, les exécutions d'outils, les étapes et les interactions.
+
+Ce guide détaille les balises spécifiques et la structure utilisées dans ces messages.
+
+## Vue d'ensemble
+
+Le contenu du message est un historique linéaire de l'exécution de l'agent. Il est conçu pour être analysé par le client afin d'afficher une interface utilisateur riche avec des étapes, des entrées/sorties d'outils et des interactions utilisateur, tout en restant une chaîne unique stockable.
+
+## Balises d'Étape (Step Tags)
+
+Les étapes représentent des actions ou des phases de haut niveau dans le plan de l'agent.
+
+-   `<<STEP_START>>` : Marque le début d'un bloc d'étape.
+-   `<<STEP_END>>` : Marque la fin d'un bloc d'étape.
+-   `<<SINGLE_STEP_FLAG>>` : Un indicateur optionnel à l'intérieur d'un bloc d'étape indiquant qu'il s'agit d'une action d'agent à étape unique.
+
+**Exemple :**
+
+```text
+<<STEP_START>>
+Step 1: Analyzing the user request ✓
+I will now look up the information.
+<<STEP_END>>
+```
+
+## Balises d'Exécution d'Outil (Tool Execution Tags)
+
+Lorsque l'agent utilise un outil, les détails de l'exécution sont intégrés directement dans le flux de contenu à l'aide d'un ensemble spécifique de balises. Cela permet d'avoir un enregistrement précis de quel outil a été appelé, avec quels arguments, et quel a été le résultat.
+
+### Structure
+
+1.  **Début** : `<<TOOL_STEP_START/nom_outil:id_execution>>`
+2.  **Entrée** : `<<TOOL_STEP_INPUT_START>>` ... entrée JSON ... `<<TOOL_STEP_INPUT_END>>`
+3.  **Résultat** : `<<TOOL_STEP_RESULT_START>>` ... résultat JSON ... `<<TOOL_STEP_RESULT_END>>`
+4.  **Fin** : `<<TOOL_STEP_END/nom_outil:id_execution>>`
+
+**Exemple :**
+
+```text
+<<TOOL_STEP_START/web_search:call_123abc>>
+<<TOOL_STEP_INPUT_START>>
+{"query": "current weather in Paris"}
+<<TOOL_STEP_INPUT_END>>
+<<TOOL_STEP_RESULT_START>>
+{"temperature": "15°C", "condition": "Cloudy"}
+<<TOOL_STEP_RESULT_END>>
+<<TOOL_STEP_END/web_search:call_123abc>>
+```
+
+## Balises de Point de Contrôle (Checkpoint Tags)
+
+Les points de contrôle marquent des points significatifs dans l'historique de la conversation, souvent utilisés pour la navigation ou la restauration de l'état.
+
+-   `<<CHECKPOINT_START>>` : Commence un bloc de point de contrôle.
+-   `Checkpoint: nom` : Le nom du point de contrôle (à l'intérieur du bloc).
+-   `<<CHECKPOINT_END>>` : Termine le bloc de point de contrôle.
+
+**Exemple :**
+
+```text
+<<CHECKPOINT_START>>
+Checkpoint: step1_completed
+<<CHECKPOINT_END>>
+```
+
+## Balises de Demande d'Entrée (Input Request Tags)
+
+Lorsque l'agent a besoin d'informations de la part de l'utilisateur, il s'arrête et attend une entrée. Cette interaction est enregistrée à l'aide de balises spécifiques.
+
+-   `<<INPUT_REQUIRED_START>>` : Commence le bloc de demande d'entrée.
+-   `<<INPUT_REQUIRED_END>>` : Termine le bloc.
+-   `<<USER_INPUT_PROVIDED_START>>` : (Optionnel) Si l'utilisateur a déjà répondu, son entrée est stockée ici.
+-   `<<USER_INPUT_PROVIDED_END>>` : Termine la section d'entrée utilisateur.
+
+**Exemple (En attente d'entrée) :**
+
+```text
+<<INPUT_REQUIRED_START>>
+Please provide your email address.
+Expected input types: text
+checkpoint_name: wait_for_email
+<<INPUT_REQUIRED_END>>
+```
+
+**Exemple (Avec entrée utilisateur) :**
+
+```text
+<<INPUT_REQUIRED_START>>
+Please provide your email address.
+Expected input types: text
+
+<<USER_INPUT_PROVIDED_START>>
+{"input": "user@example.com", "type": "text"}
+<<USER_INPUT_PROVIDED_END>>
+<<INPUT_REQUIRED_END>>
+```
+
+## Balises d'Erreur (Error Tags)
+
+Si une erreur survient pendant l'exécution de l'agent, elle est enregistrée dans le contenu du message à l'aide de balises spécifiques.
+
+-   `<<ERROR_START>>` : Marque le début d'un message d'erreur.
+-   `<<ERROR_END>>` : Marque la fin du message d'erreur.
+-   `<<ERROR_JSON_START>>` : Marque le début d'un objet d'erreur JSON détaillé (traceback, métadonnées).
+-   `<<ERROR_JSON_END>>` : Marque la fin de l'objet d'erreur JSON.
+
+**Exemple :**
+
+```text
+<<ERROR_START>>
+Error: Tool execution failed
+<<ERROR_END>>
+
+<<ERROR_JSON_START>>
+{
+  "error": "Tool execution failed",
+  "traceback": "...",
+  "timestamp": "2023-10-27T10:00:00Z"
+}
+<<ERROR_JSON_END>>
+```
+
+## Balises de Pensée (Thinking Tags)
+
+Les modèles qui prennent en charge la "Chaîne de Pensée" (Chain of Thought) ou le raisonnement afficheront leur monologue interne enveloppé dans des balises de pensée.
+
+-   `<<thinking>>` : Commence le bloc de pensée.
+-   `<<thinking>>` (ou `<</thinking>>` dans certains contextes) : Termine le bloc de pensée.
+
+**Exemple :**
+
+```text
+<<thinking>>
+The user is asking for weather data. I should use the weather tool.
+<<thinking>>
+I will check the weather for Paris.
+```
+
+
+## Stratégie d'Analyse
+
+Pour afficher ce contenu, vous avez deux options principales :
+
+### Option 1 : Utiliser le SDK Ubik Agent (Recommandé)
+
+Les SDK `ubik-agent` (JS/TS) et `ubik-agent-py` (Python) (actuellement en cours de développement) analysent automatiquement ces balises et fournissent un modèle d'objet structuré ou une chaîne Markdown propre prête à être affichée. C'est la méthode préférée pour la plupart des applications.
+
+### Option 2 : Analyse Manuelle (Avancé)
+
+Si vous traitez vous-même la chaîne de contenu brute, suivez cette stratégie :
+
+1.  **Correspondance Regex** : Utilisez des expressions régulières pour trouver ces blocs.
+2.  **Machine à États** : Itérez à travers la chaîne, en maintenant un état (par exemple, `in_step`, `in_tool`, `in_thinking`) pour afficher le composant UI approprié pour chaque section.
+3.  **Analyse JSON** : Pour les entrées/sorties d'outils et les entrées utilisateur, extrayez le texte entre les balises et analysez-le en tant que JSON.

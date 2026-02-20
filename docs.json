@@ -50,6 +50,7 @@
                   "/en/guides/executing-tools",
                   "/en/guides/agent-sessions",
                   "/en/guides/agent-session-events",
+                  "/en/guides/agent-message-structure",
                   "/en/guides/streaming-results",
                   "/en/guides/embedding-tools"
                 ]
@@ -90,6 +91,7 @@
                   "/fr/guides/executing-tools",
                   "/fr/guides/agent-sessions",
                   "/fr/guides/agent-session-events",
+                  "/fr/guides/agent-message-structure",
                   "/fr/guides/streaming-results",
                   "/fr/guides/embedding-tools"
                 ]

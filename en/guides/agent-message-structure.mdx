@@ -1,0 +1,159 @@
+---
+title: "Agent Message Structure"
+description: "Reference for the internal structure and tags of Agent Session messages."
+---
+
+When an Agent Session processes a request, it generates a response that is not just plain text. The final message content is a structured string containing special tags that represent the agent's thought process, tool executions, steps, and interactions.
+
+This guide details the specific tags and structure used in these messages.
+
+## Overview
+
+The message content is a linear history of the agent's execution. It is designed to be parsed by the client to render a rich UI with steps, tool inputs/outputs, and user interactions, while remaining a single storable string.
+
+## Step Tags
+
+Steps represent high-level actions or phases in the agent's plan.
+
+-   `<<STEP_START>>`: Marks the beginning of a step block.
+-   `<<STEP_END>>`: Marks the end of a step block.
+-   `<<SINGLE_STEP_FLAG>>`: An optional flag inside a step block indicating this is a single-step agent action.
+
+**Example:**
+
+```text
+<<STEP_START>>
+Step 1: Analyzing the user request ✓
+I will now look up the information.
+<<STEP_END>>
+```
+
+## Tool Execution Tags
+
+When the agent uses a tool, the execution details are embedded directly into the content stream using a specific set of tags. This allows for a precise record of what tool was called, with what arguments, and what the result was.
+
+### Structure
+
+1.  **Start**: `<<TOOL_STEP_START/tool_name:execution_id>>`
+2.  **Input**: `<<TOOL_STEP_INPUT_START>>` ... JSON input ... `<<TOOL_STEP_INPUT_END>>`
+3.  **Result**: `<<TOOL_STEP_RESULT_START>>` ... JSON result ... `<<TOOL_STEP_RESULT_END>>`
+4.  **End**: `<<TOOL_STEP_END/tool_name:execution_id>>`
+
+**Example:**
+
+```text
+<<TOOL_STEP_START/web_search:call_123abc>>
+<<TOOL_STEP_INPUT_START>>
+{"query": "current weather in Paris"}
+<<TOOL_STEP_INPUT_END>>
+<<TOOL_STEP_RESULT_START>>
+{"temperature": "15°C", "condition": "Cloudy"}
+<<TOOL_STEP_RESULT_END>>
+<<TOOL_STEP_END/web_search:call_123abc>>
+```
+
+## Checkpoint Tags
+
+Checkpoints mark significant points in the conversation history, often used for navigation or restoring state.
+
+-   `<<CHECKPOINT_START>>`: Starts a checkpoint block.
+-   `Checkpoint: name`: The name of the checkpoint (inside the block).
+-   `<<CHECKPOINT_END>>`: Ends the checkpoint block.
+
+**Example:**
+
+```text
+<<CHECKPOINT_START>>
+Checkpoint: step1_completed
+<<CHECKPOINT_END>>
+```
+
+## Input Request Tags
+
+When the agent needs information from the user, it pauses and waits for input. This interaction is recorded using specific tags.
+
+-   `<<INPUT_REQUIRED_START>>`: Begins the input request block.
+-   `<<INPUT_REQUIRED_END>>`: Ends the block.
+-   `<<USER_INPUT_PROVIDED_START>>`: (Optional) If the user has already replied, their input is stored here.
+-   `<<USER_INPUT_PROVIDED_END>>`: Ends the user input section.
+
+**Example (Waiting for input):**
+
+```text
+<<INPUT_REQUIRED_START>>
+Please provide your email address.
+Expected input types: text
+checkpoint_name: wait_for_email
+<<INPUT_REQUIRED_END>>
+```
+
+**Example (With user input):**
+
+```text
+<<INPUT_REQUIRED_START>>
+Please provide your email address.
+Expected input types: text
+
+<<USER_INPUT_PROVIDED_START>>
+{"input": "user@example.com", "type": "text"}
+<<USER_INPUT_PROVIDED_END>>
+<<INPUT_REQUIRED_END>>
+```
+
+## Error Tags
+
+If an error occurs during the agent's execution, it is recorded within the message content using specific tags.
+
+-   `<<ERROR_START>>`: Marks the start of an error message.
+-   `<<ERROR_END>>`: Marks the end of the error message.
+-   `<<ERROR_JSON_START>>`: Marks the start of a detailed JSON error object (traceback, metadata).
+-   `<<ERROR_JSON_END>>`: Marks the end of the JSON error object.
+
+**Example:**
+
+```text
+<<ERROR_START>>
+Error: Tool execution failed
+<<ERROR_END>>
+
+<<ERROR_JSON_START>>
+{
+  "error": "Tool execution failed",
+  "traceback": "...",
+  "timestamp": "2023-10-27T10:00:00Z"
+}
+<<ERROR_JSON_END>>
+```
+
+## Thinking Tags
+
+Models that support "Chain of Thought" or reasoning will output their internal monologue wrapped in thinking tags.
+
+-   `<<thinking>>`: Starts the thinking block.
+-   `<<thinking>>` (or `<</thinking>>` in some contexts): Ends the thinking block.
+
+**Example:**
+
+```text
+<<thinking>>
+The user is asking for weather data. I should use the weather tool.
+<<thinking>>
+I will check the weather for Paris.
+```
+
+
+## Parsing Strategy
+
+To render this content, you have two main options:
+
+### Option 1: Use the Ubik Agent SDK (Recommended)
+
+The `ubik-agent` (JS/TS) and `ubik-agent-py` (Python) SDKs (currently under development) automatically parse these tags and provide a structured object model or a clean Markdown string ready for rendering. This is the preferred method for most applications.
+
+### Option 2: Manual Parsing (Advanced)
+
+If you are processing the raw content string yourself, follow this strategy:
+
+1.  **Regex Matching**: Use regular expressions to find these blocks.
+2.  **State Machine**: Iterate through the string, maintaining a state (e.g., `in_step`, `in_tool`, `in_thinking`) to render the appropriate UI component for each section.
+3.  **JSON Parsing**: For tool inputs/outputs and user inputs, extract the text between the tags and parse it as JSON.

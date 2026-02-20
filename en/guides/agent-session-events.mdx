@@ -3,6 +3,346 @@ title: "Agent Session Events"
 description: "Reference for real-time events in Agent Sessions."
 ---
 
-<Note>
-  We are currently working on creating this guide. It will be available soon.
-</Note>
+When interacting with the Agent Session API, specifically the chat endpoints, the server streams responses using Server-Sent Events (SSE). This allows for real-time updates on the agent's thought process, steps, and final response.
+
+## Overview
+
+The response stream consists of a sequence of events. Each event has a `type` and a `data` payload. The client should listen for these events to reconstruct the agent's activity and the final message content.
+
+## Event Types
+
+Here are the primary event types you will encounter:
+
+### Initialization Events
+
+#### `connection_established`
+
+Sent immediately when the SSE connection is successfully opened.
+
+```json
+{
+  "type": "connection_established",
+  "session_id": "uuid-string",
+  "connection_id": "uuid-string",
+  "task_id": "uuid-string"
+}
+```
+
+#### `agent_processing_started`
+
+Indicates that the agent has received the request and started processing.
+
+```json
+{
+  "type": "agent_processing_started",
+  "task_id": "uuid-string",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `response_stream_start`
+
+Signals the beginning of the content stream.
+
+```json
+{
+  "type": "response_stream_start",
+  "message_id": "None", // May be None initially
+  "task_id": "uuid-string",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+### Execution Events
+
+#### `agent_step_started`
+
+Fired when the agent begins a specific step in its plan.
+
+```json
+{
+  "type": "agent_step_started",
+  "step": 1,
+  "description": "Description of the step",
+  "single_step_agent": false,
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_step_progress`
+
+Provides updates on the progress of the current step.
+
+```json
+{
+  "type": "agent_step_progress",
+  "step": 1,
+  "progress": 50,
+  "message": "Current status message",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_response_update`
+
+Provides a full update of the agent's response content. This is often used for synchronization or when the entire response needs to be refreshed.
+
+```json
+{
+  "type": "agent_response_update",
+  "message_id": "uuid-string",
+  "content": "Updated full content...",
+  "parent_id": "uuid-string",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_step_completed`
+
+Indicates that a specific step has been successfully completed.
+
+```json
+{
+  "type": "agent_step_completed",
+  "step": 1,
+  "progress": 100,
+  "completed": true,
+  "results": { ... },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `agent_progress`
+
+Provides an overall progress update for the agent's task.
+
+```json
+{
+  "type": "agent_progress",
+  "step": 1,
+  "total_steps": 1,
+  "description": "Completed step 1: ...",
+  "progress": 100.0,
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `response_chunk`
+
+Contains a partial text chunk of the agent's response. These chunks should be concatenated to form the full text. This stream includes both the agent's natural language response and injected tags for tool calls.
+
+> **Note**: Some backend parts may emit `agent_response_chunk`. The recommended client implementation specifically expects `response_chunk`.
+
+```json
+{
+  "type": "response_chunk",
+  "content": "partial text...",
+  "step": 1, // Optional: indicates which step this chunk belongs to
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `checkpoint_created`
+
+Indicates a checkpoint has been reached in the agent's execution flow.
+
+```json
+{
+  "type": "checkpoint_created",
+  "checkpoint_name": "name_of_checkpoint",
+  "created_at": "ISO-8601-timestamp"
+}
+```
+
+#### `input_required`
+
+The agent requires user input to proceed. This usually happens at a specific checkpoint.
+
+```json
+{
+  "type": "input_required",
+  "checkpoint_name": "checkpoint_identifier",
+  "prompt": "Question for the user",
+  "input_types": ["text", "json"], // Expected input formats
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+### Tool Execution Events
+
+Events related to the agent using tools. Note that the *textual representation* of tool calls (inputs/outputs) appears in the `agent_response_chunk` stream, while these events provide structured status updates.
+
+For a detailed tutorial on how to handle these events to build a rich UI, please refer to the **[Handling Tool Streaming](/en/guides/streaming-results)** guide.
+
+#### `tool_update`
+
+Updates on tool execution status, phases, or metadata.
+
+```json
+{
+  "type": "tool_update",
+  "tool_execution_id": "uuid-string",
+  "tool_name": "web_search",
+  "data": {
+    "phase": "WEB_SEARCH",
+    "status": "started",
+    "query": "search query"
+  },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `tool_partial_update`
+
+Streaming output from a tool (e.g., a long-running process, generated content, or "thinking" from a sub-agent).
+
+```json
+{
+  "type": "tool_partial_update",
+  "tool_execution_id": "uuid-string",
+  "tool_name": "web_search",
+  "data": {
+    "content": "partial content...",
+    "output_key": "response"
+  },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+#### `tool_input_required`
+
+The tool requires human intervention or confirmation.
+
+```json
+{
+  "type": "tool_input_required",
+  "tool_execution_id": "uuid-string",
+  "tool_name": "human_confirmation",
+  "tool_input": { "question": "Proceed?" },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+### Completion Events
+
+#### `agent_processing_complete`
+
+Indicates the agent has finished its task.
+
+```json
+{
+  "type": "agent_processing_complete",
+  "message_id": "uuid-string",
+  "content": "Final full content",
+  "result": { ... },
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
+## Parsing Response Content
+
+The `agent_response_chunk` events carry the raw text generated by the agent. This text often contains structured tags (like `<<TOOL_STEP_START>>`, `<<thinking>>`, etc.) that represent the agent's internal state and actions.
+
+For a detailed reference on how to parse these tags and structure the final message, please refer to the **[Agent Message Structure](/en/guides/agent-message-structure)** guide.
+
+## Handling and Reconstructing Content
+
+To correctly display the agent's response, you have two main options:
+
+### Option 1: Use the Ubik Agent SDK (Recommended)
+
+The easiest way to handle the event stream is to use the official SDKs, which automatically handle connection management, event parsing, chunk reassembly, and message reconstruction. These SDKs provide a clean, ready-to-render Markdown representation of the agent's activity.
+
+> **Note**: The `ubik-agent` (JavaScript/TypeScript) and `ubik-agent-py` (Python) SDKs are currently under development.
+
+### Option 2: Process Raw Events (Advanced)
+
+If you are building a custom interface or cannot use the SDKs, you can process the raw SSE events directly. This requires implementing the state reconstruction logic yourself.
+
+To faithfully reflect the agent's behavior, it is recommended to use a **state reconstruction** approach rather than a simple concatenation stream.
+
+### Reconstruction Logic (Rebuild)
+
+The recommended implementation maintains a chronological list of all events and rebuilds the complete message content on each update. Here is the logic:
+
+1.  **Store Sequence**: Add each incoming event (`step_started`, `response_chunk`, `checkpoint`, etc.) to an `eventSequence` array.
+2.  **Sort**: Ensure events are sorted by timestamp.
+3.  **Generate Content**: Iterate through the sequence to build the final string. For details on building message elements, see the **[Agent Message Structure](/en/guides/agent-message-structure)** guide:
+    *   **Steps (`agent_step_started`)**: Open a block with `<<STEP_START>>`. All `response_chunk` events associated with this step must be inserted inside. Close with `<<STEP_END>>` once the step is completed or when changing steps.
+    *   **Non-step Chunks (`response_chunk`)**: If a chunk is not associated with a step, it is added directly to the main content (often after a newline).
+    *   **Checkpoints (`checkpoint_created`)**: Insert `<<CHECKPOINT_START>>` ... `<<CHECKPOINT_END>>` tags at the appropriate chronological position.
+    *   **Input Required (`input_required`)**: Generate an `<<INPUT_REQUIRED_START>>` block containing the prompt and expected types. If input has been provided, include it in a `<<USER_INPUT_PROVIDED_START>>` block.
+    *   **Tools (`tool_update`)**: These events provide real-time status. While you can inject them into the text with temporary tags (like `<<TOOL_EVENT_START>>`) for display, it is recommended to use the event data directly to render reactive UI components (spinners, status logs) on top of the text stream. These temporary tags are not preserved in the final history.
+
+This method ensures that structural elements (which are not sent as raw text in `chunks`) are correctly represented in the final message.
+
+### Large Payloads (Chunking)
+
+For very large events that exceed SSE limits, the system may split a single event into multiple chunks. These events have a type ending in `_delta_sse` (e.g., `agent_response_chunk_delta_sse`, `tool_update_delta_sse`, `agent_processing_complete_delta_sse`).
+
+> **Note**: Any event type can be chunked if its payload is large enough. The client should be prepared to handle `_delta_sse` variants for all event types.
+
+The payload for these events includes:
+*   `chunk_id`: Unique ID for the split event.
+*   `chunk_index`: Index of the current chunk (0-based).
+*   `total_chunks`: Total number of chunks to expect.
+*   `original_event_type`: The type of the event being reconstructed.
+*   `chunk_data`: The partial data string.
+
+**Handling Logic:**
+1.  Buffer incoming chunks by `chunk_id`.
+2.  When `receivedChunks === totalChunks`, join the `chunk_data` in order.
+3.  Parse the joined string as JSON.
+4.  Process the result as a standard event of type `original_event_type`.
+
+### Example: JavaScript Event Handler
+
+Here is a simplified example of how you might handle these events in a frontend application:
+
+```javascript
+const eventSource = new EventSource('/api/chat/stream');
+
+eventSource.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  
+  switch (event.type) {
+    case 'agent_step_started':
+      console.log(`Step ${data.step}: ${data.description}`);
+      break;
+      
+    case 'agent_response_chunk':
+      // Append text to the current step or main response
+      // Refer to the Agent Message Structure guide for parsing tags within data.content
+      updateUIWithText(data.content);
+      break;
+      
+    case 'tool_update':
+      // Handle tool execution updates
+      console.log(`Tool ${data.tool_name}: ${data.data.status}`);
+      break;
+      
+    case 'input_required':
+      // Show input form to user
+      showInputForm(data.prompt, data.input_types);
+      break;
+      
+    case 'agent_processing_complete':
+      console.log('Done!');
+      eventSource.close();
+      break;
+  }
+};
+```
+
+## Error Handling
+
+If an error occurs during processing, you may receive an `agent_processing_error` event.
+
+```json
+{
+  "type": "agent_processing_error",
+  "error": "Error message description",
+  "traceback": "...",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
