@@ -130,14 +130,14 @@ Error: Tool execution failed
 Les modèles qui prennent en charge la "Chaîne de Pensée" (Chain of Thought) ou le raisonnement afficheront leur monologue interne enveloppé dans des balises de pensée.
 
 -   `<<thinking>>` : Commence le bloc de pensée.
--   `<<thinking>>` (ou `<</thinking>>` dans certains contextes) : Termine le bloc de pensée.
+-   `<</thinking>>` : Termine le bloc de pensée.
 
 **Exemple :**
 
 ```text
 <<thinking>>
 The user is asking for weather data. I should use the weather tool.
-<<thinking>>
+<</thinking>>
 I will check the weather for Paris.
 ```
 

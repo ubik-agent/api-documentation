@@ -131,8 +131,6 @@ Fournit une mise à jour de la progression globale de la tâche de l'agent.
 
 Contient un fragment de texte partiel de la réponse de l'agent. Ces fragments doivent être concaténés pour former le texte complet. Ce flux inclut à la fois la réponse en langage naturel de l'agent et les balises injectées pour les appels d'outils.
 
-> **Note** : Certaines parties du backend peuvent émettre `agent_response_chunk`. L'implémentation recommandée attend spécifiquement `response_chunk`.
-
 ```json
 {
   "type": "response_chunk",
@@ -241,7 +239,7 @@ Indique que l'agent a terminé sa tâche.
 
 ## Analyse du Contenu de la Réponse
 
-Les événements `agent_response_chunk` transportent le texte brut généré par l'agent. Ce texte contient souvent des balises structurées (comme `<<TOOL_STEP_START>>`, `<<thinking>>`, etc.) qui représentent l'état interne et les actions de l'agent.
+Les événements `response_chunk` transportent le texte brut généré par l'agent. Ce texte contient souvent des balises structurées (comme `<<TOOL_STEP_START>>`, `<<thinking>>`, etc.) qui représentent l'état interne et les actions de l'agent.
 
 Pour une référence détaillée sur la façon d'analyser ces balises et de structurer le message final, veuillez consulter le guide **[Structure des Messages d'Agent](/fr/guides/agent-message-structure)**.
 
@@ -310,7 +308,7 @@ eventSource.onmessage = (event) => {
       console.log(`Étape ${data.step}: ${data.description}`);
       break;
       
-    case 'agent_response_chunk':
+    case 'response_chunk':
       // Ajouter le texte à l'étape actuelle ou à la réponse principale
       // Consultez le guide Structure des Messages d'Agent pour l'analyse des balises dans data.content
       updateUIWithText(data.content);

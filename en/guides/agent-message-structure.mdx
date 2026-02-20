@@ -130,14 +130,14 @@ Error: Tool execution failed
 Models that support "Chain of Thought" or reasoning will output their internal monologue wrapped in thinking tags.
 
 -   `<<thinking>>`: Starts the thinking block.
--   `<<thinking>>` (or `<</thinking>>` in some contexts): Ends the thinking block.
+-   `<</thinking>>`: Ends the thinking block.
 
 **Example:**
 
 ```text
 <<thinking>>
 The user is asking for weather data. I should use the weather tool.
-<<thinking>>
+<</thinking>>
 I will check the weather for Paris.
 ```
 
