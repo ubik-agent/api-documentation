@@ -45,8 +45,11 @@
                   "/en/index",
                   "/en/quickstart",
                   "/en/development",
+                  "/en/guides/authentication",
                   "/en/guides/managing-workspaces",
                   "/en/guides/executing-tools",
+                  "/en/guides/agent-sessions",
+                  "/en/guides/agent-session-events",
                   "/en/guides/streaming-results",
                   "/en/guides/embedding-tools"
                 ]
@@ -80,10 +83,13 @@
                 "group": "Pour commencer",
                 "pages": [
                   "/fr/index",
-                  "/fr/demarrage-rapide",
-                  "/fr/guide-developpement",
+                  "/fr/quickstart",
+                  "/fr/development",
+                  "/fr/guides/authentication",
                   "/fr/guides/managing-workspaces",
                   "/fr/guides/executing-tools",
+                  "/fr/guides/agent-sessions",
+                  "/fr/guides/agent-session-events",
                   "/fr/guides/streaming-results",
                   "/fr/guides/embedding-tools"
                 ]

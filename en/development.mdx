@@ -5,7 +5,7 @@ description: "Understand the fundamental building blocks of the UBIK API."
 
 To make the most of the UBIK API, it's helpful to understand the key concepts that you'll be working with. This guide introduces the core components of our platform.
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Workspaces" icon="layout-dashboard" href="#workspaces">
     High-level containers for organizing your projects and data.
   </Card>
@@ -34,6 +34,8 @@ Think of a **Workspace** as a high-level container for your projects. It's the p
 
 A **Document** represents any piece of content you ingest into the UBIK platform. This could be a file you upload (like a PDF or `.txt` file) or a web page you scrape. Once ingested, documents are processed and stored, making them ready to be used by Tools.
 
+<Info>You can manage your documents through the [`/documents`](/en/api-reference/public-api/list-documents) endpoints.</Info>
+
 ## Tools
 
 A **Tool** is a specialized function that performs a specific, complex task. Tools are designed to be powerful and asynchronous, allowing you to execute long-running jobs without blocking your application.
@@ -43,7 +45,7 @@ Examples include:
 - Summarizing a long legal document.
 - Answering questions based on the content of multiple documents.
 
-You can discover and execute tools using the [`/tools`](/en/api-reference/public-api/list-available-tools) endpoints.
+<Info>You can discover and execute tools using the [`/tools`](/en/api-reference/public-api/list-available-tools) endpoints.</Info>
 
 ## Agent Sessions
 
@@ -55,4 +57,4 @@ An **Agent Session** is a persistent, stateful conversation with an AI agent. Un
 
 Sessions are designed for building interactive applications like customer support bots, research assistants, or data analysis tools.
 
-<Info>Learn more in our [Agent Sessions Guide](/en/guides/agent-sessions).</Info>
+<Info>You can create and manage sessions through the [`/agent-sessions`](/en/api-reference/public-api/create-agent-session) endpoints.</Info>
