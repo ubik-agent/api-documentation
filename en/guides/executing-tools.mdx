@@ -133,6 +133,14 @@ This guide demonstrates how to leverage UBIK's tools to perform complex tasks. Y
 
   The API will respond with a `202 Accepted` status, indicating that the task has been received. The response body contains an `execution_id` and a `details_url`. We will use this URL to get the final result.
 
+  <Tip>
+    **User Isolation**: If you are executing tools on behalf of your end-users, you can isolate their data by passing the `X-End-User-ID` header.
+    
+    `curl -H "X-End-User-ID: user_123" ...`
+    
+    For more details on data isolation and multi-tenancy, see the [Authentication & Security Guide](/en/guides/authentication).
+  </Tip>
+
 </Step>
 
 <Step title="Poll for Results">

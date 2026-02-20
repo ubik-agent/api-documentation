@@ -9,17 +9,12 @@ Pour des tutoriels plus orientés objectifs et des guides étape par étape, veu
 
 ## Authentification
 
-Toutes les requêtes vers l'API UBIK doivent être authentifiées. L'authentification est gérée en fournissant votre clé d'API secrète dans l'en-tête `X-API-KEY` de chaque requête.
+Toutes les requêtes vers l'API UBIK doivent être authentifiées. Nous supportons deux méthodes principales :
 
-Vous pouvez trouver et gérer vos clés d'API dans le tableau de bord UBIK, dans les paramètres de votre utilisateur.
+1.  **Clé API (Côté Serveur)** : Pour les intégrations backend.
+2.  **JWT Scopé (Côté Client)** : Pour les applications frontend et l'isolation des utilisateurs multi-tenant.
 
-```bash cURL
--H "X-API-KEY: VOTRE_CLE_API"
-```
-
-<Tip>
-  Gardez votre clé d'API en sécurité comme s'il s'agissait d'un mot de passe et ne l'exposez dans aucun code côté client.
-</Tip>
+Pour un guide complet sur l'authentification, la génération de jetons et la gestion du multi-tenancy avec `external_user_id`, veuillez consulter notre [Guide Authentification & Sécurité](/fr/guides/authentication).
 
 ## Endpoint de l'API
 
@@ -28,6 +23,7 @@ L'URL de base pour tous les endpoints de l'API est :
 ```
 https://app.ubik-agent.com/api/v1
 ```
+
 ## Ressources Principales
 
 L'API UBIK est organisée autour de quelques ressources principales :
@@ -47,9 +43,18 @@ L'API UBIK est organisée autour de quelques ressources principales :
   >
     Les informations brutes que vous fournissez, comme des PDF, des fichiers texte ou des pages web, qui sont ingérées et traitées par UBIK.
   </Card>
-  <Card title="Outils" icon="wrench" href="/fr/guides/executing-tools">
+  <Card
+    title="Outils"
+    icon="wrench"
+    href="/fr/guides/executing-tools"
+  >
     Fonctions puissantes et pré-construites qui effectuent des tâches complexes et asynchrones sur vos documents.
   </Card>
+  <Card
+    title="Sessions d'Agent"
+    icon="message-square"
+    href="/fr/guides/agent-sessions"
+  >
+    Conversations avec état avec des agents IA qui maintiennent le contexte et l'historique.
+  </Card>
 </CardGroup>
-
-

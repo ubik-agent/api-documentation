@@ -1,0 +1,134 @@
+---
+title: "Guide: Agent Sessions"
+description: "Learn how to build interactive, stateful chat experiences with Agent Sessions."
+---
+
+Agent Sessions are the core of interactive AI experiences in UBIK. Unlike stateless API calls, a **Session** maintains conversation history, context (documents), and state (tools), allowing you to build rich, multi-turn chat applications.
+
+## What is an Agent Session?
+
+An Agent Session represents a continuous thread of interaction between a user (or an automated system) and an AI Agent. It persists:
+
+-   **Message History**: The full back-and-forth conversation, including branching paths.
+-   **Context**: Documents and files linked specifically to this conversation.
+-   **Tool State**: Which tools are active and available for the agent to use.
+-   **User Isolation**: Security boundaries to ensure one user's session is private from others.
+
+## Creating a Session
+
+To start a chat, you first create a session. You can initialize it with a specific **Assistant** (which comes with pre-defined tools and instructions) or a raw **System Prompt**.
+
+### Multi-Tenancy & User Isolation
+
+If you are building an application for your own users, you should use the `external_user_id` field. This feature is designed to simplify multi-tenant integrations by allowing you to manage millions of end-users with a single UBIK API Key.
+
+The API enforces a **Hybrid Access Model** for documents and a **Strict Isolation Model** for sessions and tools.
+
+For a detailed explanation of how data isolation works and how to implement it (Server-Side vs. Client-Side), please refer to our [Authentication & Security Guide](/en/guides/authentication).
+
+<Warning>
+  **Important**: If you do not provide an `external_user_id`, the session will have **full access** to all resources (documents, tools, and sessions) associated with your API Key. This effectively grants "Admin" privileges and should never be used for end-user facing integrations.
+</Warning>
+
+## Sending Messages
+
+Once a session is created, you can send messages to it. The agent will process your message, potentially use tools, and generate a response.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions/{session_id}/messages" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "content": "Can you summarize the uploaded PDF?",
+           "stream": true
+         }'
+```
+
+### Streaming Responses
+
+For a real-time chat experience, set `"stream": true`. The API will return a Server-Sent Events (SSE) stream directly in the response.
+
+For a complete reference of the events you can receive, see the [Agent Session Events Guide](/en/guides/agent-session-events).
+
+#### Dedicated Stream Endpoint & Reconnection
+
+While the `POST` endpoint allows direct streaming, you may sometimes need a dedicated stream endpoint (e.g., for reconnecting to a dropped stream or consuming events from a separate client).
+
+**Endpoint**: `GET /agent-sessions/{session_id}/stream`
+
+This endpoint streams events for the current or most recent agent task. It automatically replays past events for that task before switching to live mode, ensuring you don't miss any context upon reconnection.
+
+**Authentication with EventSource (JWT)**
+
+Standard browser `EventSource` APIs do not support custom headers (like `X-API-KEY` or `Authorization`). To securely connect from a browser, you can pass a short-lived JWT token via the `token` query parameter.
+
+1.  **Generate a Token**: Use `POST /auth/token` (see [Authentication & Security Guide](/en/guides/authentication)).
+2.  **Connect**:
+
+```javascript
+const streamUrl = `https://app.ubik-agent.com/api/v1/agent-sessions/${sessionId}/stream?token=${accessToken}`;
+const eventSource = new EventSource(streamUrl);
+
+eventSource.onmessage = (event) => {
+  // Handle events
+};
+```
+
+## Managing Context
+
+You can dynamically add knowledge to a session. This is powerful for "Chat with your Data" use cases.
+
+### Linking Existing Documents
+If you've already uploaded documents to UBIK, you can link them to the session:
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions/{session_id}/documents" \
+     -d '{ "document_ids": ["doc_123...", "doc_456..."] }'
+```
+
+### Uploading Directly to Session
+You can also upload a file and link it in one step:
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions/{session_id}/upload" \
+     -F "file=@./report.pdf"
+```
+
+## Advanced Features
+
+### Branching & Navigation
+UBIK sessions support **branching**. If a user edits a message or regenerates a response, it creates a new "branch" in the conversation tree without losing the original history.
+
+-   **Regenerate**: `POST /agent-sessions/{id}/messages/{msg_id}/regenerate`
+-   **Edit**: `POST /agent-sessions/{id}/messages/{msg_id}/edit`
+-   **Navigate**: `POST /agent-sessions/{id}/navigate` (Switch active branch)
+
+### Checkpoints & Resuming
+
+Long-running tasks or complex conversations automatically save **Checkpoints** at key steps. You can list these and restore the session state to a previous point. This is particularly useful for multi-step workflows where the agent might make a mistake in the final step.
+
+-   **List Checkpoints**: `GET /agent-sessions/{id}/checkpoints`
+-   **Restore**: `POST /agent-sessions/{id}/navigate-to-checkpoint`
+
+**Example Scenario: Newsletter Generation**
+
+Imagine a 3-step workflow:
+1.  Summarize "Annual Report 2023.pdf" (Success)
+2.  Summarize "Market Trends 2024.pdf" (Success)
+3.  Write a newsletter combining both summaries. (Failure: Agent missed crucial financial data)
+
+Instead of restarting from scratch and re-summarizing the documents (which takes time and tokens), you can:
+1.  **List Checkpoints**: Find the checkpoint ID corresponding to the state *after* step 2.
+2.  **Restore & Guide**: Restore that checkpoint and provide a `checkpoint_hint` to correct the agent's course.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions/{session_id}/navigate-to-checkpoint" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "checkpoint_id": "ckpt_123...",
+           "checkpoint_hint": "Please ensure you include the Q4 revenue figures in the newsletter."
+         }'
+```
+
+The `checkpoint_hint` parameter is powerful: it injects a specific instruction right at the restoration point, guiding the agent's next action without altering the previous successful steps.

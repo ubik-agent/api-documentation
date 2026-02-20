@@ -1,0 +1,119 @@
+---
+title: "Authentication & Security"
+description: "Learn how to authenticate requests and implement multi-tenancy with UBIK."
+---
+
+All requests to the UBIK API must be authenticated. This guide covers the available authentication methods and how to implement secure multi-tenancy for your users.
+
+## Authentication Methods
+
+There are two primary ways to authenticate with the UBIK API, depending on your integration context:
+
+### 1. API Key (Server-Side)
+
+For backend-to-backend communication, use your secret API Key. Pass it in the `X-API-KEY` header. This grants full access to your account resources.
+
+```bash cURL
+-H "X-API-KEY: YOUR_API_KEY"
+```
+
+<Tip>
+  Keep your API key secure as if it were a password and **never** expose it in client-side code (browsers, mobile apps).
+</Tip>
+
+You can optionally provide an `external_user_id` (in headers or body) when using the API Key. This allows you to perform actions on behalf of a specific end-user while using your server-side credentials.
+
+```bash cURL
+-H "X-API-KEY: YOUR_API_KEY"
+-H "external_user_id: user_123"
+```
+
+### 2. Scoped JWT (Client-Side & Multi-Tenant)
+
+For frontend applications or when you need to isolate data for specific end-users, use a short-lived JSON Web Token (JWT).
+
+1.  **Generate Token**: Call `POST /auth/token` from your backend using your API Key. You can optionally pass an `external_user_id` to scope the token to a specific user.
+2.  **Use Token**: Pass the token in the `Authorization` header.
+
+```bash cURL
+-H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
+This method is secure for public clients because the token is short-lived and can be restricted to specific user data.
+
+## Multi-Tenancy & Data Isolation
+
+UBIK is designed to support multi-tenant applications out of the box. You can manage millions of your own end-users under a single UBIK account using the `external_user_id` parameter.
+
+When you authenticate a request with an `external_user_id` (either via a scoped JWT or by passing it in the request body/header), the API enforces a **Hybrid Access Model**:
+
+### 1. Private Resources (Strict Isolation)
+
+*   **Agent Sessions** and **Tool Executions** created with a specific `external_user_id` are strictly private. They can only be accessed by that same user ID.
+*   User A cannot see User B's chat history or tool results.
+
+### 2. Shared Resources (Hybrid Access)
+
+*   **Documents** follow a hybrid model. A user can access:
+    *   **Private Documents**: Uploaded specifically for them (tagged with their `external_user_id`).
+    *   **Global Documents**: Uploaded to your account *without* any `external_user_id` (e.g., product manuals, knowledge bases).
+*   This allows you to build agents that have access to both your company's shared knowledge base and the user's private context simultaneously.
+
+### Why use `external_user_id`?
+
+1.  **Automatic Filtering**: The API automatically filters list endpoints based on the rules above. You don't need to build complex filtering logic in your backend.
+2.  **Security Boundaries**: It enforces strict isolation at the database level.
+3.  **Simplified Auth**: You can generate short-lived, scoped tokens for your frontend clients that encode this ID.
+
+<Warning>
+  **Important**: If you do not provide an `external_user_id`, the session or tool execution will have **full access** to all resources associated with your API Key. This effectively grants "Admin" privileges and should never be used for end-user facing integrations.
+</Warning>
+
+## Integration Examples
+
+### Server-Side Integration (API Key)
+
+If your backend server communicates with UBIK, you can simply pass the `external_user_id` in the request body while using your main API Key.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "assistant_id": "asst_123...", 
+           "external_user_id": "user_456",
+           "title": "Customer Support Chat"
+         }'
+```
+
+### Client-Side Integration (Scoped JWT)
+
+If you are integrating UBIK directly into a frontend application (like a chat widget), **do not expose your API Key**. Instead, generate a short-lived JWT token on your server that encodes the `external_user_id`.
+
+**Step 1: Generate a Scoped Token (Server-Side)**
+
+Call this endpoint from your backend to get a token for a specific user.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/auth/token" \
+     -H "X-API-KEY: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "external_user_id": "user_456",
+           "expires_in_minutes": 60
+         }'
+```
+
+**Step 2: Use the Token (Client-Side)**
+
+Pass the returned `access_token` in the Authorization header. The `external_user_id` is automatically enforced, so you don't need to send it in the body.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "assistant_id": "asst_123...",
+           "title": "Customer Support Chat"
+         }'
+```

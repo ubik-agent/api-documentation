@@ -3,9 +3,14 @@ title: "Guide : Obtenir des Résultats en Temps Réel avec SSE"
 description: "Apprenez à streamer des événements en temps réel depuis une exécution d'outil en utilisant les Server-Sent Events (SSE)."
 ---
 
-L'interrogation des résultats est efficace, mais pour une expérience plus réactive et en temps réel, vous pouvez streamer les événements directement depuis un outil en cours d'exécution. Ce guide montre comment se connecter au flux d'événements d'un outil en utilisant les Server-Sent Events (SSE).
+L'interrogation des résultats est efficace, mais pour une expérience plus réactive et en temps réel, vous pouvez streamer les événements directement depuis un outil en cours d'exécution. Ce guide couvre les deux principaux types de streaming disponibles dans l'API :
 
-Ce guide suppose que vous avez déjà lancé une exécution d'outil comme indiqué dans le guide [Exécuter Votre Premier Outil](/fr/guides/executing-tools).
+1.  **Streaming d'Exécution d'Outil** : Pour surveiller les tâches d'outils de longue durée.
+2.  **Streaming de Session d'Agent** : Pour recevoir des réponses de chat en temps réel des agents.
+
+## Streaming d'Exécution d'Outil
+
+Ce guide montre comment se connecter au flux d'événements d'un outil en utilisant les Server-Sent Events (SSE). Il suppose que vous avez déjà lancé une exécution d'outil comme indiqué dans le guide [Exécuter Votre Premier Outil](/fr/guides/executing-tools).
 
 <Steps>
 
@@ -122,4 +127,35 @@ Ce guide suppose que vous avez déjà lancé une exécution d'outil comme indiqu
 
 </Steps>
 
-En utilisant les Server-Sent Events, vous pouvez créer des applications hautement interactives et réactives qui réagissent en temps réel aux processus de longue durée.
+## Streaming de Session d'Agent
+
+Les Sessions d'Agent fournissent un ensemble différent d'événements adaptés aux interfaces conversationnelles. Lorsque vous envoyez un message avec `"stream": true`, le serveur diffuse le processus de réflexion de l'agent et les morceaux de réponse.
+
+### Événements de Session d'Agent
+
+Contrairement aux exécutions d'outils, les événements de session d'agent sont souvent utilisés pour afficher une interface de chat en temps réel.
+
+Pour une liste complète des types d'événements et leur structure, veuillez consulter le [Guide des Événements de Session d'Agent](/fr/guides/agent-session-events).
+
+### Endpoint de Stream Dédié
+
+Bien que `POST /agent-sessions/{id}/messages` prenne en charge le streaming direct, UBIK fournit également un endpoint dédié pour s'abonner aux événements de session. Ceci est utile pour :
+1.  **Reconnexion** : Reprendre un flux si la connexion est interrompue (les événements passés sont rejoués).
+2.  **Compatibilité Navigateur** : Utiliser `EventSource` qui nécessite une requête GET et une authentification basée sur l'URL.
+
+**Endpoint** : `GET /agent-sessions/{session_id}/stream`
+
+#### Authentification avec JWT
+
+Comme l'API `EventSource` standard des navigateurs ne peut pas envoyer d'en-têtes personnalisés (comme `X-API-KEY`), cet endpoint accepte un paramètre de requête `token`. Vous devez générer un JWT à courte durée de vie en utilisant `/auth/token` et le passer ici.
+
+Pour plus de détails sur la génération de jetons, voir le [Guide Authentification & Sécurité](/fr/guides/authentication).
+
+```javascript
+// 1. Obtenir un jeton à courte durée de vie depuis votre backend
+const token = "eyJhbGciOiJIUz..."; 
+
+// 2. Se connecter en utilisant le paramètre token
+const streamUrl = `https://app.ubik-agent.com/api/v1/agent-sessions/${sessionId}/stream?token=${token}`;
+const eventSource = new EventSource(streamUrl);
+```

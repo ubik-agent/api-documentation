@@ -80,8 +80,29 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
   </CodeGroup>
   
   <Tip icon="shield-check">
-    **Bonne Pratique de Sécurité**: Votre clé API secrète UBIK ne doit jamais être exposée dans votre application frontend. L'appel à `/embed-info` doit être effectué depuis votre serveur backend, qui peut ensuite transmettre le `access_token` de courte durée et les détails de l'outil au client.
+    **Bonne Pratique de Sécurité**: Votre clé API secrète UBIK ne doit jamais être exposée dans votre application frontend. L'appel à `/embed-info` doit être effectué depuis votre serveur backend.
   </Tip>
+
+  ### Multi-Tenancy & Isolation des Utilisateurs
+
+  Si votre application sert plusieurs utilisateurs, vous souhaitez probablement vous assurer qu'un utilisateur ne peut pas voir les données d'un autre dans l'outil intégré.
+
+  Vous pouvez y parvenir en passant le paramètre de requête `external_user_id` à l'endpoint `/embed-info`.
+
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/tools/VOTRE_ID_OUTIL/embed-info?external_user_id=user_456" \
+       -H "X-API-KEY: VOTRE_CLE_API"
+  ```
+
+  Le `access_token` retourné sera automatiquement restreint à `user_456`. Lorsque vous passez ce jeton à l'iframe, toutes les actions (comme la sauvegarde de l'état ou l'accès aux fichiers) seront strictement isolées pour cet utilisateur.
+
+  <Note>
+    Alternativement, vous pouvez générer des jetons scopés utilisateur via l'endpoint générique `/auth/token`. Voir le [Guide Authentification & Sécurité](/fr/guides/authentication) pour les détails.
+  </Note>
+
+  <Warning>
+    **Important** : Si vous ne fournissez pas d'`external_user_id` lors de la génération du jeton, l'outil intégré aura un **accès complet** à toutes les ressources (documents, exécutions précédentes) associées à votre clé API. Cela accorde effectivement des privilèges "Admin" dans l'iframe et ne devrait jamais être utilisé pour des intégrations destinées aux utilisateurs finaux.
+  </Warning>
 </Step>
 
 <Step title="Afficher l'iframe">
@@ -115,6 +136,7 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
     }
 
     // Ajoutez le jeton d'accès en tant que paramètre de requête.
+    // Note : Si vous avez généré un jeton scopé utilisateur via /auth/token, utilisez-le ici à la place.
     const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}?jwt=${embedInfo.access_token}`;
 
     return (
@@ -145,7 +167,7 @@ L'intégration des outils UBIK dans votre propre application offre un moyen puis
 
   Voici une liste des paramètres disponibles :
 
-  - **`jwt`** (string) : Un JSON Web Token de courte durée obtenu depuis l'endpoint `/tools/{tool_id}/embed-info`. C'est la méthode recommandée pour l'authentification côté client.
+  - **`jwt`** (string) : Un JSON Web Token de courte durée. Utilisez celui de `/tools/{tool_id}/embed-info` (optionnellement avec `external_user_id` pour l'isolation).
   - **`apiKey`** (string) : Votre clé API UBIK. Elle peut être utilisée pour l'authentification à la place d'un JWT, mais elle est moins sécurisée pour les applications côté client car elle peut exposer votre clé secrète.
   - **`theme`** ('light' | 'dark') : Définit le thème de couleur par défaut pour l'interface de l'outil. S'il n'est pas fourni, il s'adapte à la préférence système de l'utilisateur.
   - **`showThemeToggle`** (boolean) : Si défini sur `true`, un sélecteur de thème sera affiché dans l'en-tête de l'outil, permettant aux utilisateurs de basculer entre le mode clair et le mode sombre.

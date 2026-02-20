@@ -15,6 +15,9 @@ To make the most of the UBIK API, it's helpful to understand the key concepts th
   <Card title="Tools" icon="wrench" href="#tools">
     Powerful, pre-built functions that perform complex tasks on your documents.
   </Card>
+  <Card title="Agent Sessions" icon="message-square" href="#agent-sessions">
+    Stateful conversations with AI agents that maintain context and history.
+  </Card>
 </CardGroup>
 
 ## Workspaces
@@ -41,3 +44,15 @@ Examples include:
 - Answering questions based on the content of multiple documents.
 
 You can discover and execute tools using the [`/tools`](/en/api-reference/public-api/list-available-tools) endpoints.
+
+## Agent Sessions
+
+An **Agent Session** is a persistent, stateful conversation with an AI agent. Unlike simple chat completions, sessions maintain:
+
+-   **Conversation History**: The full context of the interaction, including branching paths.
+-   **Document Context**: Files and knowledge specifically linked to the conversation.
+-   **Tool Access**: The set of tools the agent can use to answer questions or perform tasks.
+
+Sessions are designed for building interactive applications like customer support bots, research assistants, or data analysis tools.
+
+<Info>Learn more in our [Agent Sessions Guide](/en/guides/agent-sessions).</Info>

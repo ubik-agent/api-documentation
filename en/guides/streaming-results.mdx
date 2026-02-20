@@ -1,11 +1,16 @@
 ---
 title: "Guide: Getting Real-Time Results with SSE"
-description: "Learn how to stream events in real-time from a tool execution using Server-Sent Events (SSE)."
+description: "Learn how to stream events in real-time from tool executions and agent sessions using Server-Sent Events (SSE)."
 ---
 
-Polling for results is effective, but for a more responsive, real-time experience, you can stream events directly from a running tool. This guide shows you how to connect to a tool's event stream using Server-Sent Events (SSE).
+Polling for results is effective, but for a more responsive, real-time experience, you can stream events directly from UBIK. This guide covers the two main types of streaming available in the API:
 
-This guide assumes you have already started a tool execution as shown in the [Executing Your First Tool](/en/guides/executing-tools) guide.
+1.  **Tool Execution Streaming**: For monitoring long-running tool tasks.
+2.  **Agent Session Streaming**: For receiving real-time chat responses from agents.
+
+## Tool Execution Streaming
+
+This section shows you how to connect to a tool's event stream. This assumes you have already started a tool execution as shown in the [Executing Your First Tool](/en/guides/executing-tools) guide.
 
 <Steps>
 
@@ -98,7 +103,7 @@ This guide assumes you have already started a tool execution as shown in the [Ex
 
 </Step>
 
-<Step title="Understanding the Events">
+<Step title="Tool Execution Events">
   As the tool executes, you will receive a series of JSON objects. Each object contains an `event_type` and a `data` payload. Here are the main event types:
 
   - **`tool_update`**: A general progress update. The `data` payload often contains `phase` and `message` fields to describe the current state.
@@ -122,4 +127,35 @@ This guide assumes you have already started a tool execution as shown in the [Ex
 
 </Steps>
 
-By using Server-Sent Events, you can build highly interactive and responsive applications that react to long-running processes in real-time.
+## Agent Session Streaming
+
+Agent Sessions provide a different set of events tailored for conversational interfaces. When you send a message with `"stream": true`, the server will stream the agent's thought process and response chunks.
+
+### Agent Session Events
+
+Unlike tool executions, agent session events are often used to render a chat interface in real-time.
+
+For a complete list of event types and their structure, please refer to the [Agent Session Events Guide](/en/guides/agent-session-events).
+
+### Dedicated Stream Endpoint
+
+While `POST /agent-sessions/{id}/messages` supports direct streaming, UBIK also provides a dedicated endpoint for subscribing to session events. This is useful for:
+1.  **Reconnection**: Resuming a stream if the connection drops (past events are replayed).
+2.  **Browser Compatibility**: Using `EventSource` which requires a GET request and URL-based auth.
+
+**Endpoint**: `GET /agent-sessions/{session_id}/stream`
+
+#### Authentication with JWT
+
+Since the standard `EventSource` API in browsers cannot send custom headers (like `X-API-KEY`), this endpoint accepts a `token` query parameter. You should generate a short-lived JWT using `/auth/token` and pass it here.
+
+For details on generating tokens, see the [Authentication & Security Guide](/en/guides/authentication).
+
+```javascript
+// 1. Get a short-lived token from your backend
+const token = "eyJhbGciOiJIUz..."; 
+
+// 2. Connect using the token param
+const streamUrl = `https://app.ubik-agent.com/api/v1/agent-sessions/${sessionId}/stream?token=${token}`;
+const eventSource = new EventSource(streamUrl);
+```

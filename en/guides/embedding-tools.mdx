@@ -80,8 +80,29 @@ Embedding UBIK tools into your own application provides a powerful way to extend
   </CodeGroup>
   
   <Tip icon="shield-check">
-    **Security Best Practice**: Your secret UBIK API key should never be exposed in your frontend application. The call to `/embed-info` should be made from your backend server, which can then pass the resulting short-lived `access_token` and tool details to the client.
+    **Security Best Practice**: Your secret UBIK API key should never be exposed in your frontend application. The call to `/embed-info` should be made from your backend server.
   </Tip>
+
+  ### Multi-Tenancy & User Isolation
+
+  If your application serves multiple users, you likely want to ensure that one user cannot see another's data within the embedded tool.
+
+  You can achieve this by passing the `external_user_id` query parameter to the `/embed-info` endpoint.
+
+  ```bash cURL
+  curl -X GET "https://app.ubik-agent.com/api/v1/tools/YOUR_TOOL_ID/embed-info?external_user_id=user_456" \
+       -H "X-API-KEY: YOUR_API_KEY"
+  ```
+
+  The returned `access_token` will be automatically scoped to `user_456`. When you pass this token to the iframe, all actions (like saving state or accessing files) will be strictly isolated to that user.
+
+  <Note>
+    Alternatively, you can generate user-scoped tokens using the generic `/auth/token` endpoint. See the [Authentication & Security Guide](/en/guides/authentication) for details.
+  </Note>
+
+  <Warning>
+    **Important**: If you do not provide an `external_user_id` when generating the token, the embedded tool will have **full access** to all resources (documents, previous executions) associated with your API Key. This effectively grants "Admin" privileges within the iframe and should never be used for end-user facing integrations.
+  </Warning>
 </Step>
 
 <Step title="Render the iframe">
@@ -115,6 +136,7 @@ Embedding UBIK tools into your own application provides a powerful way to extend
     }
 
     // Append the access token as a query parameter.
+    // Note: If you generated a user-scoped token via /auth/token, use that here instead.
     const iframeSrc = `https://app.ubik-agent.com/embed/tools/${embedInfo.id}?jwt=${embedInfo.access_token}`;
 
     return (
@@ -145,7 +167,7 @@ Embedding UBIK tools into your own application provides a powerful way to extend
 
   Here is a list of available parameters:
 
-  - **`jwt`** (string): A short-lived JSON Web Token obtained from the `/tools/{tool_id}/embed-info` endpoint. This is the recommended method for client-side authentication.
+  - **`jwt`** (string): A short-lived JSON Web Token. Use the one from `/tools/{tool_id}/embed-info` (optionally with `external_user_id` for isolation).
   - **`apiKey`** (string): Your UBIK API key. This can be used for authentication instead of a JWT, but it is less secure for client-side applications as it may expose your secret key.
   - **`theme`** ('light' | 'dark'): Sets the default color theme for the tool's UI. If not provided, it defaults to the user's system preference.
   - **`showThemeToggle`** (boolean): If set to `true`, a theme toggle switch will be displayed in the tool's header, allowing users to switch between light and dark mode.

@@ -133,6 +133,14 @@ Ce guide montre comment tirer parti des outils d'UBIK pour effectuer des tâches
 
   L'API répondra avec un statut `202 Accepted`, indiquant que la tâche a été reçue. Le corps de la réponse contient un `execution_id` et une `details_url`. Nous utiliserons cette URL pour obtenir le résultat final.
 
+  <Tip>
+    **Isolation des Utilisateurs**: Si vous exécutez des outils pour le compte de vos utilisateurs finaux, vous pouvez isoler leurs données en passant l'en-tête `X-End-User-ID`.
+    
+    `curl -H "X-End-User-ID: user_123" ...`
+    
+    Pour plus de détails sur l'isolation des données et le multi-tenancy, voir le [Guide Authentification & Sécurité](/fr/guides/authentication).
+  </Tip>
+
 </Step>
 
 <Step title="Vérifier le Résultat de l'Exécution">

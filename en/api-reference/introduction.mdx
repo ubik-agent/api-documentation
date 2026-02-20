@@ -9,17 +9,12 @@ For more goal-oriented tutorials and step-by-step guides, please see our [Guides
 
 ## Authentication
 
-All requests to the UBIK API must be authenticated. Authentication is handled by providing your secret API key in the `X-API-KEY` header of every request.
+All requests to the UBIK API must be authenticated. We support two primary methods:
 
-You can find and manage your API keys in the UBIK dashboard under your user settings.
+1.  **API Key (Server-Side)**: For backend integrations.
+2.  **Scoped JWT (Client-Side)**: For frontend applications and multi-tenant user isolation.
 
-```bash cURL
--H "X-API-KEY: YOUR_API_KEY"
-```
-
-<Tip>
-  Keep your API key secure as if it were a password and do not expose it in any client-side code.
-</Tip>
+For a complete guide on authentication, generating tokens, and managing multi-tenancy with `external_user_id`, please see our [Authentication & Security Guide](/en/guides/authentication).
 
 ## API Endpoint
 
@@ -54,5 +49,12 @@ The UBIK API is organized around a few core resources:
     href="/en/guides/executing-tools"
   >
     Powerful, pre-built functions that perform complex, asynchronous tasks on your documents.
+  </Card>
+  <Card
+    title="Agent Sessions"
+    icon="message-square"
+    href="/en/guides/agent-sessions"
+  >
+    Stateful conversations with AI agents that maintain context and history.
   </Card>
 </CardGroup>

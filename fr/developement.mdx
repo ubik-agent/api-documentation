@@ -15,6 +15,9 @@ Pour tirer le meilleur parti de l'API UBIK, il est utile de comprendre les conce
   <Card title="Outils" icon="wrench" href="#outils-tools">
     Fonctions puissantes et pré-construites qui effectuent des tâches complexes sur vos documents.
   </Card>
+  <Card title="Sessions d'Agent" icon="message-square" href="#sessions-dagent">
+    Conversations avec état avec des agents IA qui maintiennent le contexte et l'historique.
+  </Card>
 </CardGroup>
 
 ## Espaces de Travail (Workspaces)
@@ -41,3 +44,15 @@ Exemples d'utilisation :
 - Répondre à des questions basées sur le contenu de plusieurs documents.
 
 Vous pouvez découvrir et exécuter des outils à l'aide des points de terminaison [`/tools`](/fr/api-reference/public-api/lister-les-outils-disponibles).
+
+## Sessions d'Agent
+
+Une **Session d'Agent** est une conversation persistante et avec état avec un agent IA. Contrairement aux simples complétions de chat, les sessions maintiennent :
+
+-   **Historique de Conversation** : Le contexte complet de l'interaction, y compris les chemins de branchement.
+-   **Contexte Documentaire** : Fichiers et connaissances spécifiquement liés à la conversation.
+-   **Accès aux Outils** : L'ensemble des outils que l'agent peut utiliser pour répondre aux questions ou effectuer des tâches.
+
+Les sessions sont conçues pour construire des applications interactives comme des bots de support client, des assistants de recherche ou des outils d'analyse de données.
+
+<Info>En savoir plus dans notre [Guide des Sessions d'Agent](/fr/guides/agent-sessions).</Info>

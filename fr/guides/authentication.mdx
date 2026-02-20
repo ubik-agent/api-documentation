@@ -1,0 +1,119 @@
+---
+title: "Authentification & Sécurité"
+description: "Apprenez à authentifier les requêtes et à implémenter le multi-tenancy avec UBIK."
+---
+
+Toutes les requêtes vers l'API UBIK doivent être authentifiées. Ce guide couvre les méthodes d'authentification disponibles et comment implémenter un multi-tenancy sécurisé pour vos utilisateurs.
+
+## Méthodes d'Authentification
+
+Il existe deux façons principales de s'authentifier avec l'API UBIK, selon votre contexte d'intégration :
+
+### 1. Clé API (Côté Serveur)
+
+Pour la communication de backend à backend, utilisez votre clé API secrète. Passez-la dans l'en-tête `X-API-KEY`. Cela donne un accès complet aux ressources de votre compte.
+
+```bash cURL
+-H "X-API-KEY: VOTRE_CLE_API"
+```
+
+<Tip>
+  Gardez votre clé API en sécurité comme s'il s'agissait d'un mot de passe et ne l'exposez **jamais** dans du code côté client (navigateurs, applications mobiles).
+</Tip>
+
+Vous pouvez optionnellement fournir un `external_user_id` (dans les en-têtes ou le corps) lors de l'utilisation de la clé API. Cela vous permet d'effectuer des actions au nom d'un utilisateur final spécifique tout en utilisant vos identifiants côté serveur.
+
+```bash cURL
+-H "X-API-KEY: VOTRE_CLE_API"
+-H "external_user_id: user_123"
+```
+
+### 2. JWT Scopé (Côté Client & Multi-Tenant)
+
+Pour les applications frontend ou lorsque vous devez isoler les données pour des utilisateurs finaux spécifiques, utilisez un JSON Web Token (JWT) à courte durée de vie.
+
+1.  **Générer un Jeton** : Appelez `POST /auth/token` depuis votre backend en utilisant votre clé API. Vous pouvez optionnellement passer un `external_user_id` pour restreindre le jeton à un utilisateur spécifique.
+2.  **Utiliser le Jeton** : Passez le jeton dans l'en-tête `Authorization`.
+
+```bash cURL
+-H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
+Cette méthode est sécurisée pour les clients publics car le jeton a une durée de vie courte et peut être restreint aux données d'un utilisateur spécifique.
+
+## Multi-Tenancy & Isolation des Données
+
+UBIK est conçu pour supporter les applications multi-tenant nativement. Vous pouvez gérer des millions de vos propres utilisateurs finaux sous un seul compte UBIK en utilisant le paramètre `external_user_id`.
+
+Lorsque vous authentifiez une requête avec un `external_user_id` (soit via un JWT scopé, soit en le passant dans le corps/en-tête de la requête), l'API applique un **Modèle d'Accès Hybride** :
+
+### 1. Ressources Privées (Isolation Stricte)
+
+*   Les **Sessions d'Agent** et les **Exécutions d'Outils** créées avec un `external_user_id` spécifique sont strictement privées. Elles ne peuvent être accédées que par ce même ID utilisateur.
+*   L'Utilisateur A ne peut pas voir l'historique de chat ou les résultats d'outils de l'Utilisateur B.
+
+### 2. Ressources Partagées (Accès Hybride)
+
+*   Les **Documents** suivent un modèle hybride. Un utilisateur peut accéder à :
+    *   **Documents Privés** : Téléchargés spécifiquement pour eux (marqués avec leur `external_user_id`).
+    *   **Documents Globaux** : Téléchargés sur votre compte *sans* aucun `external_user_id` (par exemple, manuels produits, bases de connaissances).
+*   Cela vous permet de construire des agents qui ont accès simultanément à la base de connaissances partagée de votre entreprise et au contexte privé de l'utilisateur.
+
+### Pourquoi utiliser `external_user_id` ?
+
+1.  **Filtrage Automatique** : L'API filtre automatiquement les endpoints de liste selon les règles ci-dessus. Vous n'avez pas besoin de construire une logique de filtrage complexe dans votre backend.
+2.  **Frontières de Sécurité** : Cela applique une isolation stricte au niveau de la base de données.
+3.  **Auth Simplifiée** : Vous pouvez générer des jetons scopés à courte durée de vie pour vos clients frontend qui encodent cet ID.
+
+<Warning>
+  **Important** : Si vous ne fournissez pas d'`external_user_id`, la session ou l'exécution de l'outil aura un **accès complet** à toutes les ressources associées à votre clé API. Cela accorde effectivement des privilèges "Admin" et ne devrait jamais être utilisé pour des intégrations destinées aux utilisateurs finaux.
+</Warning>
+
+## Exemples d'Intégration
+
+### Intégration Côté Serveur (Clé API)
+
+Si votre serveur backend communique avec UBIK, vous pouvez simplement passer l'`external_user_id` dans le corps de la requête tout en utilisant votre clé API principale.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions" \
+     -H "X-API-KEY: VOTRE_CLE_API" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "assistant_id": "asst_123...", 
+           "external_user_id": "user_456",
+           "title": "Chat Support Client"
+         }'
+```
+
+### Intégration Côté Client (JWT Scopé)
+
+Si vous intégrez UBIK directement dans une application frontend (comme un widget de chat), **n'exposez pas votre clé API**. Au lieu de cela, générez un jeton JWT à courte durée de vie sur votre serveur qui encode l'`external_user_id`.
+
+**Étape 1 : Générer un Jeton Scopé (Côté Serveur)**
+
+Appelez cet endpoint depuis votre backend pour obtenir un jeton pour un utilisateur spécifique.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/auth/token" \
+     -H "X-API-KEY: VOTRE_CLE_API" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "external_user_id": "user_456",
+           "expires_in_minutes": 60
+         }'
+```
+
+**Étape 2 : Utiliser le Jeton (Côté Client)**
+
+Passez l'`access_token` retourné dans l'en-tête Authorization. L'`external_user_id` est automatiquement appliqué, vous n'avez donc pas besoin de l'envoyer dans le corps.
+
+```bash cURL
+curl -X POST "https://app.ubik-agent.com/api/v1/agent-sessions" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "assistant_id": "asst_123...",
+           "title": "Chat Support Client"
+         }'
+```
