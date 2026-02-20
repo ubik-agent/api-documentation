@@ -49,14 +49,14 @@ Lorsque vous authentifiez une requête avec un `external_user_id` (soit via un J
 
 ### 1. Ressources Privées (Isolation Stricte)
 
-*   Les **Espaces de Travail**, **Sessions d'Agent** et les **Exécutions d'Outils** créées avec un `external_user_id` spécifique sont strictement privées. Elles ne peuvent être accédées que par ce même ID utilisateur.
-*   L'Utilisateur A ne peut pas voir les espaces de travail, l'historique de chat ou les résultats d'outils de l'Utilisateur B.
+*   Les **Sessions d'Agent** et les **Exécutions d'Outils** créées avec un `external_user_id` spécifique sont strictement privées. Elles ne peuvent être accédées que par ce même ID utilisateur.
+*   L'Utilisateur A ne peut pas voir l'historique de chat ou les résultats d'outils de l'Utilisateur B.
 
 ### 2. Ressources Partagées (Accès Hybride)
 
-*   Les **Documents** suivent un modèle hybride. Un utilisateur peut accéder à :
-    *   **Documents Privés** : Téléchargés spécifiquement pour eux (marqués avec leur `external_user_id`).
-    *   **Documents Globaux** : Téléchargés sur votre compte *sans* aucun `external_user_id` (par exemple, manuels produits, bases de connaissances).
+*   Les **Espaces de Travail** et les **Documents** suivent un modèle hybride. Un utilisateur peut accéder à :
+    *   **Ressources Privées** : Créées spécifiquement pour eux (marquées avec leur `external_user_id`).
+    *   **Ressources Globales** : Créées sur votre compte *sans* aucun `external_user_id` (par exemple, espaces de travail de projet partagés, bases de connaissances).
 *   Cela vous permet de construire des agents qui ont accès simultanément à la base de connaissances partagée de votre entreprise et au contexte privé de l'utilisateur.
 
 ### Pourquoi utiliser `external_user_id` ?

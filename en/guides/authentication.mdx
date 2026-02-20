@@ -49,14 +49,14 @@ When you authenticate a request with an `external_user_id` (either via a scoped 
 
 ### 1. Private Resources (Strict Isolation)
 
-*   **Workspaces**, **Agent Sessions**, and **Tool Executions** created with a specific `external_user_id` are strictly private. They can only be accessed by that same user ID.
-*   User A cannot see User B's workspaces, chat history, or tool results.
+*   **Agent Sessions** and **Tool Executions** created with a specific `external_user_id` are strictly private. They can only be accessed by that same user ID.
+*   User A cannot see User B's chat history or tool results.
 
 ### 2. Shared Resources (Hybrid Access)
 
-*   **Documents** follow a hybrid model. A user can access:
-    *   **Private Documents**: Uploaded specifically for them (tagged with their `external_user_id`).
-    *   **Global Documents**: Uploaded to your account *without* any `external_user_id` (e.g., product manuals, knowledge bases).
+*   **Workspaces** and **Documents** follow a hybrid model. A user can access:
+    *   **Private Resources**: Created specifically for them (tagged with their `external_user_id`).
+    *   **Global Resources**: Created in your account *without* any `external_user_id` (e.g., shared project workspaces, knowledge bases).
 *   This allows you to build agents that have access to both your company's shared knowledge base and the user's private context simultaneously.
 
 ### Why use `external_user_id`?
