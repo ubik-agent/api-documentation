@@ -749,7 +749,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAgentMessage"
+                }
               }
             }
           },
@@ -833,7 +835,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAgentMessage"
+                }
               }
             }
           },
@@ -1123,7 +1127,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAgentMessage"
+                }
               }
             }
           },
@@ -1530,15 +1536,15 @@
         }
       }
     },
-    "/agent-sessions/{session_id}/task-stream": {
+    "/agent-sessions/{session_id}/stream": {
       "get": {
         "tags": [
           "Public API",
           "Public API - Agent Sessions"
         ],
-        "summary": "Stream task events",
-        "description": "Streams Server-Sent Events (SSE) for a specific agent task, replaying past events first. Useful for reconnecting to a stream.",
-        "operationId": "task_events_stream_agent_sessions__session_id__task_stream_get",
+        "summary": "Stream session events",
+        "description": "Streams Server-Sent Events (SSE) for the agent session. By default, it streams the current or most recent task, replaying past events first.",
+        "operationId": "session_events_stream_agent_sessions__session_id__stream_get",
         "security": [
           {
             "APIKeyHeader": []
@@ -2972,7 +2978,7 @@
           "Public API - Tools"
         ],
         "summary": "Get tool embedding information",
-        "description": "Retrieves the necessary details for embedding a tool's UI, including its schema and allowed domains.",
+        "description": "Retrieves the necessary details for embedding a tool's UI, including its schema and allowed domains. Optionally accepts 'external_user_id' to scope the returned access token.",
         "operationId": "get_public_tool_embed_info_tools__tool_id__embed_info_get",
         "security": [
           {
@@ -2990,6 +2996,24 @@
               "title": "Tool Id"
             },
             "description": "The unique identifier or name of the tool."
+          },
+          {
+            "name": "external_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional external user ID to scope the access token.",
+              "title": "External User Id"
+            },
+            "description": "Optional external user ID to scope the access token."
           }
         ],
         "responses": {
@@ -3623,6 +3647,30 @@
             "type": "array",
             "title": "Sibling Ids",
             "description": "IDs of other messages that share the same parent (branches)."
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id",
+            "description": "The ID of the task processing this message (if applicable)."
+          },
+          "stream_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stream Url",
+            "description": "URL to stream events for this task."
           }
         },
         "type": "object",

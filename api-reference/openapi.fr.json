@@ -749,7 +749,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAgentMessage"
+                }
               }
             }
           },
@@ -833,7 +835,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAgentMessage"
+                }
               }
             }
           },
@@ -1123,7 +1127,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAgentMessage"
+                }
               }
             }
           },
@@ -1530,15 +1536,15 @@
         }
       }
     },
-    "/agent-sessions/{session_id}/task-stream": {
+    "/agent-sessions/{session_id}/stream": {
       "get": {
         "tags": [
           "Public API",
           "Public API - Agent Sessions"
         ],
-        "summary": "Streaming des événements de tâche",
-        "description": "Diffuse les événements Server-Sent (SSE) pour une tâche d'agent spécifique, en rejouant d'abord les événements passés. Utile pour se reconnecter à un flux.",
-        "operationId": "task_events_stream_agent_sessions__session_id__task_stream_get",
+        "summary": "Streaming des événements de session",
+        "description": "Diffuse les événements Server-Sent (SSE) pour la session d'agent. Par défaut, diffuse la tâche actuelle ou la plus récente, en rejouant d'abord les événements passés.",
+        "operationId": "session_events_stream_agent_sessions__session_id__stream_get",
         "security": [
           {
             "APIKeyHeader": []
@@ -2972,7 +2978,7 @@
           "Public API - Tools"
         ],
         "summary": "Obtenir les informations d'intégration d'un outil",
-        "description": "Récupère les détails nécessaires pour intégrer l'interface utilisateur d'un outil, y compris son schéma et les domaines autorisés.",
+        "description": "Récupère les détails nécessaires pour intégrer l'interface utilisateur d'un outil, y compris son schéma et les domaines autorisés. Accepte optionnellement 'external_user_id' pour limiter la portée du jeton d'accès retourné.",
         "operationId": "get_public_tool_embed_info_tools__tool_id__embed_info_get",
         "security": [
           {
@@ -2990,6 +2996,24 @@
               "title": "Tool Id"
             },
             "description": "L'identifiant unique ou le nom de l'outil."
+          },
+          {
+            "name": "external_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional external user ID to scope the access token.",
+              "title": "External User Id"
+            },
+            "description": "ID utilisateur externe optionnel pour limiter la portée du jeton d'accès."
           }
         ],
         "responses": {
@@ -3623,6 +3647,30 @@
             "type": "array",
             "title": "Sibling Ids",
             "description": "IDs of other messages that share the same parent (branches)."
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id",
+            "description": "The ID of the task processing this message (if applicable)."
+          },
+          "stream_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stream Url",
+            "description": "URL to stream events for this task."
           }
         },
         "type": "object",
