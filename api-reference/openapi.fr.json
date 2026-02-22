@@ -5225,6 +5225,19 @@
             "description": "Indique s'il s'agit de l'espace de travail par défaut pour l'utilisateur.",
             "default": false
           },
+          "workspace_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Metadata",
+            "description": "Métadonnées pour l'espace de travail."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -5530,6 +5543,19 @@
             "title": "Is Default",
             "description": "Indique s'il s'agit de l'espace de travail par défaut pour l'utilisateur.",
             "default": false
+          },
+          "workspace_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Metadata",
+            "description": "Métadonnées pour l'espace de travail."
           }
         },
         "type": "object",

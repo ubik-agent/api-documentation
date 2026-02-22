@@ -5225,6 +5225,19 @@
             "description": "Indicates if this is the default workspace for the user.",
             "default": false
           },
+          "workspace_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Metadata",
+            "description": "Metadata for the workspace."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -5530,6 +5543,19 @@
             "title": "Is Default",
             "description": "Indicates if this is the default workspace for the user.",
             "default": false
+          },
+          "workspace_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Metadata",
+            "description": "Metadata for the workspace."
           }
         },
         "type": "object",
