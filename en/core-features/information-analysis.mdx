@@ -1,0 +1,101 @@
+---
+title: 'Information Analysis'
+description: 'Detailed documentation for the information_analysis tool.'
+---
+
+The `information_analysis` tool is a powerful engine for deep-dive research, synthesis, and content transformation. Unlike standard search tools that retrieve snippets, this tool processes documents **in their entirety**, allowing for comprehensive analysis that bypasses the context window limitations of standard Large Language Models (LLMs).
+
+It employs a recursive summarization and synthesis pipeline to digest large volumes of text and produce a cohesive output tailored to a specific user intent.
+
+## When to Use This Tool
+
+Use `information_analysis` when you need to:
+*   **Synthesize information** from multiple large documents (e.g., "Summarize these 5 quarterly reports").
+*   **Transform content** into a specific format (e.g., "Turn this technical whitepaper into a blog post").
+*   **Analyze trends** across a dataset (e.g., "What are the common themes in these customer feedback logs?").
+*   **Create comprehensive reports** that require reading every page of the source material.
+
+<Warning>
+  **Performance Note**
+
+  Because this tool processes full document contents rather than just retrieving extracts, it is significantly more computationally intensive than the RAG tool. It may incur higher costs and latency compared to RAG if you are only looking for a precise piece of information within multiple documents.
+</Warning>
+
+## Input Parameters
+
+The tool accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `intent` | `string` | Yes | The specific goal or question guiding the analysis. Be detailed! This instruction is used at every step of the recursive process to decide what information to keep and what to discard. |
+| `document_ids` | `array<uuid>` | No* | A list of Document UUIDs to analyze. |
+| `text` | `string` | No* | Raw text to analyze directly, as an alternative to providing document IDs. |
+
+*\*Either `document_ids` or `text` must be provided.*
+
+## Output Structure
+
+The tool returns a structured object containing the synthesized response and metadata about the sources.
+
+```json
+{
+  "response": "Based on the analysis of the provided financial statements, the company has shown a steady 15% year-over-year growth. The Q3 report highlights a significant investment in R&D <citation id=\"d290f1ee-6c54-4b01-90e6-d701748f0851\" name=\"Q3 Financial Report\">[1]</citation>, which is expected to yield results by Q4 2025. Meanwhile, the annual summary indicates a strategic pivot towards sustainable energy solutions <citation id=\"a1b2c3d4-e5f6-7890-1234-567890abcdef\" name=\"Annual Strategy 2024\">[2]</citation>.",
+  "sources": [
+    {
+      "rank": 1,
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "name": "Q3 Financial Report",
+      "file_type": "application/pdf",
+      "used_in_response": true
+    },
+    {
+      "rank": 2,
+      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "name": "Annual Strategy 2024",
+      "file_type": "application/pdf",
+      "used_in_response": true
+    }
+  ],
+  "sources_used": [1, 2],
+  "execution_id": "toolu_01FVWzd1Sv3GkGu3oiE8iPCN"
+}
+```
+
+| Field | Description |
+| :--- | :--- |
+| `response` | The final synthesized text, tailored to the `intent`. Includes inline citations. |
+| `sources` | A list of the documents that were actually used in the analysis, including their metadata. |
+| `sources_used` | A list of indices (ranks) corresponding to the `sources` that were explicitly cited in the response. |
+| `execution_id` | The unique identifier for this tool execution. |
+
+## Example Usage
+
+### Scenario: Creating a Pitch Deck Script
+
+**Input:**
+```json
+{
+  "intent": "Create a compelling 2-minute pitch script for our new product 'EcoStream'. Structure it as follows: 1) The Problem: Water waste in industrial cooling. 2) The Solution: EcoStream's closed-loop recycling tech. 3) The Impact: Cost savings and environmental benefits. Focus on the technical specs from the whitepaper and the market data from the competitor analysis.",
+  "document_ids": [
+    "d290f1ee-6c54-4b01-90e6-d701748f0851", 
+    "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  ]
+}
+```
+
+**Result:**
+The tool will process the full content of the whitepaper and competitor analysis, recursively summarizing them while keeping the specific points requested in the `intent`. The final output will be a coherent script that weaves together technical details and market data, citing the original documents.
+
+## How It Works
+
+1.  **Dynamic Instruction Generation:** The tool first analyzes your `intent` and the document sample to automatically generate specialized instructions for its sub-agents. This ensures that every step of the summarization is tailored to extract exactly what you're looking for, making it far more effective than generic summarization.
+2.  **Chunking:** The tool splits the input documents into manageable chunks.
+3.  **Recursive Summarization:** It processes these chunks in parallel waves. Each chunk is summarized based on the custom instructions generated in step 1.
+4.  **Aggregation:** The summaries are combined and summarized again (and again) until they fit within the context window.
+5.  **Final Synthesis:** The final set of concentrated summaries is used to generate the response, ensuring it flows logically and directly addresses your prompt.
+
+<Tip>
+  **Citation Behavior**
+
+  Unlike `rag_search`, which cites specific text chunks/passages, `information_analysis` synthesizes content from multiple parts of a document. Therefore, its citations reference the **source document as a whole** that supports a particular point, rather than a specific line or paragraph.
+</Tip>

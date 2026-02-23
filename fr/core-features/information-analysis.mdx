@@ -1,0 +1,101 @@
+---
+title: 'Analyse d''Information'
+description: 'Documentation détaillée pour l''outil information_analysis.'
+---
+
+L'outil `information_analysis` est un moteur puissant pour la recherche approfondie, la synthèse et la transformation de contenu. Contrairement aux outils de recherche standard qui récupèrent des extraits, cet outil traite les documents **dans leur intégralité**, permettant une analyse complète qui contourne les limitations de fenêtre contextuelle des grands modèles de langage (LLM) standards.
+
+Il utilise un pipeline de résumé et de synthèse récursif pour digérer de grands volumes de texte et produire un résultat cohérent adapté à une intention utilisateur spécifique.
+
+## Quand Utiliser Cet Outil
+
+Utilisez `information_analysis` lorsque vous avez besoin de :
+*   **Synthétiser des informations** provenant de plusieurs documents volumineux (par ex., "Résume ces 5 rapports trimestriels").
+*   **Transformer du contenu** dans un format spécifique (par ex., "Transforme ce livre blanc technique en un article de blog").
+*   **Analyser des tendances** à travers un ensemble de données (par ex., "Quels sont les thèmes communs dans ces journaux de retours clients ?").
+*   **Créer des rapports complets** qui nécessitent de lire chaque page du matériel source.
+
+<Warning>
+  **Note de Performance**
+
+  Parce que cet outil traite le contenu complet des documents plutôt que de simplement récupérer des extraits, il est significativement plus intensif en calcul que l'outil RAG. Il peut entraîner des coûts et une latence plus élevés par rapport au RAG si vous recherchez uniquement une information précise au sein de plusieurs documents.
+</Warning>
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `intent` | `string` | Oui | L'objectif spécifique ou la question guidant l'analyse. Soyez détaillé ! Cette élément permet de générer les instructions utilisées à chaque étape du processus récursif pour décider quelles informations garder et lesquelles écarter. |
+| `document_ids` | `array<uuid>` | Non* | Une liste d'UUIDs de documents à analyser. |
+| `text` | `string` | Non* | Texte brut à analyser directement, comme alternative à la fourniture d'IDs de documents. |
+
+*\*Soit `document_ids` soit `text` doit être fourni.*
+
+## Structure de Sortie
+
+L'outil renvoie un objet structuré contenant la réponse synthétisée et des métadonnées sur les sources.
+
+```json
+{
+  "response": "Basé sur l'analyse des états financiers fournis, l'entreprise a montré une croissance constante de 15% d'une année sur l'autre. Le rapport du T3 met en évidence un investissement significatif en R&D <citation id=\"d290f1ee-6c54-4b01-90e6-d701748f0851\" name=\"Rapport Financier T3\">[1]</citation>, qui devrait donner des résultats d'ici le T4 2025. Parallèlement, le résumé annuel indique un pivot stratégique vers des solutions d'énergie durable <citation id=\"a1b2c3d4-e5f6-7890-1234-567890abcdef\" name=\"Stratégie Annuelle 2024\">[2]</citation>.",
+  "sources": [
+    {
+      "rank": 1,
+      "id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "name": "Rapport Financier T3",
+      "file_type": "application/pdf",
+      "used_in_response": true
+    },
+    {
+      "rank": 2,
+      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "name": "Stratégie Annuelle 2024",
+      "file_type": "application/pdf",
+      "used_in_response": true
+    }
+  ],
+  "sources_used": [1, 2],
+  "execution_id": "toolu_01FVWzd1Sv3GkGu3oiE8iPCN"
+}
+```
+
+| Champ | Description |
+| :--- | :--- |
+| `response` | Le texte final synthétisé, adapté à l'`intent`. Inclut des citations en ligne. |
+| `sources` | Une liste des documents qui ont été réellement utilisés dans l'analyse, incluant leurs métadonnées. |
+| `sources_used` | Une liste d'indices (rangs) correspondant aux `sources` qui ont été explicitement citées dans la réponse. |
+| `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Exemple d'Utilisation
+
+### Scénario : Création d'un Script de Pitch Deck
+
+**Entrée :**
+```json
+{
+  "intent": "Créez un script de présentation convaincant de 2 minutes pour notre nouveau produit 'EcoStream'. Structurez-le comme suit : 1) Le Problème : Le gaspillage d'eau dans le refroidissement industriel. 2) La Solution : La technologie de recyclage en boucle fermée d'EcoStream. 3) L'Impact : Économies de coûts et avantages environnementaux. Concentrez-vous sur les spécifications techniques du livre blanc et les données de marché de l'analyse concurrentielle.",
+  "document_ids": [
+    "d290f1ee-6c54-4b01-90e6-d701748f0851", 
+    "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  ]
+}
+```
+
+**Résultat :**
+L'outil traitera le contenu complet du livre blanc et de l'analyse concurrentielle, les résumant récursivement tout en gardant les points spécifiques demandés dans l'`intent`. Le résultat final sera un script cohérent qui tisse ensemble les détails techniques et les données de marché, citant les documents originaux.
+
+## Comment Ça Marche
+
+1.  **Génération Dynamique d'Instructions :** L'outil analyse d'abord votre `intent` et l'échantillon de document pour générer automatiquement des instructions spécialisées pour ses sous-agents. Cela garantit que chaque étape du résumé est adaptée pour extraire exactement ce que vous recherchez, le rendant bien plus efficace qu'un résumé générique.
+2.  **Découpage (Chunking) :** L'outil divise les documents d'entrée en morceaux gérables.
+3.  **Résumé Récursif :** Il traite ces morceaux en vagues parallèles. Chaque morceau est résumé en fonction des instructions personnalisées générées à l'étape 1.
+4.  **Agrégation :** Les résumés sont combinés et résumés à nouveau (et encore) jusqu'à ce qu'ils tiennent dans la fenêtre contextuelle.
+5.  **Synthèse Finale :** L'ensemble final de résumés concentrés est utilisé pour générer la réponse, assurant qu'elle coule logiquement et répond directement à votre demande.
+
+<Tip>
+  **Comportement des Citations**
+
+  Contrairement à `rag_search`, qui cite des morceaux/passages de texte spécifiques, `information_analysis` synthétise le contenu de plusieurs parties d'un document. Par conséquent, ses citations référencent le **document source dans son ensemble** qui soutient un point particulier, plutôt qu'une ligne ou un paragraphe spécifique.
+</Tip>

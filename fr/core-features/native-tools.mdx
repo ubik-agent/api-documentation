@@ -1,0 +1,144 @@
+---
+title: 'Outils Natifs'
+description: 'Aperçu des puissants outils natifs disponibles pour les agents sur la plateforme UBIK.'
+---
+
+La plateforme UBIK est équipée d'une suite d'outils natifs puissants qui sont disponibles pour l'agent par défaut. Ces outils permettent aux agents d'effectuer des tâches complexes allant de la recherche approfondie et l'analyse de données à la création de contenu et la génération visuelle.
+
+Ces outils sont conçus pour être composables et peuvent être orchestrés par l'agent pour résoudre des problèmes complexes.
+
+## Outils Disponibles
+
+### 1. Recherche RAG (`rag_search`)
+
+L'outil **Recherche RAG** est le mécanisme principal pour récupérer des informations à partir de vos documents téléchargés. Il utilise la Génération Augmentée par Récupération (RAG) pour trouver le contexte le plus pertinent pour la requête d'un utilisateur et génère une réponse basée *uniquement* sur cette information vérifiée.
+
+**Capacités Clés :**
+*   **Recherche Sémantique :** Comprend le sens derrière les requêtes, pas seulement la correspondance par mots-clés.
+*   **Citation des Sources :** Fournit des citations pour chaque information utilisée, assurant confiance et traçabilité.
+*   **Portée Documentaire :** Peut être restreint à la recherche dans des documents spécifiques ou dans des espaces de travail entiers.
+*   **Récupération à Grande Échelle :** Trouve efficacement des informations pertinentes parmi de grands volumes de documents locaux rapidement.
+*   **Compatibilité Multimodale :** Prend entièrement en charge les données multimodales, permettant la récupération à travers le texte et les images. Voir l'[Approfondissement du Pipeline RAG](/fr/advanced/rag-pipeline) pour plus d'informations.
+
+<Warning>
+  **Note Importante**
+
+  Cet outil n'est **pas** conçu pour résumer des documents entiers. Il récupère uniquement les extraits (chunks) les mieux classés d'un ensemble de documents et ne traite pas le contenu complet. Pour des résumés complets, utilisez l'outil `information_analysis`.
+</Warning>
+
+<Tip>
+  **Configuration & Ajustement**
+
+  Vous pouvez affiner le comportement du pipeline RAG dans vos [Préférences Utilisateur](https://app.ubik-agent.com/user/preferences). Ces paramètres s'appliquent à votre compte et vous permettent de configurer :
+  *   **Reranker :** Choisissez le modèle utilisé pour reclasser les résultats de recherche pour une meilleure précision.
+  *   **Modèles de Génération :** Sélectionnez le LLM utilisé pour synthétiser la réponse finale.
+  *   **Stratégies de Recherche :** Configurez les paramètres de fusion ou les poids manuels pour la recherche hybride.
+  *   **Modèles d'Embedding :** Choisissez le modèle utilisé pour vectoriser vos documents.
+  *   **Recherche Hybride :** Activez ou désactivez la recherche hybride (mot-clé + sémantique).
+
+  Pour plus de détails sur ces paramètres, veuillez vous référer à la [Documentation du Pipeline RAG](/fr/advanced/rag-pipeline).
+</Tip>
+
+**Cas d'Usage :** Répondre à des questions sur des documents de politique interne, des manuels techniques ou des bases de connaissances.
+
+### 2. Recherche Web (`web_search`)
+
+L'outil **Recherche Web** connecte votre agent à l'internet en direct. Contrairement au RAG, qui recherche dans vos documents internes, cet outil récupère des informations en temps réel sur le web, reclasse les résultats par pertinence et synthétise une réponse complète avec des citations.
+
+**Capacités Clés :**
+*   **Information en Temps Réel :** Accédez aux dernières nouvelles, cours de bourse ou événements survenus après la date limite d'entraînement du modèle.
+*   **Reranking par IA :** Utilise des modèles de reranking avancés pour trier les résultats de recherche par pertinence sémantique, assurant que la meilleure information est utilisée.
+*   **Scraping de Contenu :** Visite automatiquement les meilleurs résultats pour extraire le contenu complet de la page pour une analyse plus approfondie, pas seulement des extraits.
+*   **Citation des Sources :** Comme le RAG, il cite les pages web spécifiques utilisées pour générer la réponse.
+
+**Cas d'Usage :** Rechercher des événements actuels, trouver les prix des concurrents ou consulter la documentation d'une nouvelle bibliothèque logicielle.
+
+### 3. Analyse d'Information (`information_analysis`)
+
+L'outil **Analyse d'Information** est conçu pour la recherche approfondie et la synthèse. Contrairement à la recherche simple, qui répond à une question spécifique, cet outil peut traiter de grands volumes de texte à travers plusieurs documents pour identifier des tendances, résumer des points clés et synthétiser de nouvelles perspectives.
+
+**Capacités Clés :**
+*   **Synthèse Multi-Documents :** Agrège des informations provenant de diverses sources en une analyse cohérente.
+*   **Résumé Récursif :** Capable de traiter de très grands documents en les décomposant et en les résumant récursivement.
+*   **Piloté par l'Intention :** Adapte l'analyse en fonction de l'intention spécifique de l'utilisateur ou de l'objectif de recherche.
+*   **Traitement Complet des Documents :** Traite les documents ou ensembles de documents dans leur intégralité, contournant efficacement les contraintes de longueur de contexte des LLM.
+
+<Warning>
+  **Note de Performance**
+
+  Parce que cet outil traite le contenu complet des documents plutôt que de simplement récupérer des extraits, il est significativement plus intensif en calcul que l'outil RAG. Il peut entraîner des coûts et une latence plus élevés par rapport au RAG si vous recherchez uniquement une information précise au sein de plusieurs documents.
+</Warning>
+
+**Cas d'Usage :** Créer un résumé exécutif à partir d'une collection de rapports trimestriels ou analyser les stratégies des concurrents à partir de multiples articles de presse.
+
+### 4. Rédaction Structurée (`structured_writing`)
+
+L'outil **Rédaction Structurée** permet la génération de contenu long et cohérent. Il va au-delà des simples réponses de chat pour créer des documents structurés comme des rapports, des articles de blog ou des livres blancs.
+
+**Capacités Clés :**
+*   **Génération Basée sur un Plan :** Suit une structure ou un plan prédéfini pour assurer un flux logique.
+*   **Conscience du Contexte :** Maintient le contexte à travers les différentes sections du document pour assurer la cohérence du ton et des faits.
+*   **Raffinement Itératif :** Peut rédiger, réviser et affiner des sections pour répondre à des exigences spécifiques de longueur ou de style.
+
+**Cas d'Usage :** Rédiger un article de blog complet, écrire une spécification technique ou générer une newsletter mensuelle.
+
+### 5. Génération d'Images (`image_generation`)
+
+L'outil **Génération d'Images** permet aux agents de créer des actifs visuels à la volée. Il exploite des modèles génératifs avancés pour transformer des descriptions textuelles en images de haute qualité.
+
+**Capacités Clés :**
+*   **Texte-vers-Image :** Génère des images à partir de prompts textuels détaillés.
+*   **Image-vers-Image :** Peut accepter des images sources en entrée pour guider la génération, assurant que le résultat correspond à un style ou une composition spécifique.
+*   **Contrôle du Style :** Peut s'adapter à divers styles artistiques, du photoréaliste à l'abstrait.
+*   **Aides Visuelles :** Utile pour créer des diagrammes, des illustrations ou des couvertures pour accompagner le texte généré.
+
+**Cas d'Usage :** Créer une image de couverture pour un article de blog ou visualiser un concept décrit dans une conversation.
+
+### 6. Exécution de Code (`code_execution`)
+
+L'outil **Exécution de Code** fournit à l'agent un environnement Python isolé (sandbox). Cela permet à l'agent d'écrire et d'exécuter du code pour résoudre des problèmes difficiles pour les modèles de langage seuls, tels que des mathématiques complexes ou le traitement de données.
+
+**Capacités Clés :**
+*   **Analyse de Données :** Peut charger des CSV ou d'autres fichiers de données pour effectuer une analyse statistique en utilisant des bibliothèques comme `pandas` et `numpy`.
+*   **Visualisation :** Génère des graphiques et des diagrammes en utilisant `matplotlib` ou `seaborn`.
+*   **Calcul Précis :** Effectue des calculs mathématiques exacts là où les LLM pourraient halluciner.
+*   **Sécurité Isolée :** S'exécute dans un environnement sécurisé et isolé pour garantir la sûreté.
+
+**Cas d'Usage :** Analyser une feuille de calcul de ventes pour prévoir des tendances, tracer un graphique de croissance des utilisateurs ou résoudre une équation algébrique complexe.
+
+## Étendre les Capacités
+
+Bien que ces outils natifs fournissent une base puissante, la plateforme UBIK est conçue pour l'extensibilité. Vous n'êtes pas limité aux outils listés ci-dessus.
+
+Vous pouvez étendre les capacités de votre agent de deux manières :
+
+<CardGroup cols={2}>
+  <Card title="Intégration API" icon="cloud-arrow-up">
+    Créez de nouveaux outils en connectant vos propres API à la plateforme, permettant aux agents d'interagir avec vos services externes ou bases de données internes. Le support du Model Context Protocol (MCP) est également prévu pour les futures versions.
+  </Card>
+  <Card title="Constructeur d'Outils" icon="screwdriver-wrench">
+    Utilisez le **Constructeur d'Outils** dédié au sein de l'application UBIK pour composer visuellement des outils existants en de nouveaux flux de travail plus complexes sans écrire de code.
+  </Card>
+</CardGroup>
+
+Pour une démonstration sur la façon de construire et composer des outils en utilisant l'interface de la plateforme, consultez ce tutoriel vidéo :
+
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/vbU6leFwDs0"
+  title="Construire des Outils Personnalisés dans UBIK"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+<Tip>
+  **Optimiser la Sélection des Outils**
+
+  Lors de la création d'un assistant, il est fortement recommandé de fournir des instructions spécifiques sur le moment d'utiliser chaque outil. Comme ces outils sont puissants et génériques, le modèle peut ne pas toujours savoir intuitivement s'il faut utiliser `rag_search` pour une recherche rapide ou `information_analysis` pour une analyse approfondie.
+
+  **Exemple :** "Utilise `rag_search` pour des questions de vérification de faits spécifiques, mais passe à `information_analysis` lorsque je demande des résumés ou des rapports complets."
+
+  Des instructions explicites donnent de meilleurs résultats et adaptent les outils génériques à votre cas d'usage spécifique.
+</Tip>

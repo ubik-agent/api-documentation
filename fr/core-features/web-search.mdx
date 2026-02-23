@@ -1,0 +1,108 @@
+---
+title: 'Recherche Web'
+description: 'Documentation détaillée pour l''outil web_search.'
+---
+
+L'outil `web_search` permet aux agents de récupérer, d'analyser et de synthétiser des informations provenant du web en direct. Il va au-delà de la simple correspondance par mots-clés en employant un processus en plusieurs étapes : recherche, extraction du contenu complet (scraping), reclassement sémantique des résultats, et enfin génération d'une réponse sourcée.
+
+## Quand Utiliser Cet Outil
+
+Utilisez `web_search` lorsque vous avez besoin de :
+*   **Accéder à des Données en Temps Réel :** Trouver des informations sur des événements, des prix ou des sorties survenus récemment.
+*   **Vérifier des Faits :** Recouper des connaissances internes avec des sources externes.
+*   **Élargir la Recherche :** Explorer des sujets en dehors de votre base de connaissances interne.
+*   **Trouver de la Documentation :** Consulter les dernières références API ou guides techniques qui pourraient ne pas être dans vos données d'entraînement.
+
+<Note>
+  **Reranking & Qualité**
+  
+  Cet outil ne renvoie pas simplement une liste de liens. Il récupère le contenu réel des meilleurs résultats et utilise un modèle spécialisé de "reranker" pour les noter en fonction de la façon dont ils répondent à la requête spécifique de l'utilisateur. Cela garantit des réponses pertinentes et de haute qualité même si les mots-clés de recherche initiaux étaient imparfaits.
+</Note>
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `query` | `string` | Oui | La requête de recherche à envoyer au navigateur web. Soyez précis pour de meilleurs résultats. |
+| `time_range` | `string` | Non | Filtrer les résultats par temps. Options : `day`, `month`, `year`, `none` (défaut). Utilisez ceci uniquement si l'utilisateur demande explicitement une période. |
+
+## Structure de Sortie
+
+L'outil renvoie un objet JSON contenant la réponse synthétisée et les sources utilisées.
+
+```json
+{
+  "query": "dernières avancées batteries solides 2024",
+  "response": "L'utilisateur demande des informations sur les avancées récentes dans les batteries à l'état solide. Je dois trouver des informations spécifiques à 2024. En regardant les résultats de recherche, je vois plusieurs articles pertinents...\n\nLes avancées récentes dans les batteries à l'état solide en 2024 se sont concentrées sur l'amélioration de la densité énergétique et des vitesses de charge. Toyota a annoncé une percée revendiquant une autonomie de 745 miles et un temps de charge de 10 minutes <web_citation url=\"https://example.com/toyota-news\" title=\"Toyota News\">[1]</web_citation>. Pendant ce temps, QuantumScape a commencé à expédier des prototypes à des partenaires automobiles <web_citation url=\"https://example.com/quantumscape-update\" title=\"QuantumScape Update\">[2]</web_citation>.",
+  "sources": [
+    {
+      "rank": 1,
+      "title": "Feuille de route des batteries solides de Toyota",
+      "url": "https://example.com/toyota-news",
+      "snippet": "Toyota vise à commercialiser la technologie d'ici 2027...",
+      "rerank_score": 0.92,
+      "used_in_response": true
+    },
+    // ... autres sources
+  ],
+  "sources_used": [1, 2],
+  "model": "claude-3-7-sonnet-20250219-thinking",
+  "reranker": "llm_multimodal_tool_calling_binary_reranker::gpt-4o-mini",
+  "total_results": 15,
+  "reranked_results": 5,
+  "execution_id": "call_zIsjIkJwvPrJTz2GbIRGg8DE"
+}
+```
+
+### Champs de Réponse
+
+| Champ | Description |
+| :--- | :--- |
+| `response` | La réponse en langage naturel générée par le modèle, incluant des citations en ligne et potentiellement un bloc "Réflexion" où le modèle planifie sa réponse. |
+| `sources` | Une liste des pages web qui ont été analysées. Inclut l'`url`, le `title`, un `snippet`, et un `rerank_score` indiquant la pertinence. |
+| `sources_used` | Un tableau d'entiers correspondant au `rank` des sources qui ont été explicitement citées dans la réponse. |
+| `model` | Le LLM utilisé pour générer la réponse. |
+| `reranker` | Le modèle utilisé pour réordonner les résultats de recherche par pertinence. |
+| `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Exemple d'Utilisation
+
+### Recherche Basique
+
+**Entrée :**
+```json
+{
+  "query": "prix actuel du bitcoin"
+}
+```
+
+**Résultat :**
+L'agent renverra le prix actuel provenant d'un site d'actualités financières ou de données d'échange trouvées sur le web.
+
+### Recherche Filtrée par Temps
+
+**Entrée :**
+```json
+{
+  "query": "tremblement de terre au japon",
+  "time_range": "day"
+}
+```
+
+**Résultat :**
+L'agent restreint les résultats aux dernières 24 heures, assurant que l'information concerne des événements récents plutôt que historiques.
+
+## Comment Ça Marche
+
+1.  **Recherche :** L'outil interroge un moteur de recherche (SearXNG) pour obtenir un large ensemble de résultats initiaux.
+2.  **Scraping :** Il visite les meilleures URL pour extraire le contenu textuel complet, pas seulement l'extrait de recherche.
+3.  **Rerank :** Un modèle spécialisé de "reranker" compare la requête de l'utilisateur au texte complet de chaque page pour déterminer lesquelles sont vraiment pertinentes.
+4.  **Générer :** Les morceaux de texte les plus pertinents sont passés à un LLM, qui synthétise la réponse finale et ajoute des citations.
+
+<Tip>
+  **Configuration**
+  
+  Tout comme l'outil RAG, les modèles utilisés pour la **génération** et le **reranking** dans la Recherche Web respectent les paramètres configurés dans vos [Préférences Utilisateur](https://app.ubik-agent.com/user/preferences) sous la section RAG.
+</Tip>

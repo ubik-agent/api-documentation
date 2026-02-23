@@ -1,0 +1,176 @@
+---
+title: 'En quoi notre Pipeline RAG est différent'
+description: 'Plongée approfondie dans l''architecture du pipeline RAG UBIK, en se concentrant sur les goulots d''étranglement de performance.'
+---
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/YNI9jO4l81s"
+  title="Explication du Pipeline RAG UBIK"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+Le pipeline RAG (Génération Augmentée par Récupération) UBIK est conçu pour résoudre les goulots d'étranglement fondamentaux de performance qui affligent les implémentations standard. Plutôt que de s'appuyer sur des composants génériques prêts à l'emploi, nous avons construit un système qui optimise chaque étape du processus de récupération—en commençant par la façon dont l'information est extraite de vos documents.
+
+## Goulot d'étranglement #1 : Parsing & Extraction
+
+La première et la plus critique étape de tout pipeline RAG est le **Parsing** : extraire du texte et une structure utilisables à partir de fichiers bruts.
+
+De nombreuses bibliothèques de base tentent d'analyser les documents rapidement mais échouent à préserver les informations structurelles ou manquent complètement du contenu. Un parseur rapide peut extraire le texte mais perdre le contexte des en-têtes, des tableaux ou de la mise en page, conduisant à des morceaux fragmentés et confus pour le LLM.
+
+**Si vous alimentez votre pipeline avec du mauvais contenu, vous ne récupérerez jamais de bonnes réponses.**
+
+UBIK résout ce problème en fournissant des pipelines de parsing adaptatifs adaptés au type de document, à la vitesse requise et à la profondeur d'information nécessaire. Nous prenons en charge une large gamme de formats, y compris les documents standard (PDF, DOCX, CSV, Excel, JSON, Texte), le contenu web et les fichiers multimodaux (MP4, MP3).
+
+Une fois qu'un fichier est traité, nous appliquons la stratégie de parsing appropriée en fonction des caractéristiques du document et de vos préférences utilisateur.
+
+### Nos Pipelines de Parsing
+
+Nous proposons trois pipelines distincts pour équilibrer vitesse, coût et qualité d'extraction :
+
+#### 1. Pipeline à Faible Latence
+*   **Idéal pour :** Traitement à grand volume où la vitesse est critique et les documents sont du texte simple.
+*   **Mécanisme :** Extrait rapidement le texte brut sans analyse approfondie de la mise en page.
+*   **Compromis :** C'est l'option la plus rapide mais la moins robuste. Elle peut sauter des éléments de mise en page complexes ou échouer à extraire du texte de documents riches en images.
+
+#### 2. Pipeline Standard (Conscient de la Mise en Page)
+*   **Idéal pour :** Documents d'affaires classiques (PDF, DOCX, CSV) où la structure compte.
+*   **Mécanisme :** Exploite l'OCR (Reconnaissance Optique de Caractères) et la Vision par Ordinateur pour détecter et préserver la mise en page du document.
+*   **Personnalisation :**
+    *   **Défaut :** Utilise le moteur OCR par défaut de la plateforme (Mistral OCR).
+    *   **Optimisé :** Vous pouvez déployer notre modèle OCR propriétaire et optimisé dans votre propre section admin pour des besoins de performance et de confidentialité accrus. *Contactez-nous par email à contact@ubik-agent.com pour une démonstration sur la mise en place d'une instance personnalisée.*
+
+#### 3. Pipeline Visuel / Amélioré (Multimodal)
+*   **Idéal pour :** Documents complexes avec des graphiques, des images ou des informations non textuelles.
+*   **Mécanisme :** Convertit les documents en représentations visuelles (PDF/Image) et applique un **Modèle de Langage Vision (VLM)** pour "lire" le document comme un humain le ferait.
+*   **Capacités :** Ce pipeline peut extraire du sens à partir d'images sans texte et traiter du contenu vidéo pour créer des représentations riches.
+
+### Gestion des Formats Spécialisés
+
+Pour des modalités spécifiques nécessitant un traitement unique, nous exploitons des parseurs dédiés :
+*   **Audio/Vidéo (MP3, MP4) :** Transcrits et traités pour extraire à la fois le contenu parlé et le contexte visuel.
+*   **Sites Web :** Scrapés et nettoyés pour supprimer le boilerplate tout en préservant la structure de l'article.
+*   **Fichiers de Code :** Analysés pour conserver la structure syntaxique et l'indentation structurelle.
+
+En utilisant un ensemble de techniques de traitement propriétaires, UBIK garantit que nous extrayons non seulement le texte brut, mais aussi le **contexte structurel et multimodal** de vos informations. Cette extraction de haute qualité est la fondation d'un système RAG haute performance.
+
+## Goulot d'étranglement #2 : Encodage & Représentation
+
+Une fois que vous avez extrait un contenu de haute qualité, le prochain défi est l'**Encodage** : transformer cette information dans un format qu'une machine peut comprendre et récupérer efficacement.
+
+La plupart des pipelines RAG standard reposent sur une approche à **Index Unique**. Ils convertissent tout votre texte en une seule représentation vectorielle utilisant un seul modèle d'embedding. Bien que simple, cette approche échoue souvent à capturer les nuances des documents complexes. Un seul vecteur peut avoir du mal à représenter à la fois le sens sémantique d'un paragraphe et le contexte visuel d'un graphique accompagnant (la plupart du temps cela est ignoré car la multimodalité dans le RAG est difficile à réaliser).
+
+### L'Approche Multi-Signal
+
+UBIK surmonte cette limitation en vous permettant de mélanger et assortir plusieurs signaux pour créer une représentation plus riche et plus granulaire de vos informations. Au lieu de compter sur un seul embedding, vous pouvez exploiter différents modèles pour capturer divers aspects de vos données :
+
+*   **Sémantique Textuelle :** Utilisez un modèle optimisé pour comprendre le sens profond du texte.
+*   **Capacités Multilingues :** Incorporez un modèle spécifiquement entraîné pour gérer plusieurs langues, assurant une récupération précise à travers un contenu global.
+*   **Contexte Visuel :** Intégrez des embeddings qui représentent les éléments visuels extraits lors de la phase de parsing (par ex., graphiques, diagrammes, images).
+
+En combinant ces signaux, vous créez une **Représentation Multi-Vecteurs** pour chaque morceau de document. Cela permet au système de récupération de discriminer entre les morceaux d'information avec une bien plus grande précision.
+
+Pour une plongée plus profonde dans notre philosophie sur ce sujet, lisez notre article de glossaire sur la [Recherche Multi-Signal](https://ubik-agent.com/fr/glossary/multi-signal-search).
+
+<Note>
+  **Défauts de la Plateforme & Configuration Avancée**
+
+  Par défaut, la plateforme UBIK exploite **deux index** pour équilibrer performance et coût.
+
+  Si votre cas d'usage nécessite un **Index Multimodal** complet ou si vous souhaitez activer des modèles d'embedding supplémentaires pour des signaux spécialisés :
+  1.  Vous devez activer ces paramètres spécifiques dans vos [Préférences Utilisateur](https://app.ubik-agent.com/user/preferences).
+  2.  **Contactez-nous par email à contact@ubik-agent.com.** Nous vous guiderons pour mettre en place une instance personnalisée afin d'activer et de supporter pleinement ces capacités multi-signaux avancées.
+</Note>
+
+## Goulot d'étranglement #3 : Stratégie de Récupération & Recherche
+
+Même avec une extraction et un encodage parfaits, un pipeline RAG peut échouer si le mécanisme de **Récupération** est trop simpliste.
+
+Les systèmes standard reposent généralement uniquement sur la **Similarité Cosinus** ou les calculs de produit scalaire contre un seul index sémantique. Bien qu'efficace pour la correspondance conceptuelle large, cette approche a deux défauts majeurs :
+1.  **Faux Positifs :** Elle récupère souvent du contenu qui est sémantiquement "proche" dans l'espace vectoriel mais factuellement non lié à la requête spécifique.
+2.  **Cécité aux Mots-Clés :** La recherche sémantique pure peut manquer des documents qui contiennent les mots-clés *exacts* que vous recherchez (par ex., codes produits spécifiques, ID d'erreur ou noms propres) parce que le modèle d'embedding se concentre sur le sens général plutôt que sur les termes spécifiques.
+
+### Recherche Hybride : Le Meilleur des Deux Mondes
+
+UBIK résout cela en implémentant un moteur de **Recherche Hybride** robuste. Nous ne cherchons pas seulement le sens ; nous cherchons des correspondances exactes et les combinons intelligemment.
+
+*   **Récupération Sémantique :** Exploite les vecteurs multi-signaux (texte, visuel, multilingue) discutés ci-dessus pour trouver des informations conceptuellement pertinentes.
+*   **Correspondance par Mots-Clés :** Exécute simultanément des algorithmes basés sur les mots-clés (comme BM25) pour identifier les documents contenant les termes exacts de votre requête.
+
+En fusionnant ces deux approches, nous assurons que si vous cherchez "Erreur 505 dans le Module X", nous trouvons des documents qui discutent des erreurs du "Module X" (sémantique) *et* mentionnent spécifiquement "505" (mot-clé), les classant plus haut qu'un article général sur les "Erreurs Système".
+
+### Fusion & Pondération Personnalisables
+
+La "magie" réside dans la façon dont ces différents signaux sont combinés. UBIK vous donne le contrôle sur l'**Algorithme de Fusion** et les **Poids des Signaux** directement depuis vos [Préférences Utilisateur](https://app.ubik-agent.com/user/preferences).
+
+Vous pouvez configurer :
+*   **Algorithmes de Fusion :** Choisissez comment les résultats des différents index sont fusionnés (par ex., Reciprocal Rank Fusion).
+*   **Poids des Index :** Assignez une importance plus élevée à des signaux spécifiques. Par exemple, vous pourriez pondérer le signal "Mot-Clé" plus haut pour la documentation technique ou le signal "Visuel" plus haut pour les actifs de conception.
+
+<Tip>
+  **Conseil sur l'Ajustement**
+
+  Bien que ces paramètres offrent une personnalisation puissante, les réglages par défaut de la plateforme sont optimisés pour une large gamme de cas d'usage. Nous recommandons d'ajuster les poids de fusion uniquement si vous avez un problème de récupération spécifique que les défauts ne résolvent pas.
+</Tip>
+
+<Info>
+  **Modèles d'Interaction Tardive (ColBERT)**
+
+  Pour des cas d'usage très complexes impliquant des **données hors domaine** où la récupération dense standard pourrait avoir du mal, UBIK supporte également les modèles d'**Interaction Tardive** (comme ColBERT). Cette approche conserve des interactions fines au niveau des tokens entre la requête et le document, offrant une qualité de récupération supérieure au coût d'un stockage plus élevé.
+
+  Ce concept est abordé dans notre article sur la [Recherche Multi-Signal](https://ubik-agent.com/fr/glossary/multi-signal-search). Si votre cas d'usage nécessite cette architecture avancée, veuillez nous contacter pour la mettre en place.
+</Info>
+
+## Goulot d'étranglement #4 : Précision & Reranking
+
+Même après une recherche hybride sophistiquée, l'ensemble initial de résultats récupérés peut encore contenir du bruit. Vous pourriez obtenir 50 morceaux "pertinents", mais seulement 5 d'entre eux contiennent réellement la réponse à votre question spécifique.
+
+C'est là qu'intervient le **Reranker**.
+
+Un reranker est un système spécialisé qui prend votre requête et les résultats candidats, les analyse en profondeur et assigne un **Score de Pertinence** à chacun. Il agit comme un filtre strict, écartant les informations non pertinentes et réordonnant le reste pour que le contenu le plus significatif soit traité par le LLM.
+
+### Stratégies de Reranking
+
+UBIK offre un spectre d'options de reranking pour équilibrer vitesse, coût et intelligence :
+
+*   **Rerankers Basés sur API :** (par ex., Jina, Cohere) Exploitent des modèles plus petits et optimisés pour un scoring extrêmement rapide. Idéal pour les applications à grand volume.
+*   **Rerankers Basés sur LLM :** Utilisent un Grand Modèle de Langage pour raisonner sur la relation entre la requête et le morceau de document. Cela fournit une précision bien plus élevée pour les requêtes complexes.
+*   **Rerankers Vision-Langage (VLM) :** C'est ce qui rend un pipeline **entièrement multimodal**. En utilisant un modèle qui peut "voir", nous pouvons reclasser des graphiques, des images et des cadres vidéo basés sur leur contenu visuel, pas seulement leurs descriptions textuelles.
+
+### Configuration Avancée & Sécurité
+
+Dans vos préférences utilisateur, vous verrez une liste de rerankers disponibles adaptés aux modèles actuellement actifs sur la plateforme. Cette sélection inclut :
+
+*   **Rerankers Binaires `llm_tool_calling` :** Modèles spécialisés qui sortent une décision binaire (pertinent/non pertinent) ou un score précis utilisant des capacités d'appel de fonction.
+*   **Rerankers `llm_multimodal` :** Modèles avancés (comme GPT-4o, Claude 4 Sonnet, Gemini 2.5 Pro) capables d'analyser à la fois le texte et les images simultanément pour la plus haute précision possible.
+*   **Rerankers API :** Services externes optimisés comme Jina ou Cohere.
+
+**Auto-Hébergement pour une Sécurité Maximale**
+
+Pour les cas d'usage nécessitant une sécurité maximale et une isolation des données, vous n'êtes pas limité aux modèles par défaut de la plateforme. Vous pouvez **auto-héberger votre propre modèle de reranking** et l'enregistrer pour votre compte utilisateur spécifique.
+
+*Si vous avez besoin de déployer un modèle auto-hébergé personnalisé, veuillez nous contacter par email à contact@ubik-agent.com. Nous fournirons une démonstration et un guide sur la façon de mettre en place une instance et de l'intégrer.*
+
+En configurant le bon reranker, vous assurez que votre agent ne voit que l'information qui compte vraiment, réduisant les hallucinations et améliorant la qualité des réponses.
+
+## Goulot d'étranglement #5 : Génération & Citation
+
+L'étape finale du pipeline est la synthèse des informations récupérées et filtrées en une réponse cohérente.
+
+Une fois que l'information pertinente a été filtrée par le reranker, elle est passée à un **Modèle Génératif** pour construire la réponse finale.
+
+### Sélection de Modèle & Flexibilité
+
+Vous pouvez sélectionner l'architecture de modèle exacte qui correspond à vos besoins—que ce soit un modèle classique à haute vitesse, un modèle de "raisonement" pour les tâches complexes, ou un modèle de domaine spécialisé.
+
+**Capacités Clés :**
+*   **Sélection de Modèle :** Choisissez le meilleur modèle pour votre cas d'usage spécifique (par ex., GPT-4o pour le raisonnement, Claude 3.5 Sonnet pour le code/rédaction).
+*   **Synthèse Multimodale :** Si vous sélectionnez un modèle compatible avec la vision, le pipeline exploite la multimodalité complète, permettant au modèle de "voir" et d'interpréter les extraits visuels (graphiques, diagrammes) préservés de vos documents.
+*   **Citations Précises & Mise en Évidence :** Cette étape boucle la boucle en exploitant les données structurelles préservées lors de la phase initiale de **Parsing**. Parce que nous avons maintenu la mise en page et le contexte du document dès le début, le modèle peut citer avec précision la source exacte et mettre en évidence des extraits significatifs pour l'utilisateur. **Pour le contenu audio et vidéo, cela inclut des horodatages spécifiques**, assurant une traçabilité complète à travers toutes les modalités—que ce soit un numéro de page dans un PDF ou une minute spécifique dans un enregistrement de réunion.
+
+### Mise à l'Échelle pour la Performance
+
+Ultimement, cette conception vous permet de mettre à l'échelle votre pipeline RAG selon vos contraintes spécifiques : optimisez pour une **latence ultra-faible** avec des modèles plus rapides, ou priorisez **la performance maximale et la profondeur de raisonnement** avec des modèles plus grands. Cette flexibilité vous permet de choisir le meilleur outil pour le travail.

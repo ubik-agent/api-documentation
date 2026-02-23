@@ -54,6 +54,24 @@
                   "/en/guides/streaming-results",
                   "/en/guides/embedding-tools"
                 ]
+              },
+              {
+                "group": "Core Features",
+                "pages": [
+                  "/en/core-features/native-tools",
+                  "/en/core-features/rag-search",
+                  "/en/core-features/web-search",
+                  "/en/core-features/information-analysis",
+                  "/en/core-features/structured-writing-task",
+                  "/en/core-features/image-generation",
+                  "/en/core-features/code-execution"
+                ]
+              },
+              {
+                "group": "To Go Further",
+                "pages": [
+                  "/en/advanced/rag-pipeline"
+                ]
               }
             ]
           },
@@ -94,6 +112,24 @@
                   "/fr/guides/agent-message-structure",
                   "/fr/guides/streaming-results",
                   "/fr/guides/embedding-tools"
+                ]
+              },
+              {
+                "group": "Fonctionnalités Principales",
+                "pages": [
+                  "/fr/core-features/native-tools",
+                  "/fr/core-features/rag-search",
+                  "/fr/core-features/web-search",
+                  "/fr/core-features/information-analysis",
+                  "/fr/core-features/structured-writing-task",
+                  "/fr/core-features/image-generation",
+                  "/fr/core-features/code-execution"
+                ]
+              },
+              {
+                "group": "Pour aller plus loin",
+                "pages": [
+                  "/fr/advanced/rag-pipeline"
                 ]
               }
             ]

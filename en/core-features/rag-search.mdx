@@ -1,0 +1,111 @@
+---
+title: 'RAG Search'
+description: 'Detailed documentation for the rag_search tool.'
+---
+
+The `rag_search` tool is the cornerstone of information retrieval within the UBIK platform. It allows agents to perform **Retrieval-Augmented Generation (RAG)** searches across your uploaded documents.
+
+Unlike a standard keyword search, this tool uses semantic understanding to find the most relevant "chunks" of text from your knowledge base and uses a Large Language Model (LLM) to synthesize a precise answer grounded in those facts.
+
+## When to Use This Tool
+
+Use `rag_search` when you need to:
+*   **Answer specific questions** based on your private data (e.g., "What is the vacation policy?").
+*   **Find specific facts** buried in large documents.
+*   **Verify information** against a trusted source.
+*   **Retrieve context** to support a conversation.
+
+<Note>
+  This tool is optimized for **retrieval accuracy** and **grounded generation**. It is not intended for processing entire documents or generating long-form summaries (use `information_analysis` for that).
+</Note>
+
+## Input Parameters
+
+The tool accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `query` | `string` | Yes | The natural language question or search query. Be as specific as possible for best results. |
+| `document_ids` | `array<uuid>` | No | A list of specific Document UUIDs to search within. If omitted, the search runs across all documents accessible to the user/session. |
+
+### Scoping & Permissions
+
+The `rag_search` tool automatically respects the security context of the execution:
+*   **User Access:** Searches documents owned by the user or shared with them via workspaces.
+*   **Session Context:** If running within a chat session, it includes documents attached to that specific session.
+*   **External ID:** For multi-tenant applications, it strictly enforces `external_user_id` boundaries, ensuring users never see data from other tenants.
+
+## Output Structure
+
+The tool returns a structured object containing the answer, the evidence used to generate it, and metadata about the execution.
+
+```json
+{
+  "response": "**Reflection:**\n*The user is asking about the remote work policy. I need to check the employee handbook for eligibility and approval processes...*\n\n# Remote Work Guidelines\n\nAccording to the company handbook, remote work is allowed under specific conditions:\n\n- Employees must have completed their probation period <citation id=\"9bdef571-ed43-4cb7-a4a1-1011edce8a62\">[1]</citation>\n- Approval is required from the direct manager at least 48 hours in advance <citation id=\"af572b1c-cb3a-49dc-a062-17860219b8ef\">[2]</citation>\n\nExceptions can be made for medical reasons.",
+  "contexts": [
+    {
+      "rank": 1,
+      "chunk_id": "9bdef571-ed43-4cb7-a4a1-1011edce8a62",
+      "document_id": "7f15f1ff-d15e-4894-8fb3-155392ab8972",
+      "text_preview": "Eligibility for remote work: Full-time employees who have successfully completed their 3-month probation period are eligible...",
+      "used_in_response": true
+    },
+    {
+      "rank": 2,
+      "chunk_id": "af572b1c-cb3a-49dc-a062-17860219b8ef",
+      "document_id": "7f15f1ff-d15e-4894-8fb3-155392ab8972",
+      "text_preview": "Request process: Submit a request via the HR portal. Manager approval is required 48 hours prior to the requested date...",
+      "used_in_response": true
+    }
+  ],
+  "sources_used": [1, 2],
+  "model": "claude-3-7-sonnet-20250219-thinking",
+  "execution_id": "call_HB55iUMZE3dZ3QKCHGKE6qYF"
+}
+```
+
+| Field | Description |
+| :--- | :--- |
+| `response` | The natural language answer. Can include a "Reflection" block (thinking process), Markdown formatting, and inline citations pointing to specific chunks. |
+| `contexts` | A list of the retrieved text chunks passed to the LLM. Includes `chunk_id`, `document_id`, and `text_preview`. |
+| `sources_used` | A list of indices (ranks) corresponding to the `contexts` that were explicitly used to form the answer. |
+| `model` | The specific LLM used for generation. |
+| `execution_id` | The unique identifier for this tool execution. |
+
+## Example Usage
+
+### 1. Broad Search
+Searching across all available knowledge.
+
+**Input:**
+```json
+{
+  "query": "How do I reset my 2FA token?"
+}
+```
+
+### 2. Scoped Search
+Searching only within a specific technical manual.
+
+**Input:**
+```json
+{
+  "query": "What is the error code E-505?",
+  "document_ids": ["550e8400-e29b-41d4-a716-446655440000"]
+}
+```
+
+## Multimodal Capabilities
+
+The `rag_search` pipeline is fully multimodal. If you have indexed documents containing images (like PDFs with charts or slides), the search can retrieve relevant visual context.
+
+*   **Text-to-Image Retrieval:** Your text query can match descriptions of images.
+*   **Image Understanding:** The generation model can "see" the retrieved images to answer questions about charts, diagrams, or photos.
+
+<Note>
+  **Activation Required**
+
+  Multimodal RAG is not enabled by default. To activate this feature for your workspace, please contact the UBIK team at [contact@ubik-agent.com](mailto:contact@ubik-agent.com).
+</Note>
+
+For a deeper dive into how the pipeline handles embeddings, re-ranking, and hybrid search, see the [RAG Pipeline Deep Dive](/en/advanced/rag-pipeline).

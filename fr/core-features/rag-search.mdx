@@ -1,0 +1,111 @@
+---
+title: 'Recherche RAG'
+description: 'Documentation détaillée pour l''outil rag_search.'
+---
+
+L'outil `rag_search` est la pierre angulaire de la récupération d'information au sein de la plateforme UBIK. Il permet aux agents d'effectuer des recherches en **Génération Augmentée par Récupération (RAG)** à travers vos documents téléchargés.
+
+Contrairement à une recherche par mot-clé standard, cet outil utilise la compréhension sémantique pour trouver les "morceaux" (chunks) de texte les plus pertinents de votre base de connaissances et utilise un Grand Modèle de Langage (LLM) pour synthétiser une réponse précise basée sur ces faits.
+
+## Quand Utiliser Cet Outil
+
+Utilisez `rag_search` lorsque vous avez besoin de :
+*   **Répondre à des questions spécifiques** basées sur vos données privées (par ex., "Quelle est la politique de congés ?").
+*   **Trouver des faits précis** enfouis dans de grands documents.
+*   **Vérifier des informations** par rapport à une source fiable.
+*   **Récupérer du contexte** pour soutenir une conversation.
+
+<Note>
+  Cet outil est optimisé pour la **précision de récupération** et la **génération ancrée**. Il n'est pas destiné au traitement de documents entiers ou à la génération de résumés longs (utilisez `information_analysis` pour cela).
+</Note>
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `query` | `string` | Oui | La question en langage naturel ou la requête de recherche. Soyez aussi précis que possible pour de meilleurs résultats. |
+| `document_ids` | `array<uuid>` | Non | Une liste d'UUIDs de documents spécifiques dans lesquels chercher. Si omis, la recherche s'exécute sur tous les documents accessibles à l'utilisateur/session. |
+
+### Portée & Permissions
+
+L'outil `rag_search` respecte automatiquement le contexte de sécurité de l'exécution :
+*   **Accès Utilisateur :** Recherche les documents appartenant à l'utilisateur ou partagés avec lui via des espaces de travail.
+*   **Contexte de Session :** Si exécuté au sein d'une session de chat, il inclut les documents attachés à cette session spécifique.
+*   **ID Externe :** Pour les applications multi-tenants, il applique strictement les frontières `external_user_id`, garantissant que les utilisateurs ne voient jamais les données d'autres sous-utilisateurs.
+
+## Structure de Sortie
+
+L'outil renvoie un objet structuré contenant la réponse, les preuves utilisées pour la générer et des métadonnées sur l'exécution.
+
+```json
+{
+  "response": "**Réflexion :**\n*L'utilisateur pose une question sur la politique de télétravail. Je dois vérifier le manuel de l'employé pour l'éligibilité et les processus d'approbation...*\n\n# Directives de Télétravail\n\nSelon le manuel de l'entreprise, le télétravail est autorisé sous certaines conditions :\n\n- Les employés doivent avoir terminé leur période d'essai <citation id=\"9bdef571-ed43-4cb7-a4a1-1011edce8a62\">[1]</citation>\n- L'approbation est requise de la part du manager direct au moins 48 heures à l'avance <citation id=\"af572b1c-cb3a-49dc-a062-17860219b8ef\">[2]</citation>\n\nDes exceptions peuvent être faites pour raisons médicales.",
+  "contexts": [
+    {
+      "rank": 1,
+      "chunk_id": "9bdef571-ed43-4cb7-a4a1-1011edce8a62",
+      "document_id": "7f15f1ff-d15e-4894-8fb3-155392ab8972",
+      "text_preview": "Éligibilité au télétravail : Les employés à temps plein ayant terminé avec succès leur période d'essai de 3 mois sont éligibles...",
+      "used_in_response": true
+    },
+    {
+      "rank": 2,
+      "chunk_id": "af572b1c-cb3a-49dc-a062-17860219b8ef",
+      "document_id": "7f15f1ff-d15e-4894-8fb3-155392ab8972",
+      "text_preview": "Processus de demande : Soumettez une demande via le portail RH. L'approbation du manager est requise 48 heures avant la date demandée...",
+      "used_in_response": true
+    }
+  ],
+  "sources_used": [1, 2],
+  "model": "claude-3-7-sonnet-20250219-thinking",
+  "execution_id": "call_HB55iUMZE3dZ3QKCHGKE6qYF"
+}
+```
+
+| Champ | Description |
+| :--- | :--- |
+| `response` | La réponse en langage naturel. Peut inclure un bloc "Réflexion" (processus de pensée), du formatage Markdown et des citations en ligne pointant vers des morceaux spécifiques. |
+| `contexts` | Une liste des morceaux de texte récupérés passés au LLM. Inclut `chunk_id`, `document_id` et `text_preview`. |
+| `sources_used` | Une liste d'indices (rangs) correspondant aux `contexts` qui ont été explicitement utilisés pour former la réponse. |
+| `model` | Le LLM spécifique utilisé pour la génération. |
+| `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Exemple d'Utilisation
+
+### 1. Recherche Large
+Recherche à travers toutes les connaissances disponibles.
+
+**Entrée :**
+```json
+{
+  "query": "Comment réinitialiser mon jeton 2FA ?"
+}
+```
+
+### 2. Recherche Ciblée
+Recherche uniquement au sein d'un manuel technique spécifique.
+
+**Entrée :**
+```json
+{
+  "query": "Quel est le code d'erreur E-505 ?",
+  "document_ids": ["550e8400-e29b-41d4-a716-446655440000"]
+}
+```
+
+## Capacités Multimodales
+
+Le pipeline `rag_search` est entièrement compatible avec le multimodal. Si vous avez indexé des documents contenant des images (comme des PDF avec des graphiques ou des diapositives), la recherche peut récupérer le contexte visuel pertinent.
+
+*   **Récupération Texte-vers-Image :** Votre requête textuelle peut correspondre à des descriptions d'images.
+*   **Compréhension d'Image :** Le modèle de génération peut "voir" les images récupérées pour répondre à des questions sur des graphiques, des diagrammes ou des photos.
+
+<Note>
+  **Activation Requise**
+
+  Le RAG multimodal n'est pas activé par défaut. Pour activer cette fonctionnalité pour votre espace de travail, veuillez contacter l'équipe UBIK à [contact@ubik-agent.com](mailto:contact@ubik-agent.com).
+</Note>
+
+Pour une plongée plus profonde dans la façon dont le pipeline gère les embeddings, le re-ranking et la recherche hybride, voir l'[Approfondissement du Pipeline RAG](/fr/advanced/rag-pipeline).

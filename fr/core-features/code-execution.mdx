@@ -1,0 +1,110 @@
+---
+title: 'Exécution de Code'
+description: 'Documentation détaillée pour l''outil code_execution.'
+---
+
+L'outil `code_execution` (ou `code_interpreter`) fournit aux agents un environnement Python sécurisé et isolé (sandbox). Cela leur permet d'aller au-delà de la génération de texte et d'effectuer des tâches de calcul, d'analyse de données et de visualisation en écrivant et en exécutant du vrai code.
+
+Il est conçu pour être itératif : l'agent peut écrire du code, voir le résultat (ou les erreurs), puis affiner son code dans une boucle jusqu'à ce que la tâche soit terminée.
+
+## Quand Utiliser Cet Outil
+
+Utilisez `code_execution` lorsque vous avez besoin de :
+*   **Analyser des Données :** Traiter des fichiers CSV, Excel ou des données JSON pour trouver des insights.
+*   **Visualiser des Informations :** Créer des graphiques, des diagrammes et des tracés en utilisant des bibliothèques comme `matplotlib` ou `seaborn`.
+*   **Effectuer des Maths :** Résoudre des équations algébriques complexes ou des calculs financiers avec précision.
+*   **Transformer des Fichiers :** Convertir des formats de données ou nettoyer des jeux de données désordonnés.
+
+<Note>
+  **Sécurité & Isolation**
+
+  Chaque exécution se déroule dans un sandbox complètement isolé et éphémère. L'environnement ne peut pas accéder à votre système de fichiers local, garantissant une sécurité totale. Les fichiers doivent être explicitement passés dans le sandbox via `document_ids` pour être disponibles.
+</Note>
+
+<Tip>
+  **Configuration & Ajustement**
+
+  Vous pouvez personnaliser le comportement de l'outil d'exécution de code dans vos [Préférences Utilisateur](https://app.ubik-agent.com/user/preferences). Spécifiquement, vous pouvez sélectionner quel **fournisseur de modèle** doit être utilisé pour les tâches de génération de code, vous permettant d'optimiser pour la vitesse, le coût ou la capacité de raisonnement.
+</Tip>
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `request` | `string` | Oui | Une description en langage naturel de ce que vous voulez que le code fasse (par ex., "Trace la tendance des ventes à partir de ce CSV"). |
+| `document_ids` | `array<uuid>` | Non | Une liste d'UUIDs de documents représentant des fichiers (CSV, images, etc.) auxquels le code doit accéder. Ces fichiers seront téléchargés dans le sandbox. |
+| `context` | `string` | Non | Contexte ou contraintes supplémentaires (par ex., "Utilise un thème sombre pour le graphique"). |
+| `sandbox_id` | `string` | Non | L'ID d'une session sandbox existante à reprendre. Si omis, une nouvelle session est démarrée. |
+
+## Structure de Sortie
+
+L'outil renvoie un objet structuré contenant les résultats de l'exécution, les journaux et tous les artefacts générés.
+
+```json
+{
+  "sandbox_id": "igy4shlkrl6z9sx2uagxz",
+  "generated_files": [],
+  "logs": "INFO: Started sandbox session: igy4shlkrl6z9sx2uagxz\nINFO: Development plan: [\"Load the CSV file...\", \"Analyze the data...\", \"Create comprehensive plots...\"]\n\n--- Round 1/6: Load the CSV file... ---\nGENERATED CODE:\nimport pandas as pd\n...\nSTDOUT:\nFirst few rows of the dataset:\nFR0000120271;02/01/25;52 71;53 79...\n\nSTATUS: Execution successful\n...",
+  "artifacts": [
+    {
+      "type": "media_reference",
+      "asset_filename": "plot_0.png",
+      "url": "https://api.ubik-agent.com/v1/assets/..."
+    }
+  ],
+  "plan": [
+    "Load the CSV file located in the '/home/uploaded_files/' directory...",
+    "Analyze the data to identify the types of financial data present...",
+    "Create comprehensive plots for the identified financial data..."
+  ],
+  "total_rounds": 4,
+  "execution_id": "toolu_01NikWs2xyrrqNQwaQotf9xG"
+}
+```
+
+| Champ | Description |
+| :--- | :--- |
+| `sandbox_id` | L'ID de la session. Renvoyez-le dans les appels suivants pour maintenir l'état (variables, fonctions définies, etc.) actif. |
+| `logs` | Une transcription complète du code exécuté, de la sortie standard (instructions print) et des erreurs standard. Il inclut des marqueurs pour chaque tour d'exécution. |
+| `generated_files` | Références aux fichiers de données créés par le code (par ex., des CSV modifiés). |
+| `artifacts` | Références aux actifs visuels créés par le code (par ex., des graphiques PNG). |
+| `plan` | Le plan étape par étape que l'agent a formulé pour résoudre la demande. |
+| `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Exemple d'Utilisation
+
+### Scénario : Analyse de Données de Vente
+
+**Entrée :**
+```json
+{
+  "request": "Analysez le rapport de ventes ci-joint. Calculez le revenu total par région et générez un graphique à barres pour le visualiser.",
+  "document_ids": ["550e8400-e29b-41d4-a716-446655440000"] 
+}
+```
+
+**Résultat :**
+L'agent va :
+1.  **Planifier :** Créer un plan en plusieurs étapes (Charger les données -> Grouper par région -> Tracer).
+2.  **Exécuter :** Écrire du code Python utilisant `pandas` pour lire le CSV (téléchargé dans `/home/uploaded_files/`).
+3.  **Visualiser :** Utiliser `matplotlib` pour créer le graphique et le sauvegarder en tant qu'image.
+4.  **Retourner :** La réponse finale inclura les chiffres calculés dans les `logs` et le graphique dans le tableau `artifacts`.
+
+## Comment Ça Marche
+
+1.  **Planification :** L'agent décompose d'abord votre `request` en un plan de codage logique, étape par étape.
+2.  **Codage Itératif :** Il exécute le plan une étape à la fois.
+    *   Il écrit le code pour l'Étape 1.
+    *   Il exécute le code dans le sandbox.
+    *   Il observe la sortie (stdout/stderr).
+    *   S'il y a une erreur, il s'autocorrige et réessaie.
+3.  **Persistance de l'État :** Les variables et dataframes définis à l'Étape 1 sont disponibles à l'Étape 2, permettant des flux de travail complexes et multi-étapes.
+4.  **Finalisation :** Une fois toutes les étapes terminées, il empaquette les journaux, fichiers et images dans la réponse finale.
+
+<Tip>
+  **Raffinement Itératif**
+
+  Parce que le `sandbox_id` est renvoyé, vous pouvez continuer la conversation ! Vous pouvez poser des questions de suivi comme "Maintenant filtre ces données pour le T4 seulement", et l'agent reprendra exactement là où il s'était arrêté, avec toutes les données encore chargées en mémoire.
+</Tip>

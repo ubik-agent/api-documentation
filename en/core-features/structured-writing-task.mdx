@@ -1,0 +1,173 @@
+---
+title: 'Structured Writing'
+description: 'Detailed documentation for the structured_writing tool.'
+---
+
+The `structured_writing` tool is designed for generating long-form, coherent content that requires a specific structure or outline. Unlike standard chat responses which are often linear and limited in length, this tool can orchestrate the creation of complex documents like reports, blog posts, white papers, or technical specifications.
+
+It works by taking a high-level **intent** and a **structured plan**, then systematically generating content for each section, maintaining context and consistency throughout the document.
+
+## When to Use This Tool
+
+Use `structured_writing` when you need to:
+*   **Draft Long Documents:** Create content that exceeds the typical output limits of a single LLM call.
+*   **Follow a Specific Outline:** Ensure the output adheres strictly to a predefined structure (e.g., Introduction -> Methodology -> Results -> Conclusion).
+*   **Maintain Consistency:** Generate multiple sections that need to reference each other or maintain a consistent tone.
+*   **Collaborate with Sub-Agents:** Delegate specific sections to specialized sub-agents (e.g., a "Data Analyst" agent for the results section).
+
+## Input Parameters
+
+The tool accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `intent` | `string` | Yes | The overall goal of the writing. This guides the tone, style, and content generation for all parts. |
+| `structured_plan` | `object` | Yes* | A recursive JSON object detailing the structure of the document. Each part can contain its own `parts` array, allowing for deeply nested sections and subsections. See "Plan Structure" below. |
+| `plan_document_id` | `string` | Yes* | Alternatively, the UUID of a JSON document containing the `structured_plan`. |
+| `execution_mode` | `string` | No | `sequential` (default) or `parallel`. Sequential allows for memory/context between sections; parallel is faster but sections are independent. |
+| `memory_mode` | `string` | No | `classic` (default), `specific`, or `none`. Controls how context is passed between sections in sequential mode. |
+
+*\*Either `structured_plan` or `plan_document_id` must be provided.*
+
+### Plan Structure
+
+The `structured_plan` is a recursive JSON object where each node represents a section of the document. This allows you to create complex hierarchies with chapters, sections, and subsections.
+
+```json
+{
+  "title": "Document Title",
+  "global_document_ids": ["uuid-1", "uuid-2"], // Docs available to all sections
+  "parts": [
+    {
+      "title": "1. Introduction",
+      "content": "Key points to cover in the intro...",
+      "metadata": { "tone": "formal" }
+    },
+    {
+      "title": "2. Detailed Analysis",
+      "parts": [ // Nested subsections
+        { 
+          "title": "2.1 Methodology",
+          "content": "Explain the research methods used."
+        },
+        { 
+          "title": "2.2 Results",
+          "content": "Present the findings.",
+          "parts": [ // Further nesting is possible
+             { 
+               "title": "2.2.1 Quantitative Data",
+               "content": "Summarize the numerical data trends." 
+             },
+             { 
+               "title": "2.2.2 Qualitative Feedback",
+               "content": "Highlight key user quotes and themes." 
+             }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Output Structure
+
+The tool returns the original plan enriched with the generated content.
+
+```json
+{
+  "full_text": "# Document Title\n\n## 1. Introduction\nGenerated intro text...\n\n## 2. Detailed Analysis\n\n### 2.1 Methodology\nGenerated methodology text...",
+  "plan": {
+    "title": "Document Title",
+    "parts": [
+      {
+        "title": "1. Introduction",
+        "content": "Key points...",
+        "written_content": "Generated intro text...",
+        "parts": [],
+        "id": "part_0",
+        "depth": 0
+      },
+      {
+        "title": "2. Detailed Analysis",
+        "parts": [
+           {
+              "title": "2.1 Methodology",
+              "content": "Explain methods...",
+              "written_content": "Generated methodology text...",
+              "parts": [],
+              "id": "part_1_0",
+              "depth": 1
+           }
+        ],
+        "id": "part_1",
+        "depth": 0
+      }
+    ]
+  },
+  "execution_id": "exec-1234-5678"
+}
+```
+
+| Field | Description |
+| :--- | :--- |
+| `full_text` | The complete, concatenated text of the generated document, formatted with Markdown headers. |
+| `plan` | The original plan object, but each part now includes a `written_content` field containing the generated text for that specific section. It also includes metadata like `id`, `depth`, and potentially `sub_session_id` if an agent was used. |
+| `execution_id` | The unique identifier for this tool execution. |
+
+## Example Usage
+
+### Scenario: Writing a Quarterly Report
+
+**Input:**
+```json
+{
+  "intent": "Write a Q3 2024 Quarterly Business Review for internal stakeholders. Tone should be professional but optimistic.",
+  "execution_mode": "sequential",
+  "structured_plan": {
+    "title": "Q3 2024 QBR",
+    "global_document_ids": ["550e8400-e29b-41d4-a716-446655440000"], // Q3 Financial Data
+    "parts": [
+      {
+        "title": "Executive Summary",
+        "content": "Summarize key wins: 20% growth, new product launch."
+      },
+      {
+        "title": "Financial Performance",
+        "content": "Detail revenue, EBITDA, and cost of goods sold. Reference the attached financial data."
+      },
+      {
+        "title": "Q4 Outlook",
+        "content": "Project goals for the next quarter."
+      }
+    ]
+  }
+}
+```
+
+**Result:**
+The tool will generate the "Executive Summary" first. Then, carrying the context of what it just wrote, it will move to "Financial Performance", ensuring it doesn't contradict the summary. Finally, it writes the "Q4 Outlook". The final output is a cohesive report.
+
+## Advanced Features
+
+### 1. Sequential vs. Parallel Execution
+*   **Sequential:** Writes sections one by one. The context (what was written previously) is passed to the next step. Best for narratives where flow and consistency are critical.
+*   **Parallel:** Writes all sections simultaneously. Much faster, but sections cannot reference each other. Best for encyclopedic content or independent summaries.
+
+### 2. Sub-Agent Delegation
+You can assign specific sections to specialized agents by adding an `agent_id` to a part in the plan.
+
+```json
+{
+  "title": "Technical Analysis",
+  "agent_id": "agent-uuid-for-data-scientist", // This agent will write this section
+  "content": "Analyze the server logs..."
+}
+```
+This allows you to mix generalist writing with specialist analysis in a single document.
+
+### 3. Memory Modes
+In `sequential` mode, you can control how much context is retained:
+*   **Classic:** Summarizes the history when it gets too long. Good balance.
+*   **Specific:** Re-analyzes the entire history for *each* new section to find relevant context. Slower but higher quality for complex documents.
+*   **None:** No context is passed between sections (acts like parallel but runs sequentially).

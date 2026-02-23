@@ -1,0 +1,107 @@
+---
+title: 'Génération d''Images'
+description: 'Documentation détaillée pour l''outil image_generation.'
+---
+
+L'outil `image_generation` (spécifiquement `openai_image_generation`) permet aux agents de créer et d'éditer du contenu visuel directement au sein d'une conversation. Il exploite des modèles d'IA générative avancés (tels que DALL-E 3) pour transformer des descriptions en langage naturel en images de haute qualité.
+
+Au-delà de la simple création, cet outil prend en charge les flux de travail **image-vers-image**, vous permettant de fournir des documents sources comme références pour l'édition ou le transfert de style.
+
+## Quand Utiliser Cet Outil
+
+Utilisez `image_generation` lorsque vous avez besoin de :
+*   **Visualiser des Concepts :** Transformer des idées abstraites en représentations visuelles concrètes.
+*   **Créer des Actifs :** Générer des illustrations, des icônes ou des supports marketing.
+*   **Éditer des Images :** Modifier des images existantes basées sur des instructions en langage naturel (par ex., "Ajoute un chapeau rouge à la personne sur cette photo").
+*   **Maquetter une UI :** Générer rapidement des prototypes visuels pour des interfaces ou des mises en page.
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `prompt` | `string` | Oui | Une description textuelle détaillée de l'image souhaitée. Le modèle est optimisé pour suivre des instructions complexes, alors soyez descriptif ! |
+| `document_ids` | `array<uuid>` | Non | Une liste d'UUIDs de documents représentant des images sources. Si fournis, ces images sont utilisées comme entrée pour des tâches d'édition ou de variation. |
+| `n` | `integer` | Non | Nombre d'images à générer (défaut : 1, max : 10). |
+| `size` | `string` | Non | La résolution de l'image générée. Valeurs supportées : `1024x1024`, `1536x1024`, `1024x1536`, `auto`. Par défaut `auto`. |
+| `quality` | `string` | Non | Le réglage de qualité. Valeurs supportées : `high`, `medium`, `low`, `auto`. Par défaut `auto`. |
+
+<Tip>
+  **Ingénierie de Prompt**
+
+  Les modèles d'image modernes réécrivent souvent votre prompt pour l'optimiser. L'outil renvoie le `revised_prompt` dans la sortie, ce qui vous montre exactement comment le modèle a interprété votre demande.
+</Tip>
+
+## Structure de Sortie
+
+L'outil renvoie un objet structuré contenant des références aux images générées et des métadonnées.
+
+```json
+{
+  "images": [
+    {
+      "type": "media_reference",
+      "tool_id": "169e962a-ba15-5233-83c0-b2df685d9344",
+      "execution_id": "toolu_01TbFRSPsY9X5aN37X5mzybA",
+      "asset_filename": "generated_image_0.png",
+      "url": "https://api.ubik-agent.com/v1/assets/tools/...",
+      "revised_prompt": "A photorealistic close-up of a futuristic cybernetic cat..."
+    }
+  ],
+  "usage": {
+    "input_tokens": 318,
+    "output_tokens": 4360,
+    "total_tokens": 4678,
+    "input_tokens_details": {
+      "text_tokens": 124,
+      "image_tokens": 194
+    }
+  },
+  "execution_id": "toolu_01TbFRSPsY9X5aN37X5mzybA"
+}
+```
+
+| Champ | Description |
+| :--- | :--- |
+| `images` | Une liste d'objets image générés. Chacun contient une `url` sécurisée pour afficher l'image et le `revised_prompt` utilisé par le modèle. |
+| `usage` | Informations sur l'utilisation des tokens et le coût de l'opération de génération. |
+| `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Exemple d'Utilisation
+
+### 1. Création Texte-vers-Image
+Générer une image à partir de zéro.
+
+**Entrée :**
+```json
+{
+  "prompt": "Un logo minimaliste pour un café nommé 'Bean & Byte', combinant un grain de café et une puce informatique. Style vectoriel, couleurs orange et gris foncé.",
+  "size": "1024x1024"
+}
+```
+
+### 2. Édition d'Image
+Modifier un actif existant.
+
+**Entrée :**
+```json
+{
+  "prompt": "Change l'arrière-plan en un paysage de montagne enneigé.",
+  "document_ids": ["a1b2c3d4-e5f6-7890-1234-567890abcdef"] 
+}
+```
+*Note : Le document fourni dans `document_ids` doit être un fichier image valide (PNG, JPG, WEBP).*
+
+## Capacités
+
+### Support d'Image Source
+L'une des fonctionnalités les plus puissantes de cet outil est sa capacité à accepter des **images sources**. En passant des `document_ids`, vous pouvez :
+*   **Éditer :** Demander au modèle d'ajouter, supprimer ou modifier des éléments dans l'image téléchargée.
+*   **Inspirer :** Utiliser la composition ou la palette de couleurs de l'image source pour guider la nouvelle génération.
+
+### Optimisation Automatique
+L'outil gère la complexité des formats d'image et des contraintes API pour vous. Il effectue automatiquement :
+*   La conversion des documents téléchargés au format correct (PNG) requis par le modèle.
+*   Le redimensionnement des images si elles dépassent les dimensions d'entrée maximales.
+*   La gestion du stockage temporaire pour les étapes de traitement intermédiaires.

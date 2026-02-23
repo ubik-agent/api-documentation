@@ -1,0 +1,173 @@
+---
+title: 'Rédaction Structurée'
+description: 'Documentation détaillée pour l''outil structured_writing.'
+---
+
+L'outil `structured_writing` est conçu pour générer du contenu long et cohérent nécessitant une structure ou un plan spécifique. Contrairement aux réponses de chat standard qui sont souvent linéaires et limitées en longueur, cet outil peut orchestrer la création de documents complexes comme des rapports, des articles de blog, des livres blancs ou des spécifications techniques.
+
+Il fonctionne en prenant une **intention** de haut niveau et un **plan structuré**, puis en générant systématiquement du contenu pour chaque section, en maintenant le contexte et la cohérence tout au long du document.
+
+## Quand Utiliser Cet Outil
+
+Utilisez `structured_writing` lorsque vous avez besoin de :
+*   **Rédiger de Longs Documents :** Créer du contenu qui dépasse les limites de sortie typiques d'un seul appel LLM.
+*   **Suivre un Plan Spécifique :** Assurer que la sortie respecte strictement une structure prédéfinie (par ex., Introduction -> Méthodologie -> Résultats -> Conclusion).
+*   **Maintenir la Cohérence :** Générer plusieurs sections qui doivent se référencer les unes les autres ou maintenir un ton cohérent.
+*   **Collaborer avec des Sous-Agents :** Déléguer des sections spécifiques à des sous-agents spécialisés (par ex., un agent "Analyste de Données" pour la section résultats).
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `intent` | `string` | Oui | L'objectif global de la rédaction. Cela guide le ton, le style et la génération de contenu pour toutes les parties. |
+| `structured_plan` | `object` | Oui* | Un objet JSON récursif détaillant la structure du document. Chaque partie peut contenir son propre tableau `parts`, permettant des sections et sous-sections profondément imbriquées. Voir "Structure du Plan" ci-dessous. |
+| `plan_document_id` | `string` | Oui* | Alternativement, l'UUID d'un document JSON contenant le `structured_plan`. |
+| `execution_mode` | `string` | Non | `sequential` (défaut) ou `parallel`. Séquentiel permet la mémoire/contexte entre les sections ; parallèle est plus rapide mais les sections sont indépendantes. |
+| `memory_mode` | `string` | Non | `classic` (défaut), `specific`, ou `none`. Contrôle comment le contexte est passé entre les sections en mode séquentiel. |
+
+*\*Soit `structured_plan` soit `plan_document_id` doit être fourni.*
+
+### Structure du Plan
+
+Le `structured_plan` est un objet JSON récursif où chaque nœud représente une section du document. Cela vous permet de créer des hiérarchies complexes avec des chapitres, sections et sous-sections.
+
+```json
+{
+  "title": "Titre du Document",
+  "global_document_ids": ["uuid-1", "uuid-2"], // Docs disponibles pour toutes les sections
+  "parts": [
+    {
+      "title": "1. Introduction",
+      "content": "Points clés à couvrir dans l'intro...",
+      "metadata": { "tone": "formal" }
+    },
+    {
+      "title": "2. Analyse Détaillée",
+      "parts": [ // Sous-sections imbriquées
+        { 
+          "title": "2.1 Méthodologie",
+          "content": "Expliquer les méthodes de recherche utilisées."
+        },
+        { 
+          "title": "2.2 Résultats",
+          "content": "Présenter les conclusions.",
+          "parts": [ // Imbrication supplémentaire possible
+             { 
+               "title": "2.2.1 Données Quantitatives",
+               "content": "Résumer les tendances des données numériques." 
+             },
+             { 
+               "title": "2.2.2 Retours Qualitatifs",
+               "content": "Mettre en évidence les citations et thèmes clés des utilisateurs." 
+             }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Structure de Sortie
+
+L'outil renvoie le plan original enrichi avec le contenu généré.
+
+```json
+{
+  "full_text": "# Titre du Document\n\n## 1. Introduction\nTexte d'intro généré...\n\n## 2. Analyse Détaillée\n\n### 2.1 Méthodologie\nTexte de méthodologie généré...",
+  "plan": {
+    "title": "Titre du Document",
+    "parts": [
+      {
+        "title": "1. Introduction",
+        "content": "Points clés...",
+        "written_content": "Texte d'intro généré...",
+        "parts": [],
+        "id": "part_0",
+        "depth": 0
+      },
+      {
+        "title": "2. Analyse Détaillée",
+        "parts": [
+           {
+              "title": "2.1 Méthodologie",
+              "content": "Expliquer les méthodes...",
+              "written_content": "Texte de méthodologie généré...",
+              "parts": [],
+              "id": "part_1_0",
+              "depth": 1
+           }
+        ],
+        "id": "part_1",
+        "depth": 0
+      }
+    ]
+  },
+  "execution_id": "exec-1234-5678"
+}
+```
+
+| Champ | Description |
+| :--- | :--- |
+| `full_text` | Le texte complet et concaténé du document généré, formaté avec des en-têtes Markdown. |
+| `plan` | L'objet plan original, mais chaque partie inclut maintenant un champ `written_content` contenant le texte généré pour cette section spécifique. Il inclut également des métadonnées comme `id`, `depth`, et potentiellement `sub_session_id` si un agent a été utilisé. |
+| `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Exemple d'Utilisation
+
+### Scénario : Rédaction d'un Rapport Trimestriel
+
+**Entrée :**
+```json
+{
+  "intent": "Rédigez une Revue d'Activité Trimestrielle T3 2024 pour les parties prenantes internes. Le ton doit être professionnel mais optimiste.",
+  "execution_mode": "sequential",
+  "structured_plan": {
+    "title": "QBR T3 2024",
+    "global_document_ids": ["550e8400-e29b-41d4-a716-446655440000"], // Données Financières T3
+    "parts": [
+      {
+        "title": "Résumé Exécutif",
+        "content": "Résumer les victoires clés : croissance de 20%, lancement de nouveau produit."
+      },
+      {
+        "title": "Performance Financière",
+        "content": "Détailler les revenus, l'EBITDA et le coût des marchandises vendues. Référencer les données financières jointes."
+      },
+      {
+        "title": "Perspectives T4",
+        "content": "Objectifs du projet pour le prochain trimestre."
+      }
+    ]
+  }
+}
+```
+
+**Résultat :**
+L'outil générera d'abord le "Résumé Exécutif". Ensuite, portant le contexte de ce qu'il vient d'écrire, il passera à la "Performance Financière", s'assurant de ne pas contredire le résumé. Enfin, il rédige les "Perspectives T4". Le résultat final est un rapport cohérent.
+
+## Fonctionnalités Avancées
+
+### 1. Exécution Séquentielle vs. Parallèle
+*   **Séquentiel :** Écrit les sections une par une. Le contexte (ce qui a été écrit précédemment) est passé à l'étape suivante. Idéal pour les récits où le flux et la cohérence sont critiques.
+*   **Parallèle :** Écrit toutes les sections simultanément. Beaucoup plus rapide, mais les sections ne peuvent pas se référencer les unes les autres. Idéal pour le contenu encyclopédique ou les résumés indépendants.
+
+### 2. Délégation à des Sous-Agents
+Vous pouvez assigner des sections spécifiques à des agents spécialisés en ajoutant un `agent_id` à une partie dans le plan.
+
+```json
+{
+  "title": "Analyse Technique",
+  "agent_id": "agent-uuid-for-data-scientist", // Cet agent écrira cette section
+  "content": "Analyser les journaux du serveur..."
+}
+```
+Cela vous permet de mélanger une rédaction généraliste avec une analyse spécialisée dans un seul document.
+
+### 3. Modes de Mémoire
+En mode `sequential`, vous pouvez contrôler la quantité de contexte conservée :
+*   **Classic :** Résume l'historique lorsqu'il devient trop long. Bon équilibre.
+*   **Specific :** Ré-analyse tout l'historique pour *chaque* nouvelle section afin de trouver le contexte pertinent. Plus lent mais de meilleure qualité pour les documents complexes.
+*   **None :** Aucun contexte n'est passé entre les sections (agit comme le parallèle mais s'exécute séquentiellement).

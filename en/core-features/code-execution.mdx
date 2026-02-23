@@ -1,0 +1,110 @@
+---
+title: 'Code Execution'
+description: 'Detailed documentation for the code_execution tool.'
+---
+
+The `code_execution` (or `code_interpreter`) tool provides agents with a secure, sandboxed Python environment. This allows them to go beyond text generation and perform computational tasks, data analysis, and visualization by writing and executing real code.
+
+It is designed to be iterative: the agent can write code, see the output (or errors), and then refine its code in a loop until the task is complete.
+
+## When to Use This Tool
+
+Use `code_execution` when you need to:
+*   **Analyze Data:** Process CSVs, Excel files, or JSON data to find insights.
+*   **Visualize Information:** Create charts, graphs, and plots using libraries like `matplotlib` or `seaborn`.
+*   **Perform Math:** Solve complex algebraic equations or financial calculations accurately.
+*   **Transform Files:** Convert data formats or clean up messy datasets.
+
+<Note>
+  **Security & Isolation**
+
+  Every execution runs in a completely isolated, ephemeral sandbox. The environment cannot access your local filesystem, ensuring complete safety. Files must be explicitly passed into the sandbox via `document_ids` to be available in the sandbox.
+</Note>
+
+<Tip>
+  **Configuration & Tuning**
+
+  You can customize the behavior of the code execution tool in your [User Preferences](https://app.ubik-agent.com/user/preferences). Specifically, you can select which **model provider** should be used for the code generation tasks, allowing you to optimize for speed, cost, or reasoning capability.
+</Tip>
+
+## Input Parameters
+
+The tool accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `request` | `string` | Yes | A natural language description of what you want the code to do (e.g., "Plot the sales trend from this CSV"). |
+| `document_ids` | `array<uuid>` | No | A list of Document UUIDs representing files (CSVs, images, etc.) that the code needs to access. These files will be uploaded to the sandbox. |
+| `context` | `string` | No | Additional context or constraints (e.g., "Use a dark theme for the plot"). |
+| `sandbox_id` | `string` | No | The ID of an existing sandbox session to resume. If omitted, a new session is started. |
+
+## Output Structure
+
+The tool returns a structured object containing the execution results, logs, and any generated artifacts.
+
+```json
+{
+  "sandbox_id": "igy4shlkrl6z9sx2uagxz",
+  "generated_files": [],
+  "logs": "INFO: Started sandbox session: igy4shlkrl6z9sx2uagxz\nINFO: Development plan: [\"Load the CSV file...\", \"Analyze the data...\", \"Create comprehensive plots...\"]\n\n--- Round 1/6: Load the CSV file... ---\nGENERATED CODE:\nimport pandas as pd\n...\nSTDOUT:\nFirst few rows of the dataset:\nFR0000120271;02/01/25;52 71;53 79...\n\nSTATUS: Execution successful\n...",
+  "artifacts": [
+    {
+      "type": "media_reference",
+      "asset_filename": "plot_0.png",
+      "url": "https://api.ubik-agent.com/v1/assets/..."
+    }
+  ],
+  "plan": [
+    "Load the CSV file located in the '/home/uploaded_files/' directory...",
+    "Analyze the data to identify the types of financial data present...",
+    "Create comprehensive plots for the identified financial data..."
+  ],
+  "total_rounds": 4,
+  "execution_id": "toolu_01NikWs2xyrrqNQwaQotf9xG"
+}
+```
+
+| Field | Description |
+| :--- | :--- |
+| `sandbox_id` | The ID of the session. Pass this back in subsequent calls to keep the state (variables, defined functions, etc.) alive. |
+| `logs` | A complete transcript of the code executed, standard output (print statements), and standard errors. It includes markers for each execution round. |
+| `generated_files` | References to data files created by the code (e.g., modified CSVs). |
+| `artifacts` | References to visual assets created by the code (e.g., PNG plots). |
+| `plan` | The step-by-step plan the agent formulated to solve the request. |
+| `execution_id` | The unique identifier for this tool execution. |
+
+## Example Usage
+
+### Scenario: analyzing Sales Data
+
+**Input:**
+```json
+{
+  "request": "Analyze the attached sales report. Calculate the total revenue per region and generate a bar chart visualizing it.",
+  "document_ids": ["550e8400-e29b-41d4-a716-446655440000"] 
+}
+```
+
+**Result:**
+The agent will:
+1.  **Plan:** Create a multi-step plan (Load data -> Group by region -> Plot).
+2.  **Execute:** Write Python code using `pandas` to read the CSV (uploaded to `/home/uploaded_files/`).
+3.  **Visualize:** Use `matplotlib` to create the chart and save it as an image.
+4.  **Return:** The final response will include the calculated numbers in the `logs` and the chart in the `artifacts` array.
+
+## How It Works
+
+1.  **Planning:** The agent first breaks down your `request` into a logical, step-by-step coding plan.
+2.  **Iterative Coding:** It executes the plan one step at a time.
+    *   It writes code for Step 1.
+    *   It runs the code in the sandbox.
+    *   It observes the output (stdout/stderr).
+    *   If there's an error, it self-corrects and retries.
+3.  **State Persistence:** Variables and dataframes defined in Step 1 are available in Step 2, allowing for complex, multi-stage workflows.
+4.  **Finalization:** Once all steps are complete, it packages the logs, files, and images into the final response.
+
+<Tip>
+  **Iterative Refinement**
+
+  Because the `sandbox_id` is returned, you can continue the conversation! You can ask follow-up questions like "Now filter that data for Q4 only," and the agent will resume exactly where it left off, with all the data still loaded in memory.
+</Tip>

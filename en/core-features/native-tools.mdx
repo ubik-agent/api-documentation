@@ -1,0 +1,144 @@
+---
+title: 'Native Tools'
+description: 'Overview of the powerful native tools available to agents in the UBIK platform.'
+---
+
+The UBIK platform comes equipped with a suite of powerful, native tools that are available to the default agent. These tools enable agents to perform complex tasks ranging from deep research and data analysis to content creation and visual generation.
+
+These tools are designed to be composable and can be orchestrated by the agent to solve intricate problems.
+
+## Available Tools
+
+### 1. RAG Search (`rag_search`)
+
+The **RAG Search** tool is the primary mechanism for retrieving information from your uploaded documents. It uses Retrieval-Augmented Generation (RAG) to find the most relevant context for a user's query and generates an answer based *only* on that verified information.
+
+**Key Capabilities:**
+*   **Semantic Search:** Understands the meaning behind queries, not just keyword matching.
+*   **Source Citation:** Provides citations for every piece of information used, ensuring trust and traceability.
+*   **Document Scoping:** Can be restricted to search across specific documents or entire workspaces.
+*   **Large-Scale Retrieval:** Efficiently finds relevant information across large volumes of local documents quickly.
+*   **Multimodal Compatibility:** Fully supports multimodal data, allowing retrieval across text and images. See the [RAG Pipeline Deep Dive](/en/advanced/rag-pipeline) for more information.
+
+<Warning>
+  **Important Note**
+
+  This tool is **not** designed for summarizing entire documents. It retrieves only the top-ranked extracts (chunks) from a set of documents and does not process the full content. For comprehensive summaries, use the `information_analysis` tool.
+</Warning>
+
+<Tip>
+  **Configuration & Tuning**
+
+  You can fine-tune the RAG pipeline's behavior in your [User Preferences](https://app.ubik-agent.com/user/preferences). These settings apply to your account and allow you to configure:
+  *   **Reranker:** Choose the model used to re-rank search results for better accuracy.
+  *   **Generation Models:** Select the LLM used to synthesize the final answer.
+  *   **Search Strategies:** Configure fusion parameters or manual weights for hybrid search.
+  *   **Embedding Models:** Choose the model used for vectorizing your documents.
+  *   **Hybrid Search:** Toggle hybrid search (keyword + semantic) on or off.
+
+  For more details on these parameters, please refer to the [RAG Pipeline Documentation](/en/advanced/rag-pipeline).
+</Tip>
+
+**Use Case:** Answering questions about internal policy documents, technical manuals, or knowledge bases.
+
+### 2. Web Search (`web_search`)
+
+The **Web Search** tool connects your agent to the live internet. Unlike RAG, which searches your internal documents, this tool retrieves real-time information from the web, re-ranks the results for relevance, and synthesizes a comprehensive answer with citations.
+
+**Key Capabilities:**
+*   **Real-Time Information:** Access the latest news, stock prices, or events that happened after the model's training cutoff.
+*   **AI-Powered Reranking:** Uses advanced reranking models to sort search results by semantic relevance, ensuring the best information is used.
+*   **Content Scraping:** Automatically visits top results to scrape full page content for deeper analysis, not just snippets.
+*   **Source Citation:** Like RAG, it cites the specific web pages used to generate the answer.
+
+**Use Case:** Researching current events, finding competitor pricing, or looking up documentation for a new software library.
+
+### 3. Information Analysis (`information_analysis`)
+
+The **Information Analysis** tool is designed for deep-dive research and synthesis. Unlike simple search, which answers a specific question, this tool can process large volumes of text across multiple documents to identify trends, summarize key points, and synthesize new insights.
+
+**Key Capabilities:**
+*   **Multi-Document Synthesis:** Aggregates information from various sources into a cohesive analysis.
+*   **Recursive Summarization:** Capable of processing very large documents by breaking them down and summarizing them recursively.
+*   **Intent-Driven:** Tailors the analysis based on the specific user intent or research goal.
+*   **Full Document Processing:** Processes documents or sets of documents in their entirety, effectively bypassing LLM context length constraints.
+
+<Warning>
+  **Performance Note**
+
+  Because this tool processes full document contents rather than just retrieving extracts, it is significantly more computationally intensive than the RAG tool. It may incur higher costs and latency compared to RAG if you are only looking for a precise piece of information within multiple documents.
+</Warning>
+
+**Use Case:** Creating an executive summary from a collection of quarterly reports or analyzing competitor strategies from multiple news articles.
+
+### 4. Structured Writing (`structured_writing`)
+
+The **Structured Writing** tool enables the generation of long-form, coherent content. It moves beyond simple chat responses to create structured documents like reports, blog posts, or white papers.
+
+**Key Capabilities:**
+*   **Plan-Based Generation:** Follows a predefined structure or outline to ensure logical flow.
+*   **Context Awareness:** Maintains context across different sections of the document to ensure consistency in tone and facts.
+*   **Iterative Refinement:** Can draft, review, and refine sections to meet specific length or style requirements.
+
+**Use Case:** Drafting a complete blog post, writing a technical specification, or generating a monthly newsletter.
+
+### 5. Image Generation (`image_generation`)
+
+The **Image Generation** tool allows agents to create visual assets on the fly. It leverages advanced generative models to turn text descriptions into high-quality images.
+
+**Key Capabilities:**
+*   **Text-to-Image:** Generates images from detailed text prompts.
+*   **Image-to-Image:** Can accept source images as input to guide the generation, ensuring the output matches a specific style or composition.
+*   **Style Control:** Can adapt to various artistic styles, from photorealistic to abstract.
+*   **Visual Aids:** Useful for creating diagrams, illustrations, or cover art to accompany generated text.
+
+**Use Case:** Creating a cover image for a blog post or visualizing a concept described in a conversation.
+
+### 6. Code Execution (`code_execution`)
+
+The **Code Execution** tool provides the agent with a sandboxed Python environment. This allows the agent to write and run code to solve problems that are difficult for language models alone, such as complex math or data processing.
+
+**Key Capabilities:**
+*   **Data Analysis:** Can load CSVs or other data files to perform statistical analysis using libraries like `pandas` and `numpy`.
+*   **Visualization:** Generates charts and graphs using `matplotlib` or `seaborn`.
+*   **Precise Calculation:** Performs exact mathematical calculations where LLMs might hallucinate.
+*   **Sandboxed Security:** Runs in a secure, isolated environment to ensure safety.
+
+**Use Case:** analyzing a sales spreadsheet to forecast trends, plotting a graph of user growth, or solving a complex algebraic equation.
+
+## Extending Capabilities
+
+While these native tools provide a powerful foundation, the UBIK platform is designed for extensibility. You are not limited to the tools listed above.
+
+You can expand your agent's capabilities in two ways:
+
+<CardGroup cols={2}>
+  <Card title="API Integration" icon="cloud-arrow-up">
+    Create new tools by connecting your own APIs to the platform, allowing agents to interact with your external services or internal databases. Support for the Model Context Protocol (MCP) is also planned for future releases.
+  </Card>
+  <Card title="Tool Builder" icon="screwdriver-wrench">
+    Use the dedicated **Tool Builder** within the UBIK application to visually compose existing tools into new, more complex workflows without writing code.
+  </Card>
+</CardGroup>
+
+For a walkthrough on how to build and compose tools using the platform's interface, check out this video tutorial:
+
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/vbU6leFwDs0"
+  title="Building Custom Tools in UBIK"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+<Tip>
+  **Optimizing Tool Selection**
+
+  When creating an assistant, it is highly recommended to provide specific instructions on when to use each tool. Since these tools are powerful and generic, the model may not always intuitively know whether to use `rag_search` for a quick lookup or `information_analysis` for a deep dive.
+
+  **Example:** "Use `rag_search` for specific fact-checking questions, but switch to `information_analysis` when I ask for summaries or comprehensive reports."
+
+  Explicit instructions yield better results and tailor the generic tools to your specific use case.
+</Tip>

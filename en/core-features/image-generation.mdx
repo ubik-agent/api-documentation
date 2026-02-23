@@ -1,0 +1,107 @@
+---
+title: 'Image Generation'
+description: 'Detailed documentation for the image_generation tool.'
+---
+
+The `image_generation` (specifically `openai_image_generation`) tool empowers agents to create and edit visual content directly within a conversation. It leverages advanced generative AI models (such as DALL-E 3) to turn natural language descriptions into high-quality images.
+
+Beyond simple creation, this tool supports **image-to-image** workflows, allowing you to provide source documents as references for editing or style transfer.
+
+## When to Use This Tool
+
+Use `image_generation` when you need to:
+*   **Visualize Concepts:** Turn abstract ideas into concrete visual representations.
+*   **Create Assets:** Generate illustrations, icons, or marketing materials.
+*   **Edit Images:** Modify existing images based on natural language instructions (e.g., "Add a red hat to the person in this photo").
+*   **Mockup UI:** Quickly generate visual prototypes for interfaces or layouts.
+
+## Input Parameters
+
+The tool accepts the following parameters:
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `prompt` | `string` | Yes | A detailed text description of the desired image. The model is optimized to follow complex instructions, so be descriptive! |
+| `document_ids` | `array<uuid>` | No | A list of Document UUIDs representing source images. If provided, these images are used as input for editing or variation tasks. |
+| `n` | `integer` | No | Number of images to generate (default: 1, max: 10). |
+| `size` | `string` | No | The resolution of the generated image. Supported values: `1024x1024`, `1536x1024`, `1024x1536`, `auto`. Defaults to `auto`. |
+| `quality` | `string` | No | The quality setting. Supported values: `high`, `medium`, `low`, `auto`. Defaults to `auto`. |
+
+<Tip>
+  **Prompt Engineering**
+
+  Modern image models often rewrite your prompt to optimize it. The tool returns the `revised_prompt` in the output, which shows you exactly how the model interpreted your request.
+</Tip>
+
+## Output Structure
+
+The tool returns a structured object containing references to the generated images and metadata.
+
+```json
+{
+  "images": [
+    {
+      "type": "media_reference",
+      "tool_id": "169e962a-ba15-5233-83c0-b2df685d9344",
+      "execution_id": "toolu_01TbFRSPsY9X5aN37X5mzybA",
+      "asset_filename": "generated_image_0.png",
+      "url": "https://api.ubik-agent.com/v1/assets/tools/...",
+      "revised_prompt": "A photorealistic close-up of a futuristic cybernetic cat..."
+    }
+  ],
+  "usage": {
+    "input_tokens": 318,
+    "output_tokens": 4360,
+    "total_tokens": 4678,
+    "input_tokens_details": {
+      "text_tokens": 124,
+      "image_tokens": 194
+    }
+  },
+  "execution_id": "toolu_01TbFRSPsY9X5aN37X5mzybA"
+}
+```
+
+| Field | Description |
+| :--- | :--- |
+| `images` | A list of generated image objects. Each contains a secure `url` to display the image and the `revised_prompt` used by the model. |
+| `usage` | Information about the token usage and cost of the generation operation. |
+| `execution_id` | The unique identifier for this tool execution. |
+
+## Example Usage
+
+### 1. Text-to-Image Creation
+Generating an image from scratch.
+
+**Input:**
+```json
+{
+  "prompt": "A minimalist logo for a coffee shop named 'Bean & Byte', combining a coffee bean and a computer chip. Vector art style, orange and dark grey colors.",
+  "size": "1024x1024"
+}
+```
+
+### 2. Image Editing
+Modifying an existing asset.
+
+**Input:**
+```json
+{
+  "prompt": "Change the background to a snowy mountain landscape.",
+  "document_ids": ["a1b2c3d4-e5f6-7890-1234-567890abcdef"] 
+}
+```
+*Note: The document provided in `document_ids` must be a valid image file (PNG, JPG, WEBP).*
+
+## Capabilities
+
+### Source Image Support
+One of the most powerful features of this tool is its ability to accept **source images**. By passing `document_ids`, you can:
+*   **Edit:** Ask the model to add, remove, or change elements in the uploaded picture.
+*   **Inspire:** Use the composition or color palette of the source image to guide the new generation.
+
+### Automatic Optimization
+The tool handles the complexity of image formats and API constraints for you. It automatically:
+*   Converts uploaded documents to the correct format (PNG) required by the model.
+*   Resizes images if they exceed the maximum input dimensions.
+*   Manages temporary storage for intermediate processing steps.
