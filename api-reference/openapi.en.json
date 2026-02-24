@@ -216,7 +216,7 @@
           "Public API - Agent Sessions"
         ],
         "summary": "Create agent session",
-        "description": "Creates a new agent session. Provide 'external_user_id' to isolate this session for a specific end-user.",
+        "description": "Creates a new agent session. Provide 'external_user_id' to isolate this session for a specific end-user. If both 'assistant_id' and 'initial_system_prompt' are provided, the 'initial_system_prompt' will override the assistant's default system prompt.",
         "operationId": "create_agent_session_agent_sessions_post",
         "security": [
           {
