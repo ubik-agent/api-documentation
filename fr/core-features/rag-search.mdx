@@ -72,6 +72,52 @@ L'outil renvoie un objet structuré contenant la réponse, les preuves utilisée
 | `model` | Le LLM spécifique utilisé pour la génération. |
 | `execution_id` | L'identifiant unique pour cette exécution d'outil. |
 
+## Récupération des Détails des Chunks
+
+La réponse de `rag_search` fournit des `chunk_id`s dans le tableau `contexts`. Vous pouvez utiliser ces identifiants pour récupérer des données de localisation précises pour le surlignage ou la navigation dans le document original via l'endpoint `GET /chunks/{chunk_id}`.
+
+*   **Obtenir les détails d'un chunk :** [`GET /chunks/{chunk_id}`](/fr/api-reference/public-api/get-chunk-details)
+*   **Obtenir le document d'un chunk :** [`GET /chunks/{chunk_id}/document`](/fr/api-reference/public-api/get-document-from-chunk)
+
+La structure de la réponse s'adapte à la modalité du contenu (Texte/PDF vs Audio/Vidéo) :
+
+```json
+{
+  "id": "9bdef571-ed43-4cb7-a4a1-1011edce8a62",
+  "document_id": "7f15f1ff-d15e-4894-8fb3-155392ab8972",
+  "text": "Contenu complet du chunk...",
+  
+  // Pour les PDF et Images
+  "page_number": 3,
+  "bbox": [
+    {
+      "bbox": [100.5, 200.0, 300.5, 250.0], // [x1, y1, x2, y2]
+      "page_number": 3
+    },
+    {
+      "bbox": [50.0, 100.0, 200.0, 150.0], // Suite sur la page suivante
+      "page_number": 4
+    }
+  ],
+
+  // Pour Audio et Vidéo
+  "start_time": 120.5, // Secondes
+  "end_time": 135.0,   // Secondes
+
+  "metadata": {
+    "filename": "manuel.pdf",
+    "languages": ["fra"],
+    "modality": "text"
+  }
+}
+```
+
+| Champ | Description |
+| :--- | :--- |
+| `bbox` | Une liste de boîtes englobantes pour le surlignage visuel. Chaque entrée contient les coordonnées `[x1, y1, x2, y2]` et le `page_number` spécifique. **Note :** Certains types de documents (ex: fichiers texte brut, markdown) peuvent ne pas fournir de coordonnées. |
+| `page_number` | Le numéro de page principal du chunk (indexé à partir de 1). Null pour les médias temporels. |
+| `start_time` / `end_time` | Horodatages en secondes, utilisés pour la navigation dans les lecteurs audio ou vidéo. |
+
 ## Événements de Streaming
 
 Lorsqu'il est utilisé en mode streaming, l'outil `rag_search` émet des événements en temps réel via SSE (Server-Sent Events). Cela permet de suivre la progression du pipeline RAG et d'afficher la réponse au fur et à mesure de sa génération.

@@ -72,6 +72,52 @@ The tool returns a structured object containing the answer, the evidence used to
 | `model` | The specific LLM used for generation. |
 | `execution_id` | The unique identifier for this tool execution. |
 
+## Retrieving Chunk Details
+
+The `rag_search` response provides `chunk_id`s in the `contexts` array. You can use these IDs to fetch precise location data for highlighting or deep-linking within the original document using the `GET /chunks/{chunk_id}` endpoint.
+
+*   **Get Chunk Details:** [`GET /chunks/{chunk_id}`](/api-reference/public-api/get-chunk-details)
+*   **Get Document from Chunk:** [`GET /chunks/{chunk_id}/document`](/api-reference/public-api/get-document-from-chunk)
+
+The response structure adapts to the content modality (Text/PDF vs. Audio/Video):
+
+```json
+{
+  "id": "9bdef571-ed43-4cb7-a4a1-1011edce8a62",
+  "document_id": "7f15f1ff-d15e-4894-8fb3-155392ab8972",
+  "text": "Full text content of the chunk...",
+  
+  // For PDFs and Images
+  "page_number": 3,
+  "bbox": [
+    {
+      "bbox": [100.5, 200.0, 300.5, 250.0], // [x1, y1, x2, y2]
+      "page_number": 3
+    },
+    {
+      "bbox": [50.0, 100.0, 200.0, 150.0], // Continuation on next page
+      "page_number": 4
+    }
+  ],
+
+  // For Audio and Video
+  "start_time": 120.5, // Seconds
+  "end_time": 135.0,   // Seconds
+
+  "metadata": {
+    "filename": "handbook.pdf",
+    "languages": ["eng"],
+    "modality": "text"
+  }
+}
+```
+
+| Field | Description |
+| :--- | :--- |
+| `bbox` | A list of bounding boxes for visual highlighting. Each entry contains coordinates `[x1, y1, x2, y2]` and the specific `page_number`. **Note:** Some document types (e.g., plain text files, markdown) may not provide coordinates. |
+| `page_number` | The primary page number for the chunk (1-indexed). Null for time-based media. |
+| `start_time` / `end_time` | Timestamps in seconds, used for seeking in audio or video players. |
+
 ## Streaming Events
 
 When used in streaming mode, the `rag_search` tool emits real-time events via SSE (Server-Sent Events). This allows you to track the progress of the RAG pipeline and display the answer as it is generated.
