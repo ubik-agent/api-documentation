@@ -2498,6 +2498,138 @@
         }
       }
     },
+    "/chunks/{chunk_id}/document": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Obtenir le document d'un chunk",
+        "description": "Récupère le document associé à un ID de chunk spécifique, si l'utilisateur a accès au document.",
+        "operationId": "get_document_from_chunk_chunks__chunk_id__document_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chunk_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Chunk Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicDocument"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chunks/{chunk_id}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Obtenir les détails d'un chunk",
+        "description": "Récupère les détails d'un chunk spécifique, y compris le contenu textuel et les informations de boîte englobante.",
+        "operationId": "get_chunk_chunks__chunk_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chunk_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Chunk Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicChunk"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/documents/{document_id}/reprocess": {
       "post": {
         "tags": [
@@ -4012,6 +4144,59 @@
         ],
         "title": "PublicAssistant"
       },
+      "PublicBoundingBox": {
+        "properties": {
+          "bbox": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Bbox",
+            "description": "The bounding box coordinates as [x1, y1, x2, y2]."
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number",
+            "description": "The page number for this bounding box (1-indexed)."
+          },
+          "layout_width": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Width",
+            "description": "The width of the layout used for coordinates."
+          },
+          "layout_height": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Height",
+            "description": "The height of the layout used for coordinates."
+          }
+        },
+        "type": "object",
+        "required": [
+          "bbox"
+        ],
+        "title": "PublicBoundingBox"
+      },
       "PublicCheckpoint": {
         "properties": {
           "checkpoint_name": {
@@ -4060,6 +4245,98 @@
           "checkpoints"
         ],
         "title": "PublicCheckpointListResponse"
+      },
+      "PublicChunk": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "L'identifiant unique du chunk."
+          },
+          "document_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Document Id",
+            "description": "L'identifiant unique du document parent."
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "Le contenu textuel du chunk."
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number",
+            "description": "Le numéro de la page où se trouve ce chunk (indexé à partir de 1)."
+          },
+          "bbox": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PublicBoundingBox"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox",
+            "description": "Liste des boîtes englobantes pour les éléments du chunk."
+          },
+          "start_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Time",
+            "description": "Le temps de début du chunk en secondes (pour l'audio/vidéo)."
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time",
+            "description": "Le temps de fin du chunk en secondes (pour l'audio/vidéo)."
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata",
+            "description": "Métadonnées supplémentaires associées au chunk."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "document_id",
+          "text"
+        ],
+        "title": "PublicChunk"
       },
       "PublicDocument": {
         "properties": {
