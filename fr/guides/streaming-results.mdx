@@ -51,18 +51,23 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
 
   with requests.get(stream_url, headers=headers, stream=True) as response:
       if response.status_code == 200:
+          current_event = None
           for line in response.iter_lines():
               if line:
                   decoded_line = line.decode('utf-8')
-                  if decoded_line.startswith('data:'):
+                  
+                  if decoded_line.startswith('event:'):
+                      current_event = decoded_line[6:].strip()
+                  
+                  elif decoded_line.startswith('data:'):
                       try:
                           # Extraire la partie JSON du message
                           json_data = decoded_line[5:].strip()
-                          event_payload = json.loads(json_data)
-                          print("Événement reçu:", event_payload)
+                          data_payload = json.loads(json_data)
+                          print(f"Événement: {current_event}, Données: {data_payload}")
                           
                           # Vérifier la fin du flux
-                          if event_payload.get("event_type") == "final_result":
+                          if current_event in ["tool_end", "final_result"]:
                               print("Flux terminé.")
                               break
                       except json.JSONDecodeError:
@@ -74,26 +79,47 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
   const apiKey = "VOTRE_CLE_API";
   const streamUrl = "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream";
 
+  // Note: EventSource ne supporte pas les en-têtes personnalisés, nous passons la clé API en paramètre
   const eventSource = new EventSource(`${streamUrl}?api_key=${apiKey}`);
 
   eventSource.onopen = () => {
     console.log("Connexion au flux d'événements ouverte.");
   };
 
-  eventSource.onmessage = (event) => {
-    const eventPayload = JSON.parse(event.data);
-    console.log("Événement reçu:", eventPayload);
+  // Écouter les événements spécifiques
+  eventSource.addEventListener('tool_update', (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Mise à jour:", data);
+  });
 
-    if (eventPayload.event_type === "final_result") {
-      console.log("Flux terminé. Fermeture de la connexion.");
-      eventSource.close();
-    }
-  };
+  eventSource.addEventListener('tool_partial_update', (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Contenu partiel:", data.content);
+  });
 
-  eventSource.onerror = (error) => {
-    console.error("EventSource a échoué:", error);
+  const handleCompletion = (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Terminé:", data);
     eventSource.close();
   };
+
+  eventSource.addEventListener('tool_end', handleCompletion);
+  eventSource.addEventListener('final_result', handleCompletion);
+
+  eventSource.addEventListener('error', (event) => {
+      // Note: 'error' ici peut être un événement SSE nommé 'error' ou une erreur réseau générique
+      if (event.data) {
+          try {
+            const data = JSON.parse(event.data);
+            console.error("Erreur outil:", data);
+          } catch(e) {
+             console.error("Erreur EventSource:", event);
+          }
+      } else {
+          console.error("Erreur connexion EventSource");
+      }
+      eventSource.close();
+  });
   ```
   </CodeGroup>
   
@@ -111,13 +137,10 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
   
   ```json
   {
-    "event_type": "tool_update",
-    "data": {
-      "phase": "processing",        // Optionnel : Phase d'exécution actuelle
-      "message": "Traitement...",   // Optionnel : Statut lisible par l'humain
-      "output_key": "result",       // Optionnel : Clé pour les données structurées
-      "data": { ... }               // Optionnel : Données structurées arbitraires
-    }
+    "phase": "processing",        // Optionnel : Phase d'exécution actuelle
+    "message": "Traitement...",   // Optionnel : Statut lisible par l'humain
+    "output_key": "result",       // Optionnel : Clé pour les données structurées
+    "data": { ... }               // Optionnel : Données structurées arbitraires
   }
   ```
 
@@ -126,12 +149,9 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
   
   ```json
   {
-    "event_type": "tool_partial_update",
-    "data": {
-      "content": "texte partiel...", // Le fragment de contenu
-      "output_key": "response",      // Le champ de sortie en cours de streaming
-      "data": { ... }                // Optionnel : Métadonnées supplémentaires
-    }
+    "content": "texte partiel...", // Le fragment de contenu
+    "output_key": "response",      // Le champ de sortie en cours de streaming
+    "data": { ... }                // Optionnel : Métadonnées supplémentaires
   }
   ```
 
@@ -140,28 +160,25 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
   
   ```json
   {
-    "event_type": "tool_input_required",
-    "data": {
-      "prompt": "Veuillez confirmer...", // Question pour l'utilisateur
-      "input_types": ["text"],           // Types d'entrée autorisés
-      "timeout": 300,                    // Délai d'attente en secondes
-      "state": { ... }                   // État interne (opaque)
-    }
+    "prompt": "Veuillez confirmer...", // Question pour l'utilisateur
+    "input_types": ["text"],           // Types d'entrée autorisés
+    "timeout": 300,                    // Délai d'attente en secondes
+    "state": { ... }                   // État interne (opaque)
   }
   ```
 
-  ### `final_result`
-  L'événement final d'une exécution réussie.
+  ### `tool_end`
+  L'événement final d'une exécution réussie. Les données contiennent les sorties directes de l'outil.
+
+  <Note>
+    Pour des raisons de compatibilité ou selon la méthode d'exécution, cet événement peut parfois apparaître sous le nom `final_result`. Il doit être traité de la même manière que `tool_end`.
+  </Note>
   
   ```json
   {
-    "event_type": "final_result",
-    "data": {
-      "outputs": {                   // Les sorties complètes de l'outil
-        "response": "Texte complet...",
-        "images": [...]
-      }
-    }
+    "execution_id": "exec_123...", // ID de l'exécution
+    "response": "Texte complet...", // Exemple de sortie (dépend de l'outil)
+    "images": [...]                 // Exemple de sortie
   }
   ```
 
@@ -170,30 +187,131 @@ Ce guide montre comment se connecter au flux d'événements d'un outil en utilis
   
   ```json
   {
-    "event_type": "error",
-    "data": {
-      "message": "Description de l'erreur",
-      "code": "CODE_ERREUR"
-    }
+    "message": "Description de l'erreur",
+    "code": "CODE_ERREUR"
+  }
+  ```
+
+  ### Gestion des Événements Larges (Chunking)
+
+  Pour les événements qui dépassent la limite de taille (par exemple, de grandes images encodées en base64 ou de longs textes), l'API utilise un mécanisme de "chunking". Ces événements sont divisés en plusieurs parties avec le suffixe `_delta_sse` ajouté au nom de l'événement d'origine.
+
+  Par exemple, si un événement `tool_update` est trop volumineux, vous recevrez une série d'événements `tool_update_delta_sse`.
+
+  **Structure d'un événement chunké :**
+
+  ```json
+  {
+    "chunk_id": "uuid-unique-pour-ce-groupe",
+    "chunk_index": 0,           // Index du morceau (commence à 0)
+    "total_chunks": 5,          // Nombre total de morceaux
+    "original_event_type": "tool_update",
+    "chunk_data": "...",        // Fragment de la donnée JSON originale (string)
+    "is_last_chunk": false      // true pour le dernier morceau
+  }
+  ```
+
+  **Logique de réassemblage (Côté Client) :**
+
+  1.  Détectez si le nom de l'événement se termine par `_delta_sse`.
+  2.  Stockez les `chunk_data` dans un buffer, ordonnés par `chunk_index`.
+  3.  Lorsque `is_last_chunk` est `true`, concaténez tous les fragments de `chunk_data`.
+  4.  Analysez la chaîne concaténée comme du JSON.
+  5.  Traitez l'objet résultant comme s'il s'agissait de l'événement `original_event_type`.
+
+  **Exemple JavaScript de gestion du chunking :**
+
+  ```javascript
+  const eventBuffers = {}; // Stocker les morceaux par chunk_id
+
+  eventSource.addEventListener('message', (event) => {
+      // Note: EventSource peut ne pas exposer le type d'événement directement dans 'message'
+      // Il est préférable d'utiliser un gestionnaire générique ou d'écouter tous les types possibles
+  });
+
+  // Fonction utilitaire pour gérer tous les événements entrants
+  function handleIncomingEvent(eventType, eventData) {
+      if (eventType.endsWith('_delta_sse')) {
+          const { chunk_id, chunk_index, chunk_data, is_last_chunk, original_event_type } = eventData;
+          
+          if (!eventBuffers[chunk_id]) {
+              eventBuffers[chunk_id] = [];
+          }
+          eventBuffers[chunk_id][chunk_index] = chunk_data;
+
+          if (is_last_chunk) {
+              const fullDataString = eventBuffers[chunk_id].join('');
+              delete eventBuffers[chunk_id]; // Nettoyage
+              
+              try {
+                  const fullData = JSON.parse(fullDataString);
+                  // Traiter récursivement l'événement reconstitué
+                  handleIncomingEvent(original_event_type, fullData);
+              } catch (e) {
+                  console.error("Erreur de parsing du chunk réassemblé", e);
+              }
+          }
+          return; // Attendre les autres morceaux
+      }
+
+      // Traitement normal des événements
+      console.log(`Événement reçu: ${eventType}`, eventData);
+      if (eventType === 'tool_end') {
+          console.log("Résultat final:", eventData);
+      }
   }
   ```
 
   ### Exemple de Flux d'Événements
 
-  ```json
-  data: {"event_type": "tool_update", "data": {"phase": "retrieval", "message": "Récupération des documents pertinents..."}}
+  ```
+  event: tool_update
+  data: {"phase": "retrieval", "message": "Récupération des documents pertinents..."}
 
-  data: {"event_type": "tool_update", "data": {"phase": "generation", "message": "Génération de la réponse..."}}
+  event: tool_update
+  data: {"phase": "generation", "message": "Génération de la réponse..."}
 
-  data: {"event_type": "tool_partial_update", "data": {"content": "Les résultats financiers montrent..."}}
+  event: tool_partial_update
+  data: {"content": "Les résultats financiers montrent..."}
 
-  data: {"event_type": "tool_partial_update", "data": {"content": " une augmentation significative du chiffre d'affaires."}}
+  event: tool_partial_update
+  data: {"content": " une augmentation significative du chiffre d'affaires."}
 
-  data: {"event_type": "final_result", "data": {"outputs": {"response": "Les résultats financiers montrent une augmentation significative du chiffre d'affaires."}}}
+  event: tool_end
+  data: {"execution_id": "...", "status": "completed", "outputs": {"response": "Les résultats financiers montrent une augmentation significative du chiffre d'affaires."}}
   ```
 </Step>
 
 </Steps>
+
+## Intégrer les Événements d'Outils dans l'Interface de Chat
+
+Lorsque vous construisez une interface de chat personnalisée, vous devez souvent combiner l'**historique permanent de la conversation** (texte) avec les **mises à jour transitoires en temps réel** (événements). Cela garantit que votre interface utilisateur est à la fois réactive pendant l'exécution et précise lors du rechargement de l'historique.
+
+### La Stratégie à Double Flux
+
+1.  **Flux de Texte (`response_chunk`)** : Contient la "source de vérité" de la conversation. Il inclut des délimiteurs qui marquent où un outil a été appelé et quel a été le résultat final.
+2.  **Flux d'Événements (`tool_update`, `tool_partial_update`)** : Contient les mises à jour de statut en temps réel, les journaux et les indicateurs de progression qui doivent être affichés *pendant* l'exécution de l'outil.
+
+### Logique d'Implémentation
+
+Pour construire une interface utilisateur riche comme celle d'Ubik, suivez ce modèle :
+
+1.  **Détecter le Début** : Lorsque vous analysez `<<TOOL_STEP_START/nom_outil:id_exec>>` dans le flux de texte, créez un **Conteneur d'Outil** dans votre interface. Marquez-le comme "Chargement" ou "En cours".
+2.  **Mises à jour en Direct** : Écoutez les événements SSE. Si vous recevez un `tool_update` ou `tool_partial_update` où `tool_execution_id` correspond à `id_exec`, mettez à jour le contenu de votre **Conteneur d'Outil** (par exemple, affichez "Recherche sur le web...", mettez à jour une barre de progression ou diffusez des journaux).
+3.  **Détecter la Fin** : Lorsque vous analysez `<<TOOL_STEP_RESULT_START>>` ... `<<TOOL_STEP_RESULT_END>>` dans le flux de texte, vous avez la sortie finale et permanente. Vous pouvez maintenant remplacer l'état "Chargement" dans votre **Conteneur d'Outil** par le résultat statique final.
+
+Cette approche garantit que même si l'utilisateur actualise la page (perdant les événements transitoires), le flux de texte contient toujours l'historique complet de l'exécution (entrées et résultats) nécessaire pour afficher l'état terminé de l'outil.
+
+### Flux d'Événements Spécifiques aux Outils
+
+Chaque outil peut émettre des structures de données différentes dans ses événements `tool_update` et `tool_partial_update` en fonction de sa fonction (par exemple, un outil de recherche web peut diffuser des mises à jour "Recherche d'URL...", tandis qu'un outil d'exécution de code diffuse des journaux de console).
+
+Pour construire une interface utilisateur robuste, vous devrez analyser le flux d'événements spécifique pour les outils que vous avez l'intention de prendre en charge.
+
+> **Note** : Des guides détaillés documentant les structures d'événements spécifiques pour chaque outil natif seront disponibles à l'avenir. Pour l'instant, nous vous recommandons d'inspecter les événements renvoyés par les outils pendant le développement.
+
+Pour une liste des outils disponibles et de leurs capacités, veuillez consulter le guide **[Outils Natifs](/fr/core-features/native-tools)**.
 
 ## Streaming de Session d'Agent
 

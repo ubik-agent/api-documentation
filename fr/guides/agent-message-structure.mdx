@@ -32,12 +32,23 @@ I will now look up the information.
 
 Lorsque l'agent utilise un outil, les détails de l'exécution sont intégrés directement dans le flux de contenu à l'aide d'un ensemble spécifique de balises. Cela permet d'avoir un enregistrement précis de quel outil a été appelé, avec quels arguments, et quel a été le résultat.
 
-### Structure
+> **Note** : Ces balises représentent l'*historique* de l'exécution de l'outil. Pour afficher la progression en temps réel (comme un indicateur de chargement ou des journaux) *pendant* l'exécution de l'outil, vous devez écouter les événements SSE décrits dans le guide **[Gestion du Streaming d'Outils](/fr/guides/streaming-results)**.
+
+### Structure et Étapes de Gestion
 
 1.  **Début** : `<<TOOL_STEP_START/nom_outil:id_execution>>`
+    *   **Action** : Initialisez un conteneur UI pour l'outil.
+    *   **Temps réel** : Commencez à écouter les événements `tool_update` correspondant à cet `id_execution` (voir [Gestion du Streaming d'Outils](/fr/guides/streaming-results)).
+
 2.  **Entrée** : `<<TOOL_STEP_INPUT_START>>` ... entrée JSON ... `<<TOOL_STEP_INPUT_END>>`
+    *   **Action** : Analysez le contenu JSON pour afficher les arguments spécifiques passés à l'outil.
+
 3.  **Résultat** : `<<TOOL_STEP_RESULT_START>>` ... résultat JSON ... `<<TOOL_STEP_RESULT_END>>`
+    *   **Action** : Analysez le contenu JSON pour afficher la sortie finale.
+    *   **Temps réel** : Ce résultat statique remplace tous les états de chargement transitoires ou les journaux dérivés des événements SSE.
+
 4.  **Fin** : `<<TOOL_STEP_END/nom_outil:id_execution>>`
+    *   **Action** : Marquez l'exécution de l'outil comme terminée dans l'interface utilisateur.
 
 **Exemple :**
 
@@ -152,8 +163,33 @@ Les SDK `ubik-agent` (JS/TS) et `ubik-agent-py` (Python) (actuellement en cours 
 
 ### Option 2 : Analyse Manuelle (Avancé)
 
-Si vous traitez vous-même la chaîne de contenu brute, suivez cette stratégie :
+Si vous construisez une interface utilisateur personnalisée et traitez vous-même la chaîne de contenu brute, vous devrez combiner deux sources de données :
+
+1.  **Délimiteurs de Texte** : Analysez les blocs `<<TOOL_STEP_INPUT_START>>` et `<<TOOL_STEP_RESULT_START>>` du contenu du message pour afficher l'état final de l'outil.
+2.  **Événements SSE** : Écoutez les événements `tool_update` et `tool_partial_update` pour afficher la progression en temps réel (chargement, journaux) avant que l'outil ne se termine.
+
+Pour un tutoriel complet sur la combinaison de ces flux pour construire une interface riche, veuillez consulter le guide **[Gestion du Streaming d'Outils](/fr/guides/streaming-results)**.
+
+**Stratégie Générale d'Analyse :**
 
 1.  **Correspondance Regex** : Utilisez des expressions régulières pour trouver ces blocs.
 2.  **Machine à États** : Itérez à travers la chaîne, en maintenant un état (par exemple, `in_step`, `in_tool`, `in_thinking`) pour afficher le composant UI approprié pour chaque section.
 3.  **Analyse JSON** : Pour les entrées/sorties d'outils et les entrées utilisateur, extrayez le texte entre les balises et analysez-le en tant que JSON.
+
+## Résumé de Référence des Balises
+
+Voici une référence rapide de toutes les balises dans leur ordre d'apparition typique au cours du cycle de vie d'un agent :
+
+| Phase | Balise | Description |
+| :--- | :--- | :--- |
+| **Étape** | `<<STEP_START>>` | Commence une étape de haut niveau. |
+| **Pensée** | `<<thinking>>` ... `<</thinking>>` | Monologue interne (optionnel). |
+| **Début Outil** | `<<TOOL_STEP_START/nom:id>>` | Commence un bloc d'exécution d'outil. |
+| **Entrée Outil** | `<<TOOL_STEP_INPUT_START>>` ... `<<TOOL_STEP_INPUT_END>>` | Arguments JSON pour l'outil. |
+| **Résultat Outil** | `<<TOOL_STEP_RESULT_START>>` ... `<<TOOL_STEP_RESULT_END>>` | Sortie JSON de l'outil. |
+| **Fin Outil** | `<<TOOL_STEP_END/nom:id>>` | Termine le bloc d'exécution d'outil. |
+| **Fin Étape** | `<<STEP_END>>` | Termine l'étape de haut niveau. |
+| **Point de Contrôle** | `<<CHECKPOINT_START>>` ... `<<CHECKPOINT_END>>` | Marque un point de sauvegarde. |
+| **Entrée** | `<<INPUT_REQUIRED_START>>` ... `<<INPUT_REQUIRED_END>>` | Pause pour attendre une entrée utilisateur. |
+| **Réponse Utilisateur** | `<<USER_INPUT_PROVIDED_START>>` ... `<<USER_INPUT_PROVIDED_END>>` | Enregistre la réponse de l'utilisateur. |
+| **Erreur** | `<<ERROR_START>>` ... `<<ERROR_END>>` | Enveloppe les messages d'erreur. |

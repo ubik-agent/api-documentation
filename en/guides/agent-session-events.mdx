@@ -172,6 +172,10 @@ Events related to the agent using tools. Note that the *textual representation* 
 
 For a detailed tutorial on how to handle these events to build a rich UI, please refer to the **[Handling Tool Streaming](/en/guides/streaming-results)** guide.
 
+<Tip>
+  **Simplified UI Integration**: If you prefer not to implement a custom UI for tool execution events, you can extract the `tool_execution_id` from the `tool_update` event (when status is `started`) and use the **[Tool Execution Embed](/en/guides/embedding-tools#embedding-a-specific-execution)** iframe. This allows you to display the tool's progress and result with a single line of code.
+</Tip>
+
 #### `tool_update`
 
 Updates on tool execution status, phases, or metadata.

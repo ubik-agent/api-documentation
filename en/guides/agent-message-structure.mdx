@@ -32,12 +32,23 @@ I will now look up the information.
 
 When the agent uses a tool, the execution details are embedded directly into the content stream using a specific set of tags. This allows for a precise record of what tool was called, with what arguments, and what the result was.
 
-### Structure
+> **Note**: These tags represent the *history* of the tool execution. To display real-time progress (like a spinner or logs) *while* the tool is running, you should listen to the SSE events described in the **[Handling Tool Streaming](/en/guides/streaming-results)** guide.
+
+### Structure and Handling Stages
 
 1.  **Start**: `<<TOOL_STEP_START/tool_name:execution_id>>`
+    *   **Action**: Initialize a UI container for the tool.
+    *   **Real-time**: Begin listening for `tool_update` events matching this `execution_id` (see [Handling Tool Streaming](/en/guides/streaming-results)).
+
 2.  **Input**: `<<TOOL_STEP_INPUT_START>>` ... JSON input ... `<<TOOL_STEP_INPUT_END>>`
+    *   **Action**: Parse the JSON content to display the specific arguments passed to the tool.
+
 3.  **Result**: `<<TOOL_STEP_RESULT_START>>` ... JSON result ... `<<TOOL_STEP_RESULT_END>>`
+    *   **Action**: Parse the JSON content to display the final output.
+    *   **Real-time**: This static result replaces any transient loading states or logs derived from SSE events.
+
 4.  **End**: `<<TOOL_STEP_END/tool_name:execution_id>>`
+    *   **Action**: Mark the tool execution as complete in the UI.
 
 **Example:**
 
@@ -152,8 +163,33 @@ The `ubik-agent` (JS/TS) and `ubik-agent-py` (Python) SDKs (currently under deve
 
 ### Option 2: Manual Parsing (Advanced)
 
-If you are processing the raw content string yourself, follow this strategy:
+If you are building a custom UI and processing the raw content string yourself, you will need to combine two data sources:
+
+1.  **Text Delimiters**: Parse the `<<TOOL_STEP_INPUT_START>>` and `<<TOOL_STEP_RESULT_START>>` blocks from the message content to display the final tool state.
+2.  **SSE Events**: Listen for `tool_update` and `tool_partial_update` events to show real-time progress (spinners, logs) before the tool finishes.
+
+For a complete tutorial on combining these streams to build a rich interface, please refer to the **[Handling Tool Streaming](/en/guides/streaming-results)** guide.
+
+**General Parsing Strategy:**
 
 1.  **Regex Matching**: Use regular expressions to find these blocks.
 2.  **State Machine**: Iterate through the string, maintaining a state (e.g., `in_step`, `in_tool`, `in_thinking`) to render the appropriate UI component for each section.
 3.  **JSON Parsing**: For tool inputs/outputs and user inputs, extract the text between the tags and parse it as JSON.
+
+## Tag Reference Summary
+
+Here is a quick reference of all delimiters in their typical order of appearance during an agent's execution lifecycle:
+
+| Phase | Tag | Description |
+| :--- | :--- | :--- |
+| **Step** | `<<STEP_START>>` | Begins a high-level step. |
+| **Thinking** | `<<thinking>>` ... `<</thinking>>` | Internal monologue (optional). |
+| **Tool Start** | `<<TOOL_STEP_START/name:id>>` | Begins a tool execution block. |
+| **Tool Input** | `<<TOOL_STEP_INPUT_START>>` ... `<<TOOL_STEP_INPUT_END>>` | JSON arguments for the tool. |
+| **Tool Result** | `<<TOOL_STEP_RESULT_START>>` ... `<<TOOL_STEP_RESULT_END>>` | JSON output from the tool. |
+| **Tool End** | `<<TOOL_STEP_END/name:id>>` | Ends the tool execution block. |
+| **Step End** | `<<STEP_END>>` | Ends the high-level step. |
+| **Checkpoint** | `<<CHECKPOINT_START>>` ... `<<CHECKPOINT_END>>` | Marks a save point in the conversation. |
+| **Input** | `<<INPUT_REQUIRED_START>>` ... `<<INPUT_REQUIRED_END>>` | Pauses for user input. |
+| **User Reply** | `<<USER_INPUT_PROVIDED_START>>` ... `<<USER_INPUT_PROVIDED_END>>` | Records the user's response. |
+| **Error** | `<<ERROR_START>>` ... `<<ERROR_END>>` | Wraps error messages. |

@@ -51,18 +51,23 @@ This section shows you how to connect to a tool's event stream. This assumes you
 
   with requests.get(stream_url, headers=headers, stream=True) as response:
       if response.status_code == 200:
+          current_event = None
           for line in response.iter_lines():
               if line:
                   decoded_line = line.decode('utf-8')
-                  if decoded_line.startswith('data:'):
+                  
+                  if decoded_line.startswith('event:'):
+                      current_event = decoded_line[6:].strip()
+                  
+                  elif decoded_line.startswith('data:'):
                       try:
                           # Extract the JSON part of the message
                           json_data = decoded_line[5:].strip()
-                          event_payload = json.loads(json_data)
-                          print("Received event:", event_payload)
+                          data_payload = json.loads(json_data)
+                          print(f"Event: {current_event}, Data: {data_payload}")
                           
                           # Check for the end of the stream
-                          if event_payload.get("event_type") == "final_result":
+                          if current_event in ["tool_end", "final_result"]:
                               print("Stream finished.")
                               break
                       except json.JSONDecodeError:
@@ -74,26 +79,47 @@ This section shows you how to connect to a tool's event stream. This assumes you
   const apiKey = "YOUR_API_KEY";
   const streamUrl = "https://app.ubik-agent.com/api/v1/tool-executions/exec_123456789/stream";
 
+  // Note: EventSource does not support custom headers, we pass the API key as a parameter
   const eventSource = new EventSource(`${streamUrl}?api_key=${apiKey}`);
 
   eventSource.onopen = () => {
     console.log("Connection to event stream opened.");
   };
 
-  eventSource.onmessage = (event) => {
-    const eventPayload = JSON.parse(event.data);
-    console.log("Received event:", eventPayload);
+  // Listen for specific events
+  eventSource.addEventListener('tool_update', (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Update:", data);
+  });
 
-    if (eventPayload.event_type === "final_result") {
-      console.log("Stream finished. Closing connection.");
-      eventSource.close();
-    }
-  };
+  eventSource.addEventListener('tool_partial_update', (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Partial content:", data.content);
+  });
 
-  eventSource.onerror = (error) => {
-    console.error("EventSource failed:", error);
+  const handleCompletion = (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Finished:", data);
     eventSource.close();
   };
+
+  eventSource.addEventListener('tool_end', handleCompletion);
+  eventSource.addEventListener('final_result', handleCompletion);
+
+  eventSource.addEventListener('error', (event) => {
+      // Note: 'error' here can be a named SSE event 'error' or a generic network error
+      if (event.data) {
+          try {
+            const data = JSON.parse(event.data);
+            console.error("Tool error:", data);
+          } catch(e) {
+             console.error("EventSource error:", event);
+          }
+      } else {
+          console.error("EventSource connection error");
+      }
+      eventSource.close();
+  });
   ```
   </CodeGroup>
   
@@ -111,13 +137,10 @@ This section shows you how to connect to a tool's event stream. This assumes you
   
   ```json
   {
-    "event_type": "tool_update",
-    "data": {
-      "phase": "processing",        // Optional: Current execution phase
-      "message": "Processing...",   // Optional: Human-readable status
-      "output_key": "result",       // Optional: Key for structured data
-      "data": { ... }               // Optional: Arbitrary structured data
-    }
+    "phase": "processing",        // Optional: Current execution phase
+    "message": "Processing...",   // Optional: Human-readable status
+    "output_key": "result",       // Optional: Key for structured data
+    "data": { ... }               // Optional: Arbitrary structured data
   }
   ```
 
@@ -126,12 +149,9 @@ This section shows you how to connect to a tool's event stream. This assumes you
   
   ```json
   {
-    "event_type": "tool_partial_update",
-    "data": {
-      "content": "partial text...", // The chunk of content
-      "output_key": "response",     // The output field being streamed
-      "data": { ... }               // Optional: Additional metadata
-    }
+    "content": "partial text...", // The chunk of content
+    "output_key": "response",     // The output field being streamed
+    "data": { ... }               // Optional: Additional metadata
   }
   ```
 
@@ -140,28 +160,25 @@ This section shows you how to connect to a tool's event stream. This assumes you
   
   ```json
   {
-    "event_type": "tool_input_required",
-    "data": {
-      "prompt": "Please confirm...", // Question for the user
-      "input_types": ["text"],       // Allowed input types
-      "timeout": 300,                // Timeout in seconds
-      "state": { ... }               // Internal state (opaque)
-    }
+    "prompt": "Please confirm...", // Question for the user
+    "input_types": ["text"],       // Allowed input types
+    "timeout": 300,                // Timeout in seconds
+    "state": { ... }               // Internal state (opaque)
   }
   ```
 
-  ### `final_result`
-  The final event of a successful execution.
+  ### `tool_end`
+  The final event of a successful execution. The data contains the direct outputs of the tool.
+
+  <Note>
+    For compatibility reasons or depending on the execution method, this event may sometimes appear as `final_result`. It should be treated the same way as `tool_end`.
+  </Note>
   
   ```json
   {
-    "event_type": "final_result",
-    "data": {
-      "outputs": {                   // The complete tool outputs
-        "response": "Full text...",
-        "images": [...]
-      }
-    }
+    "execution_id": "exec_123...", // Execution ID
+    "response": "Full text...",    // Example output (tool dependent)
+    "images": [...]                // Example output
   }
   ```
 
@@ -170,30 +187,131 @@ This section shows you how to connect to a tool's event stream. This assumes you
   
   ```json
   {
-    "event_type": "error",
-    "data": {
-      "message": "Error description",
-      "code": "ERROR_CODE"
-    }
+    "message": "Error description",
+    "code": "ERROR_CODE"
+  }
+  ```
+
+  ### Handling Large Events (Chunking)
+
+  For events that exceed the size limit (e.g., large base64 encoded images or long text), the API uses a "chunking" mechanism. These events are split into multiple parts with the `_delta_sse` suffix added to the original event name.
+
+  For example, if a `tool_update` event is too large, you will receive a series of `tool_update_delta_sse` events.
+
+  **Structure of a chunked event:**
+
+  ```json
+  {
+    "chunk_id": "unique-uuid-for-this-group",
+    "chunk_index": 0,           // Index of the chunk (starts at 0)
+    "total_chunks": 5,          // Total number of chunks
+    "original_event_type": "tool_update",
+    "chunk_data": "...",        // Fragment of the original JSON data (string)
+    "is_last_chunk": false      // true for the last chunk
+  }
+  ```
+
+  **Reassembly Logic (Client-Side):**
+
+  1.  Detect if the event name ends with `_delta_sse`.
+  2.  Store the `chunk_data` in a buffer, ordered by `chunk_index`.
+  3.  When `is_last_chunk` is `true`, concatenate all `chunk_data` fragments.
+  4.  Parse the concatenated string as JSON.
+  5.  Process the resulting object as if it were the `original_event_type`.
+
+  **JavaScript Example for Chunk Handling:**
+
+  ```javascript
+  const eventBuffers = {}; // Store chunks by chunk_id
+
+  eventSource.addEventListener('message', (event) => {
+      // Note: EventSource might not expose the event type directly in 'message'
+      // It is better to use a generic handler or listen to all possible types
+  });
+
+  // Utility function to handle all incoming events
+  function handleIncomingEvent(eventType, eventData) {
+      if (eventType.endsWith('_delta_sse')) {
+          const { chunk_id, chunk_index, chunk_data, is_last_chunk, original_event_type } = eventData;
+          
+          if (!eventBuffers[chunk_id]) {
+              eventBuffers[chunk_id] = [];
+          }
+          eventBuffers[chunk_id][chunk_index] = chunk_data;
+
+          if (is_last_chunk) {
+              const fullDataString = eventBuffers[chunk_id].join('');
+              delete eventBuffers[chunk_id]; // Cleanup
+              
+              try {
+                  const fullData = JSON.parse(fullDataString);
+                  // Recursively process the reassembled event
+                  handleIncomingEvent(original_event_type, fullData);
+              } catch (e) {
+                  console.error("Error parsing reassembled chunk", e);
+              }
+          }
+          return; // Wait for other chunks
+      }
+
+      // Normal event processing
+      console.log(`Received event: ${eventType}`, eventData);
+      if (eventType === 'tool_end') {
+          console.log("Final result:", eventData);
+      }
   }
   ```
 
   ### Example Event Stream
 
-  ```json
-  data: {"event_type": "tool_update", "data": {"phase": "retrieval", "message": "Fetching relevant documents..."}}
+  ```
+  event: tool_update
+  data: {"phase": "retrieval", "message": "Fetching relevant documents..."}
 
-  data: {"event_type": "tool_update", "data": {"phase": "generation", "message": "Generating response..."}}
+  event: tool_update
+  data: {"phase": "generation", "message": "Generating response..."}
 
-  data: {"event_type": "tool_partial_update", "data": {"content": "The financial results show..."}}
+  event: tool_partial_update
+  data: {"content": "The financial results show..."}
 
-  data: {"event_type": "tool_partial_update", "data": {"content": " a significant increase in revenue."}}
+  event: tool_partial_update
+  data: {"content": " a significant increase in revenue."}
 
-  data: {"event_type": "final_result", "data": {"outputs": {"response": "The financial results show a significant increase in revenue."}}}
+  event: tool_end
+  data: {"execution_id": "...", "status": "completed", "outputs": {"response": "The financial results show a significant increase in revenue."}}
   ```
 </Step>
 
 </Steps>
+
+## Integrating Tool Events in Chat UI
+
+When building a custom chat interface, you often need to combine the **permanent conversation history** (text) with **transient real-time updates** (events). This ensures your UI is both responsive during execution and accurate when reloading history.
+
+### The Dual-Stream Strategy
+
+1.  **Text Stream (`response_chunk`)**: Contains the "source of truth" for the conversation. It includes delimiters that mark where a tool was called and what the final result was.
+2.  **Event Stream (`tool_update`, `tool_partial_update`)**: Contains real-time status updates, logs, and progress indicators that should be displayed *while* the tool is running.
+
+### Implementation Logic
+
+To build a rich UI like the one in Ubik, follow this pattern:
+
+1.  **Detect Start**: When you parse `<<TOOL_STEP_START/tool_name:exec_id>>` in the text stream, create a **Tool Container** in your UI. Mark it as "Loading" or "Running".
+2.  **Live Updates**: Listen for SSE events. If you receive a `tool_update` or `tool_partial_update` where `tool_execution_id` matches `exec_id`, update the content of your **Tool Container** (e.g., show "Searching web...", update a progress bar, or stream logs).
+3.  **Detect End**: When you parse `<<TOOL_STEP_RESULT_START>>` ... `<<TOOL_STEP_RESULT_END>>` in the text stream, you have the final, permanent output. You can now replace the "Loading" state in your **Tool Container** with the final static result.
+
+This approach ensures that even if the user refreshes the page (losing the transient events), the text stream still contains the full execution history (inputs and results) needed to render the completed tool state.
+
+### Tool-Specific Event Streams
+
+Each tool may emit different data structures in its `tool_update` and `tool_partial_update` events depending on its function (e.g., a web search tool might stream "Searching URL..." updates, while a code execution tool streams console logs).
+
+To build a robust UI, you will need to analyze the specific event stream for the tools you intend to support.
+
+> **Note**: Detailed guides documenting the specific event structures for each native tool will be available in the future. For now, we recommend inspecting the events returned by the tools during development.
+
+For a list of available tools and their capabilities, please refer to the **[Native Tools](/en/core-features/native-tools)** guide.
 
 ## Agent Session Streaming
 

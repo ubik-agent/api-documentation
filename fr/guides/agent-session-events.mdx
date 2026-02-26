@@ -172,6 +172,10 @@ L'agent nécessite une entrée utilisateur pour continuer. Cela se produit gén�
 
 Pour un tutoriel détaillé sur la façon de gérer ces événements pour construire une interface utilisateur riche, veuillez consulter le guide **[Gestion du Streaming d'Outils](/fr/guides/streaming-results)**.
 
+<Tip>
+  **Intégration UI Simplifiée** : Si vous préférez ne pas implémenter une interface utilisateur personnalisée pour les événements d'exécution d'outils, vous pouvez extraire le `tool_execution_id` de l'événement `tool_update` (lorsque le statut est `started`) et utiliser l'iframe **[Intégration d'Exécution d'Outil](/fr/guides/embedding-tools#integrer-une-execution-specifique)**. Cela vous permet d'afficher la progression et le résultat de l'outil avec une seule ligne de code.
+</Tip>
+
 #### `tool_update`
 
 Mises à jour sur le statut d'exécution de l'outil, les phases ou les métadonnées.

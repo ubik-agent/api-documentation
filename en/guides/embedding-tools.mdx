@@ -179,10 +179,38 @@ Embedding UBIK tools into your own application provides a powerful way to extend
   ```
 </Step>
 
+<Step title="Embedding a Specific Execution">
+  In addition to embedding the tool input form, you can also embed a specific **existing execution**. This is ideal for sharing results with users or allowing them to monitor a long-running task that was initiated via the API.
+
+  The process is identical to embedding a tool, but you use a different URL path.
+
+  **URL Format:**
+  `https://app.ubik-agent.com/embed/execution/YOUR_EXECUTION_ID?jwt=YOUR_JWT`
+
+  **Or with an API Key (Server-side rendering only):**
+  `https://app.ubik-agent.com/embed/execution/YOUR_EXECUTION_ID?apiKey=YOUR_API_KEY`
+
+  **Use Cases:**
+  *   **Monitoring:** Redirect a user to this view after starting a task via the API.
+  *   **Sharing:** Allow users to view the results of a completed task.
+
+  The embedded view will automatically handle:
+  *   Connecting to the real-time event stream.
+  *   Displaying progress and intermediate steps.
+  *   Rendering the final results (text, images, files) when complete.
+</Step>
+
 <Step title="Handling Events (Advanced)">
   The embedded iframe handles all real-time events, state management, and user interactions internally. You do not need to write any additional code to handle tool progress or results.
 
   However, if you need to build a completely custom interface that reacts to tool events programmatically (e.g., for deep integration into your own UI framework), you should use the API directly instead of the iframe.
+
+  The main events to monitor are:
+  - `tool_update`: General progress.
+  - `tool_partial_update`: Content streaming.
+  - `tool_input_required`: Request for user interaction.
+  - `tool_end` (or `final_result`): Execution completion with results.
+  - `error`: Execution error.
 
   For details on consuming the raw event stream, please refer to the **[Getting Real-Time Results with SSE](/en/guides/streaming-results)** guide.
 </Step>
