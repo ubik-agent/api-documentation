@@ -68,9 +68,77 @@ L'outil renvoie un objet structuré contenant la réponse, les preuves utilisée
 | :--- | :--- |
 | `response` | La réponse en langage naturel. Peut inclure un bloc "Réflexion" (processus de pensée), du formatage Markdown et des citations en ligne pointant vers des morceaux spécifiques. |
 | `contexts` | Une liste des morceaux de texte récupérés passés au LLM. Inclut `chunk_id`, `document_id` et `text_preview`. |
-| `sources_used` | Une liste d'indices (rangs) correspondant aux `contexts` qui ont été explicitement utilisés pour former la réponse. |
+| `sources_used` | Une liste d'indices (rangs) correspondant aux `contexts` qui ont été explicitement utilisés pour former la réponse. Ces indices sont dérivés des citations (ex: `<source_1>`) générées par le modèle. |
 | `model` | Le LLM spécifique utilisé pour la génération. |
 | `execution_id` | L'identifiant unique pour cette exécution d'outil. |
+
+## Événements de Streaming
+
+Lorsqu'il est utilisé en mode streaming, l'outil `rag_search` émet des événements en temps réel via SSE (Server-Sent Events). Cela permet de suivre la progression du pipeline RAG et d'afficher la réponse au fur et à mesure de sa génération.
+
+### Types d'Événements
+
+| Événement | Description |
+| :--- | :--- |
+| `tool_update` | Indique une mise à jour de progression (changement de phase). |
+| `tool_partial_update` | Contient un nouveau fragment de texte de la réponse générée (streaming). |
+| `error` | Signale qu'une erreur critique s'est produite pendant l'exécution. |
+| `tool_end` | Signale la fin de l'exécution de l'outil et fournit le résultat final complet. |
+
+### Phases du Pipeline (`tool_update`)
+
+L'événement `tool_update` contient un champ `data` avec une `phase` et un `status`. Voici les phases possibles :
+
+1.  **`SEARCH_PREPARATION`**
+    *   `status`: `started`
+    *   Indique que le pipeline a commencé et prépare la recherche.
+
+2.  **`RETRIEVAL`** (Récupération)
+    *   `status`: `completed`
+    *   `data`: `{ "retrieved_count": <int> }`
+    *   Indique que la recherche vectorielle initiale est terminée et combien de documents ont été trouvés.
+
+3.  **`RERANKING`** (Réordonnancement)
+    *   `status`: `completed`
+    *   `data`: `{ "initial_count": <int>, "reranked_count": <int>, "kept_count": <int> }`
+    *   Indique que les résultats ont été réordonnés par pertinence. `kept_count` est le nombre de documents retenus pour la génération.
+
+4.  **`COMPILING_RESULTS`** (Génération)
+    *   `status`: `started`
+    *   Indique que la génération de la réponse par le LLM commence.
+
+### Streaming de Contenu (`tool_partial_update`)
+
+Pendant la phase de génération, des événements `tool_partial_update` sont émis pour chaque fragment de texte généré.
+
+*   `content`: `<string>` (Le fragment de texte)
+*   `output_key`: `"response"`
+
+Ces fragments doivent être concaténés pour former la réponse complète.
+
+### Exemple de Flux d'Événements
+
+```json
+// Début
+{ "event": "tool_update", "data": { "phase": "SEARCH_PREPARATION", "status": "started" } }
+
+// Récupération terminée
+{ "event": "tool_update", "data": { "phase": "RETRIEVAL", "status": "completed", "data": { "retrieved_count": 15 } } }
+
+// Réordonnancement terminé
+{ "event": "tool_update", "data": { "phase": "RERANKING", "status": "completed", "data": { "initial_count": 15, "reranked_count": 15, "kept_count": 5 } } }
+
+// Début de la génération
+{ "event": "tool_update", "data": { "phase": "COMPILING_RESULTS", "status": "started" } }
+
+// Streaming de la réponse (tool_partial_update)
+{ "event": "tool_partial_update", "data": { "content": "Selon", "output_key": "response" } }
+{ "event": "tool_partial_update", "data": { "content": " le", "output_key": "response" } }
+{ "event": "tool_partial_update", "data": { "content": " document...", "output_key": "response" } }
+
+// Fin
+{ "event": "tool_end", "data": { ...résultat final complet... } }
+```
 
 ## Exemple d'Utilisation
 
