@@ -1,0 +1,113 @@
+---
+title: 'Parseur GPU Auto-hébergé'
+description: 'Apprenez à déployer et gérer votre propre instance de parseur GPU optimisé.'
+---
+
+Ce guide explique comment auto-héberger notre parseur GPU optimisé qui permet la mise en évidence des éléments.
+
+<Note>
+  **Avertissement** : Ce processus de déploiement est actuellement manuel. Nous travaillons à le simplifier dans les futures mises à jour. Si vous rencontrez des problèmes, avez besoin d'aide ou avez des besoins spécifiques pour d'autres fournisseurs de cloud, n'hésitez pas à nous contacter.
+</Note>
+
+## Prérequis
+
+- Accès à la [Console d'Administration UBIK](https://app.ubik-agent.com/admin)
+- Permissions de propriétaire de facturation
+
+## Étapes de Déploiement
+
+1.  **Accéder à la Page d'Administration**
+    Allez sur [https://app.ubik-agent.com/admin](https://app.ubik-agent.com/admin). Ici, vous avez accès à la gestion de tous les utilisateurs de votre entreprise.
+
+    ![Aperçu de la Page d'Administration](/images/en/self-hosted-gpu-parser/1_admin_panel.png)
+
+2.  **Lancer le Déploiement**
+    Cliquez sur **Deploy Service** (Déployer un service).
+
+    ![Bouton Déployer Service](/images/en/self-hosted-gpu-parser/2_deploy_service.png)
+
+3.  **Configurer le Service**
+    Dans la modale de déploiement :
+    -   Sélectionnez **"Parsing api (gpu optimized)"** pour le service.
+    -   Sélectionnez **"Digital Ocean"** comme fournisseur.
+    -   Sélectionnez votre entreprise (par exemple, "DitocAI_dev") comme propriétaire de la facturation.
+
+4.  **Configuration JSON**
+    Insérez la configuration JSON suivante dans le champ de configuration du déploiement :
+
+    ```json
+    {
+      "region": "tor1",
+      "instance_size": "gpu-4000adax1-20gb",
+      "image": "gpu-h100x1-base",
+      "health_check_path": "/healthcheck",
+      "environment_vars": {
+        "PORT": "8080",
+        "NUM_WORKERS": "8"
+      }
+    }
+    ```
+
+    <Note>
+      **Note sur la disponibilité** : L'option la moins chère est `gpu-4000adax1-20gb` dans `tor1` (ci-dessus), mais elle est souvent en rupture de stock.
+      
+      Si le déploiement échoue en raison de l'indisponibilité, essayez la configuration suivante qui utilise `gpu-6000adax1-48gb` et qui est généralement plus disponible :
+
+      ```json
+      {
+        "region": "tor1",
+        "instance_size": "gpu-6000adax1-48gb",
+        "image": "gpu-h100x1-base",
+        "health_check_path": "/healthcheck",
+        "environment_vars": {
+          "PORT": "8080",
+          "NUM_WORKERS": "8"
+        }
+      }
+      ```
+    </Note>
+
+    ![Configuration du Déploiement](/images/en/self-hosted-gpu-parser/3_deploy_service_filled.png)
+
+5.  **Déployer**
+    Cliquez sur **Deploy**. Le service passera en état de déploiement. Ce processus prend généralement environ 15 minutes pour que la machine soit configurée.
+
+    ![Déploiement en Cours](/images/en/self-hosted-gpu-parser/4_deployment_in_progress.png)
+
+## Gestion des Accès
+
+Une fois la machine prête et en état "Running" (En cours d'exécution), elle est initialement associée uniquement à votre entreprise. Vous devez accorder l'accès à des utilisateurs ou services spécifiques.
+
+![Service Prêt](/images/en/self-hosted-gpu-parser/5_deployment_ready.png)
+
+Une fois la machine prête, vous verrez qu'elle sera en état de marche. Maintenant que la machine est réactive, lions-la à un service particulier de la plateforme :
+
+![Gestion du Registre des Services](/images/en/self-hosted-gpu-parser/6_service_registry_management.png)
+
+1.  **Lier au Service**
+    -   Cliquez sur **Add from deployment** (Ajouter depuis le déploiement) et sélectionnez votre nouvelle machine.
+        ![Ajouter depuis le Déploiement](/images/en/self-hosted-gpu-parser/7_add_from_deployement.png)
+    -   Cliquez sur **Register** (Enregistrer).
+        ![Enregistrer le Service](/images/en/self-hosted-gpu-parser/8_save_registry.png)
+    -   Cliquez sur **Save** (Enregistrer).
+        ![Sauvegarder le Service](/images/en/self-hosted-gpu-parser/9_new_service_in_registry.png)
+
+2.  **Gérer les Permissions**
+    -   Dans la gestion du registre des services, vous avez le nouveau service qui peut être sélectionné. Cliquez sur l'icône **Clé** pour déterminer qui doit avoir accès au nouveau service.
+        ![Registre des Services](/images/en/self-hosted-gpu-parser/10_new_access.png)
+    -   Dans ce menu, si vous souhaitez l'associer à un utilisateur particulier, vous pouvez sélectionner Accorder l'accès à **"A specific company"** (Une entreprise spécifique) puis **"Le nom de votre entreprise"**.
+    -   Vous pouvez également choisir d'accorder l'accès à un utilisateur particulier au sein de votre entreprise pour une gestion plus granulaire des accès.
+        ![Menu d'Octroi d'Accès](/images/en/self-hosted-gpu-parser/11_new_access_filled.png)
+
+    Vous devriez maintenant voir l'entreprise spécifique associée à votre service.
+
+    ![Accès Accordé](/images/en/self-hosted-gpu-parser/12_new_access_rules_added.png)
+
+## Notes Importantes
+
+-   **Gestion des Coûts** : Cette instance continuera de fonctionner jusqu'à ce que vous :
+    1.  Atteigniez un solde de crédits trop bas (moins de 2 heures de service).
+    2.  Cliquiez manuellement sur l'action **Delete deployment** (Supprimer le déploiement).
+-   **Attention** : Vos crédits peuvent diminuer rapidement si vous oubliez d'arrêter l'instance lorsqu'elle n'est plus nécessaire.
+
+    ![Supprimer le Déploiement](/images/en/self-hosted-gpu-parser/13_deleting_parser.png)

@@ -1,0 +1,113 @@
+---
+title: 'Self-hosted GPU Parser'
+description: 'Learn how to deploy and manage your own optimized GPU parser instance.'
+---
+
+This guide explains how to self-host our optimized GPU parser that allows for element highlighting.
+
+<Note>
+  **Disclaimer**: This deployment process is currently manual. We are working to streamline it in future updates. If you encounter any issues, need assistance, or have specific requirements for other cloud providers, please do not hesitate to reach out to us.
+</Note>
+
+## Prerequisites
+
+- Access to the [UBIK Admin Console](https://app.ubik-agent.com/admin)
+- Billing owner permissions
+
+## Deployment Steps
+
+1.  **Navigate to the Admin Page**
+    Go to [https://app.ubik-agent.com/admin](https://app.ubik-agent.com/admin). Here you have access to manage all users within your company.
+
+    ![Admin Page Overview](/images/en/self-hosted-gpu-parser/1_admin_panel.png)
+
+2.  **Initiate Deployment**
+    Click on **Deploy Service**.
+
+    ![Deploy Service Button](/images/en/self-hosted-gpu-parser/2_deploy_service.png)
+
+3.  **Configure Service**
+    In the deployment modal:
+    -   Select **"Parsing api (gpu optimized)"** for the service.
+    -   Select **"Digital Ocean"** as the provider.
+    -   Select your company (e.g., "demo_company") as the billing owner.
+
+4.  **JSON Configuration**
+    Insert the following JSON configuration into the deployment configuration field:
+
+    ```json
+    {
+      "region": "tor1",
+      "instance_size": "gpu-4000adax1-20gb",
+      "image": "gpu-h100x1-base",
+      "health_check_path": "/healthcheck",
+      "environment_vars": {
+        "PORT": "8080",
+        "NUM_WORKERS": "8"
+      }
+    }
+    ```
+
+    <Note>
+      **Availability Note**: The cheapest option is `gpu-4000adax1-20gb` in `tor1` (shown above), but it is often out of stock. 
+      
+      If the deployment fails due to unavailability, try the following configuration which uses `gpu-6000adax1-48gb` and is generally more available:
+
+      ```json
+      {
+        "region": "tor1",
+        "instance_size": "gpu-6000adax1-48gb",
+        "image": "gpu-h100x1-base",
+        "health_check_path": "/healthcheck",
+        "environment_vars": {
+          "PORT": "8080",
+          "NUM_WORKERS": "8"
+        }
+      }
+      ```
+    </Note>
+
+    ![Deployment Configuration](/images/en/self-hosted-gpu-parser/3_deploy_service_filled.png)
+
+5.  **Deploy**
+    Click on **Deploy**. The service will enter a deployment state. This process typically takes around 15 minutes for the machine to be set up.
+
+    ![Deployment In Progress](/images/en/self-hosted-gpu-parser/4_deployment_in_progress.png)
+
+## Access Management
+
+Once the machine is ready and in a "Running" state, it is initially only associated with your company. You need to grant access to specific users or services.
+
+![Service Ready](/images/en/self-hosted-gpu-parser/5_deployment_ready.png)
+
+Once the machine is ready you’ll see that It will be in a running state. Now that the machine is responsive, let’s link it to a particular service of the platform:
+
+![Service Registry Management](/images/en/self-hosted-gpu-parser/6_service_registry_management.png)
+
+1.  **Link to Service**
+    -   Click on **Add from deployment** and select your new machine.
+        ![Add From Deployment](/images/en/self-hosted-gpu-parser/7_add_from_deployement.png)
+    -   Click on **Register**.
+        ![Register Service](/images/en/self-hosted-gpu-parser/8_save_registry.png)
+    -   Click on **Save**.
+        ![Save Service](/images/en/self-hosted-gpu-parser/9_new_service_in_registry.png)
+
+2.  **Manage Permissions**
+    -   In the service registry management, you have the new service that can be selected. Click on the **Key icon** to determine who should have access to the new service.
+        ![Service Registry](/images/en/self-hosted-gpu-parser/10_new_access.png)
+    -   In this menu, if you want to associate it to a particular user, you can select Grant access to **"A specific company"** and then **"The name of your company"**.
+    -   You can also select to grant access to a particular user that is inside your company for more granular access management.
+        ![Grant Access Menu](/images/en/self-hosted-gpu-parser/11_new_access_filled.png)
+
+    You should now see the specific company associated with your service.
+
+    ![Access Granted](/images/en/self-hosted-gpu-parser/12_new_access_rules_added.png)
+
+## Important Notes
+
+-   **Cost Management**: This instance will keep running until you either:
+    1.  Reach a low balance of credits (less than 2 hours of service worth).
+    2.  Manually click on the **Delete deployment** action.
+-   **Warning**: Your credits can deplete quickly if you forget to kill the instance when it is no longer needed.
+
+    ![Delete Deployment](/images/en/self-hosted-gpu-parser/13_deleting_parser.png)

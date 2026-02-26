@@ -68,6 +68,12 @@
                 ]
               },
               {
+                "group": "Infrastructure",
+                "pages": [
+                  "/en/guides/self-hosted-gpu-parser"
+                ]
+              },
+              {
                 "group": "To Go Further",
                 "pages": [
                   "/en/advanced/rag-pipeline"
@@ -124,6 +130,12 @@
                   "/fr/core-features/structured-writing-task",
                   "/fr/core-features/image-generation",
                   "/fr/core-features/code-execution"
+                ]
+              },
+              {
+                "group": "Infrastructure",
+                "pages": [
+                  "/fr/guides/self-hosted-gpu-parser"
                 ]
               },
               {
