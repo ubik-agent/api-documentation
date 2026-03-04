@@ -1452,6 +1452,149 @@
         }
       }
     },
+    "/agent-sessions/{session_id}/workspaces": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "Lier des espaces de travail",
+        "description": "Lie des espaces de travail existants au contexte de la session d'agent.\n\n**Règles de liaison :**\n1. Vous devez avoir accès à l'espace de travail.\n2. **Espaces de travail globaux** (sans `external_user_id`) peuvent être liés à n'importe laquelle de vos sessions.\n3. **Espaces de travail limités** (avec `external_user_id`) ne peuvent être liés qu'aux sessions limitées au **même** `external_user_id`.",
+        "operationId": "link_workspaces_agent_sessions__session_id__workspaces_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicLinkWorkspacesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent-sessions/{session_id}/workspaces/{workspace_id}": {
+      "delete": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "Délier un espace de travail",
+        "description": "Délie un espace de travail du contexte de la session d'agent.",
+        "operationId": "unlink_workspace_agent_sessions__session_id__workspaces__workspace_id__delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agent-sessions/{session_id}/documents/{document_id}/star": {
       "put": {
         "tags": [
@@ -2703,6 +2846,80 @@
         }
       }
     },
+    "/documents/{document_id}/access/metadata": {
+      "patch": {
+        "tags": [
+          "Public API",
+          "Public API - Documents"
+        ],
+        "summary": "Mettre à jour les métadonnées d'accès au document",
+        "description": "Met à jour les métadonnées personnalisées (comme external_URI) pour un utilisateur externe spécifique ou globalement.",
+        "operationId": "update_document_access_metadata_documents__document_id__access_metadata_patch",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentAccessMetadataUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/documents/{document_id}/workspaces": {
       "post": {
         "tags": [
@@ -3607,6 +3824,18 @@
             "title": "Workspace Ids",
             "description": "Une liste d'IDs d'espaces de travail où ajouter les documents, séparées par des virgules."
           },
+          "api_metadata": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Metadata",
+            "description": "Métadonnées API personnalisées (chaîne JSON)."
+          },
           "scraping_mode": {
             "type": "string",
             "title": "Scraping Mode",
@@ -3713,6 +3942,18 @@
             "type": "string",
             "format": "binary",
             "title": "File"
+          },
+          "api_metadata": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Metadata",
+            "description": "Métadonnées API personnalisées (chaîne JSON)."
           }
         },
         "type": "object",
@@ -3720,6 +3961,33 @@
           "file"
         ],
         "title": "Body_upload_and_link_document_agent_sessions__session_id__upload_post"
+      },
+      "DocumentAccessMetadataUpdate": {
+        "properties": {
+          "external_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External User Id",
+            "description": "L'ID utilisateur externe à mettre à jour. Si omis, met à jour la règle d'accès globale. Note : Si le document a été téléversé/limité à un utilisateur spécifique, vous devez fournir cet ID ici pour mettre à jour ses métadonnées spécifiques."
+          },
+          "api_metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Api Metadata",
+            "description": "Métadonnées JSON personnalisées. Utile pour stocker des références de systèmes externes (par exemple, {'internal_app_ref': 'REF-123'}). Ces métadonnées sont limitées : les mises à jour ici s'appliquent uniquement à l'external_user_id spécifié (ou globalement si omis). Lors de la récupération, les métadonnées spécifiques à l'utilisateur remplacent les métadonnées globales."
+          }
+        },
+        "type": "object",
+        "required": [
+          "api_metadata"
+        ],
+        "title": "DocumentAccessMetadataUpdate"
       },
       "HTTPValidationError": {
         "properties": {
@@ -3919,6 +4187,14 @@
             "type": "array",
             "title": "Documents",
             "description": "List of documents linked to this session."
+          },
+          "workspaces": {
+            "items": {
+              "$ref": "#/components/schemas/PublicWorkspace"
+            },
+            "type": "array",
+            "title": "Workspaces",
+            "description": "List of workspaces linked to this session."
           }
         },
         "type": "object",
@@ -4404,6 +4680,19 @@
             "title": "Error Message",
             "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
           },
+          "api_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Metadata",
+            "description": "Métadonnées API personnalisées résolues pour l'utilisateur actuel. Utile pour récupérer des références externes stockées (par exemple {'internal_app_ref': 'REF-123'}). Note : Cette valeur est résolue en fonction de l'external_user_id de la requête. Un document partagé globalement mais aussi limité à un utilisateur spécifique peut renvoyer des métadonnées différentes selon qui demande."
+          },
           "file_name": {
             "anyOf": [
               {
@@ -4504,6 +4793,19 @@
             ],
             "title": "Error Message",
             "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
+          },
+          "api_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Metadata",
+            "description": "Métadonnées API personnalisées résolues pour l'utilisateur actuel. Utile pour récupérer des références externes stockées (par exemple {'internal_app_ref': 'REF-123'}). Note : Cette valeur est résolue en fonction de l'external_user_id de la requête. Un document partagé globalement mais aussi limité à un utilisateur spécifique peut renvoyer des métadonnées différentes selon qui demande."
           }
         },
         "type": "object",
@@ -4566,6 +4868,24 @@
           "document_ids"
         ],
         "title": "PublicLinkDocumentsRequest"
+      },
+      "PublicLinkWorkspacesRequest": {
+        "properties": {
+          "workspace_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Workspace Ids",
+            "description": "List of workspace IDs to link to the session. Note: Scoped workspaces (with external_user_id) can only be linked to sessions with the matching external_user_id."
+          }
+        },
+        "type": "object",
+        "required": [
+          "workspace_ids"
+        ],
+        "title": "PublicLinkWorkspacesRequest"
       },
       "PublicMessageCreate": {
         "properties": {
@@ -5037,6 +5357,19 @@
             ],
             "title": "Error Message",
             "description": "Si le traitement a échoué, ce champ contiendra le message d'erreur."
+          },
+          "api_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Metadata",
+            "description": "Métadonnées API personnalisées résolues pour l'utilisateur actuel. Utile pour récupérer des références externes stockées (par exemple {'internal_app_ref': 'REF-123'}). Note : Cette valeur est résolue en fonction de l'external_user_id de la requête. Un document partagé globalement mais aussi limité à un utilisateur spécifique peut renvoyer des métadonnées différentes selon qui demande."
           },
           "is_starred": {
             "type": "boolean",
