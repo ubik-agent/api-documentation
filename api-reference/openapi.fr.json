@@ -682,6 +682,70 @@
         }
       }
     },
+    "/agent-sessions/{session_id}/stop": {
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "Arrêter la génération de l'agent",
+        "description": "Arrête la génération en cours de l'agent pour la session spécifiée. Si un appel d'outil est en cours, le système attendra sa fin avant de s'arrêter pour garantir la cohérence de l'état. Un événement 'agent_stop_requested' sera émis dans le flux de la session.",
+        "operationId": "stop_agent_generation_agent_sessions__session_id__stop_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agent-sessions/{session_id}/messages/{message_id}/regenerate": {
       "post": {
         "tags": [
