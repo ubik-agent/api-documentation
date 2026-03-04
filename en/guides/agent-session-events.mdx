@@ -225,6 +225,18 @@ The tool requires human intervention or confirmation.
 }
 ```
 
+#### `agent_stop_requested`
+
+Indicates that a stop request has been received for the session. The agent will stop gracefully after completing any ongoing tool calls.
+
+```json
+{
+  "type": "agent_stop_requested",
+  "task_id": "uuid-string",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
 ### Completion Events
 
 #### `agent_processing_complete`

@@ -225,6 +225,18 @@ L'outil nécessite une intervention ou une confirmation humaine.
 }
 ```
 
+#### `agent_stop_requested`
+
+Indique qu'une demande d'arrêt a été reçue pour la session. L'agent s'arrêtera gracieusement après avoir terminé les appels d'outils en cours (le cas échéant).
+
+```json
+{
+  "type": "agent_stop_requested",
+  "task_id": "chaine-uuid",
+  "timestamp": "ISO-8601-timestamp"
+}
+```
+
 ### Événements de Fin
 
 #### `agent_processing_complete`
