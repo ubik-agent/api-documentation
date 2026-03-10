@@ -4350,6 +4350,19 @@
             ],
             "title": "External User Id",
             "description": "A unique identifier for your end-user. If provided, access to this session will be restricted to requests providing the 'X-End-User-ID' header with this value."
+          },
+          "prompt_variables": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Variables",
+            "description": "A dictionary of variables to inject into the system prompt template (e.g. {'tone': 'formal'} for {{tone}}). These variables can be defined in the assistant's parameters (as defaults) or provided here at runtime to override them."
           }
         },
         "type": "object",
