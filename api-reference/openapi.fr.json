@@ -542,6 +542,217 @@
         }
       }
     },
+    "/agent-sessions/{session_id}/skills": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "Lister les skills de la session",
+        "description": "Récupère une liste des skills accessibles à la session d'agent avec tous les détails.",
+        "operationId": "list_session_skills_agent_sessions__session_id__skills_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicSkillListItem"
+                  },
+                  "title": "Response List Session Skills Agent Sessions  Session Id  Skills Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "Lier des Skills",
+        "description": "Lie des Skills existants au contexte de la session d'agent.",
+        "operationId": "link_skills_agent_sessions__session_id__skills_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicLinkSkillsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent-sessions/{session_id}/skills/{skill_id}": {
+      "delete": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "Délier un Skill",
+        "description": "Délie un skill du contexte de la session d'agent.",
+        "operationId": "unlink_skill_agent_sessions__session_id__skills__skill_id__delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "skill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Skill Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agent-sessions/{session_id}/messages": {
       "get": {
         "tags": [
@@ -1839,6 +2050,236 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/tools/{tool_id}/{execution_id}/{filename}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Assets"
+        ],
+        "summary": "Récupérer un actif d'outil",
+        "description": "Récupère un actif multimédia associé à une exécution d'outil. Applique le contrôle d'accès basé sur le propriétaire de la session et l'external_user_id.",
+        "operationId": "get_public_tool_asset_assets_tools__tool_id___execution_id___filename__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tool Id"
+            }
+          },
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Execution Id"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/skills": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Skills"
+        ],
+        "summary": "Lister les Skills",
+        "description": "Récupère une liste des Skills accessibles à l'utilisateur. Prend en charge le filtrage par ID pour récupérer des skills spécifiques.",
+        "operationId": "list_skills_skills_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "List of skill IDs to fetch.",
+              "title": "Ids"
+            },
+            "description": "List of skill IDs to fetch."
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicSkill"
+                  },
+                  "title": "Response List Skills Skills Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/skills/{skill_id}": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Skills"
+        ],
+        "summary": "Récupérer un skill",
+        "description": "Récupère un skill spécifique par ID.",
+        "operationId": "get_skill_skills__skill_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Skill Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicSkill"
+                }
               }
             }
           },
@@ -4244,6 +4685,14 @@
             "title": "Active Tools",
             "description": "List of tools enabled for this session."
           },
+          "active_skills": {
+            "items": {
+              "$ref": "#/components/schemas/PublicSkillListItem"
+            },
+            "type": "array",
+            "title": "Active Skills",
+            "description": "List of skills enabled for this session."
+          },
           "documents": {
             "items": {
               "$ref": "#/components/schemas/PublicSessionDocumentListItem"
@@ -4339,6 +4788,22 @@
             "title": "Tool Ids",
             "description": "List of tool IDs to enable for this session."
           },
+          "skill_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Ids",
+            "description": "List of skill IDs to enable for this session."
+          },
           "external_user_id": {
             "anyOf": [
               {
@@ -4397,6 +4862,22 @@
             ],
             "title": "Tool Ids",
             "description": "List of tool IDs to enable for this session. Replaces existing tools."
+          },
+          "skill_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Ids",
+            "description": "List of skill IDs to enable for this session. Replaces existing skills."
           },
           "model_name": {
             "anyOf": [
@@ -4946,6 +5427,24 @@
         ],
         "title": "PublicLinkDocumentsRequest"
       },
+      "PublicLinkSkillsRequest": {
+        "properties": {
+          "skill_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Skill Ids",
+            "description": "List of skill IDs to link to the session."
+          }
+        },
+        "type": "object",
+        "required": [
+          "skill_ids"
+        ],
+        "title": "PublicLinkSkillsRequest"
+      },
       "PublicLinkWorkspacesRequest": {
         "properties": {
           "workspace_ids": {
@@ -5464,6 +5963,72 @@
           "updated_at"
         ],
         "title": "PublicSessionDocumentListItem"
+      },
+      "PublicSkill": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "L'identifiant unique de la compétence."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Le nom de la compétence."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "Une brève description de ce que fait la compétence."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PublicSkill"
+      },
+      "PublicSkillListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "L'identifiant unique de la compétence."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Le nom de la compétence."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "Une brève description de ce que fait la compétence."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PublicSkillListItem"
       },
       "PublicStarDocumentRequest": {
         "properties": {
