@@ -1,0 +1,80 @@
+---
+title: 'Tâche de Sous-Agent'
+description: 'Documentation détaillée pour l''outil subagent.'
+---
+
+L'outil `subagent` permet à un assistant IA de déléguer des tâches complexes, spécialisées ou à plusieurs étapes à un sous-agent dédié. Le sous-agent s'exécute dans sa propre session isolée avec son propre contexte, ses propres outils et compétences, puis renvoie un résultat final à l'agent parent.
+
+Ceci est particulièrement utile pour décomposer de grands problèmes, utiliser des agents spécialisés (par ex., un agent "Analyste de Données" ou "Relecteur de Code"), ou exécuter des tâches qui nécessitent un ensemble spécifique d'outils sans encombrer le contexte de la session principale.
+
+## Quand Utiliser Cet Outil
+
+Utilisez l'outil `subagent` lorsque vous avez besoin de :
+*   **Déléguer des Tâches Spécialisées :** Confier une tâche spécifique à un agent préconfiguré avec le bon prompt système, les bons outils et les bonnes compétences pour ce travail.
+*   **Isoler le Contexte :** Exécuter une tâche complexe dans une session séparée afin que les étapes intermédiaires et les sorties d'outils ne polluent pas l'historique de la conversation principale.
+*   **Paralléliser le Travail :** (Lorsqu'il est utilisé conjointement avec l'exécution parallèle d'outils) Générer plusieurs sous-agents pour traiter simultanément différentes parties d'un problème.
+
+## Paramètres d'Entrée
+
+L'outil accepte les paramètres suivants :
+
+| Paramètre | Type | Requis | Description |
+| :--- | :--- | :--- | :--- |
+| `prompt` | `string` | Oui | L'instruction détaillée ou la tâche pour le sous-agent. |
+| `agent_id` | `string` | Non | ID optionnel (UUID) d'un assistant/agent spécifique à utiliser. Si non fourni, un agent générique par défaut est utilisé. |
+| `tools` | `tableau de chaînes` | Non | Liste optionnelle de noms d'outils auxquels le sous-agent devrait avoir accès. Ceux-ci seront fusionnés avec les outils par défaut de l'assistant. |
+| `skills` | `tableau de chaînes` | Non | Liste optionnelle d'ID de compétences (skills) auxquelles le sous-agent devrait avoir accès. Celles-ci seront fusionnées avec les compétences par défaut de l'assistant. |
+| `model` | `string` | Non | Modèle optionnel à utiliser pour le sous-agent. Si non fourni, il se rabat sur le modèle par défaut de l'assistant ou le modèle par défaut du système (par ex., `gpt-4o`). |
+| `external_user_id` | `string` | Non | ID utilisateur externe optionnel pour propager le contexte et les permissions. |
+| `document_ids` | `tableau de chaînes` | Non | Liste optionnelle d'ID de documents à joindre à la sous-session. Ceux-ci seront fusionnés avec les documents par défaut de l'assistant. |
+| `workspace_ids` | `tableau de chaînes` | Non | Liste optionnelle d'ID d'espaces de travail à joindre à la sous-session. Ceux-ci seront fusionnés avec les espaces de travail par défaut de l'assistant. |
+
+## Structure de Sortie
+
+L'outil renvoie un objet contenant le résultat final produit par le sous-agent.
+
+```json
+{
+  "result": "La réponse textuelle finale ou le résultat généré par le sous-agent après avoir terminé sa tâche."
+}
+```
+
+## Exemple d'Utilisation
+
+### Scénario : Délégation de l'Analyse de Données
+
+**Entrée :**
+```json
+{
+  "prompt": "Analysez les données financières du T3 ci-jointes et résumez les principales tendances des revenus. Concentrez-vous sur la croissance d'un mois sur l'autre.",
+  "agent_id": "uuid-for-data-analyst-agent",
+  "tools": ["python_interpreter", "read_document"],
+  "document_ids": ["uuid-for-q3-financial-data"]
+}
+```
+
+**Résultat :**
+L'outil `subagent` va créer une nouvelle session en utilisant l'agent Analyste de Données spécifié. Le sous-agent utilisera les outils `python_interpreter` et `read_document` pour analyser les données. Une fois terminé, il utilisera son outil interne `submit_result` pour renvoyer le résumé final.
+
+```json
+{
+  "result": "D'après les données financières du T3, les revenus ont augmenté de 5 % en juillet, de 8 % en août et de 12 % en septembre. Le principal moteur de cette croissance a été le nouveau niveau de logiciel d'entreprise..."
+}
+```
+
+## Fonctionnalités Avancées
+
+### 1. Propagation du Contexte et des Ressources
+Lors de la création d'un sous-agent, vous pouvez transmettre des `document_ids` et `workspace_ids` spécifiques. Le système vérifiera automatiquement l'accès de l'utilisateur à ces ressources et les joindra à la sous-session. Si aucune ressource spécifique n'est demandée, le sous-agent héritera des fichiers et espaces de travail par défaut configurés pour cet `agent_id` spécifique.
+
+### 2. Fusion d'Outils et de Compétences
+Les tableaux `tools` et `skills` fournis en entrée sont fusionnés avec les outils et compétences par défaut de l'assistant cible. Cela vous permet d'accorder dynamiquement des capacités temporaires à un sous-agent pour une tâche spécifique.
+
+### 3. Le Mécanisme `submit_result`
+En interne, le sous-agent reçoit l'instruction d'utiliser un outil spécial `submit_result` lorsqu'il a terminé sa tâche. Cela garantit que le sous-agent définit explicitement ce que devrait être la sortie finale, plutôt que de laisser le système deviner à partir de l'historique de la conversation.
+
+### 4. Résultats Intermédiaires et Suivi
+Pendant que le sous-agent traite la tâche, il s'exécute dans une session séparée et isolée. L'outil émet un événement de données (`SUB_AGENT_STARTED`) contenant le `sub_session_id`. Les clients peuvent utiliser ce `sub_session_id` pour suivre la progression du sous-agent, voir les messages intermédiaires et observer les exécutions d'outils en temps réel avant que le résultat final ne soit soumis. Si vous souhaitez afficher l'activité du sous-agent dans une interface utilisateur, vous devez utiliser les points de terminaison de session standards pour récupérer les informations de ce `sub_session_id` et vous connecter à son flux (stream) associé.
+
+### 5. Prévention de la Récursion
+Pour éviter les boucles infinies, l'outil `subagent` ne peut pas s'appeler lui-même de manière récursive. Même si l'outil `subagent` est explicitement demandé dans le tableau `tools` ou s'il s'agit d'un outil par défaut de l'assistant cible, il sera automatiquement retiré des outils disponibles pour le sous-agent.
