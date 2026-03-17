@@ -15,6 +15,9 @@ To make the most of the UBIK API, it's helpful to understand the key concepts th
   <Card title="Tools" icon="wrench" href="#tools">
     Powerful, pre-built functions that perform complex tasks on your documents.
   </Card>
+  <Card title="Skills" icon="lightbulb" href="#skills">
+    Custom capabilities, instructions, and logic bundled into reusable modules.
+  </Card>
   <Card title="Agent Sessions" icon="message-square" href="#agent-sessions">
     Stateful conversations with AI agents that maintain context and history.
   </Card>
@@ -46,6 +49,16 @@ Examples include:
 - Answering questions based on the content of multiple documents.
 
 <Info>You can discover and execute tools using the [`/tools`](/en/api-reference/public-api/list-available-tools) endpoints.</Info>
+
+## Skills
+
+A **Skill** is a packaged set of instructions, files, and logic that define a custom capability for your AI agents. Instead of constantly rewriting complex prompts or attaching files, you can bundle them into a reusable Skill.
+
+- **Reusability**: Build a capability once and share it across multiple agents.
+- **Customization**: Provide specific files (`SKILL.md`, scripts, data) to guide the agent's behavior.
+- **Access Control**: Share skills across your company or keep them private to your user account.
+
+<Info>You can manage your skills using the [`/skills`](/en/api-reference/public-api/list-skills) endpoints.</Info>
 
 ## Agent Sessions
 

@@ -1,0 +1,38 @@
+---
+title: "Compétences d'Agent (Skills)"
+description: "Dotez vos agents IA de capacités, d'instructions et d'outils personnalisés et réutilisables."
+---
+
+## Que sont les Compétences d'Agent ?
+
+Une **Compétence (Skill)** est un ensemble packagé d'instructions, de configurations, de fichiers et d'outils qui définissent une capacité spécifique et réutilisable pour un agent IA.
+
+Au lieu d'écrire des prompts longs et répétitifs, ou de joindre manuellement les mêmes fichiers et le même contexte à chaque fois que vous souhaitez qu'un agent effectue une tâche spécifique, vous pouvez tout regrouper dans une Compétence. Une fois créée, une Compétence peut être attachée à n'importe quel nombre d'agents, leur donnant un accès instantané à cette capacité.
+
+### Principaux Avantages
+
+- **Réutilisabilité** : Créez un comportement complexe une fois et réutilisez-le sur plusieurs agents ou espaces de travail.
+- **Modularité** : Composez des agents avec différents ensembles de compétences (par exemple, donner à un agent une compétence "Analyse de Données" et à un autre une compétence "Écriture Créative").
+- **Organisation** : Gardez les instructions de votre agent claires en déléguant des tâches et des logiques spécifiques à des compétences isolées.
+- **Collaboration** : Partagez des compétences utiles au sein de votre entreprise ou gardez-les privées pour vos propres flux de travail.
+
+## Anatomie d'une Compétence
+
+Une Compétence typique comprend :
+
+1.  **Métadonnées** : Nom et description de ce que fait la compétence.
+2.  **Contenu (`SKILL.md`)** : Les instructions de base, les directives et le contexte que l'agent doit suivre lorsqu'il exerce cette compétence.
+3.  **Fichiers** : Scripts supplémentaires, documents de référence ou données structurées sur lesquels la compétence s'appuie pour fonctionner correctement.
+4.  **Contrôle d'Accès** : Paramètres déterminant si la compétence vous est privée, partagée avec votre entreprise ou publique.
+
+## Gérer les Compétences via l'API
+
+Vous pouvez gérer vos Compétences d'Agent de manière programmatique à l'aide de notre API REST :
+
+-   **Créer une Compétence** : Définir une nouvelle compétence avec son contenu de base et ses métadonnées.
+-   **Télécharger des Fichiers de Compétence** : Joindre des documents de support ou des scripts à la compétence.
+-   **Lister les Compétences** : Récupérer toutes les compétences disponibles pour votre utilisateur ou votre entreprise.
+-   **Mettre à jour / Supprimer** : Modifier les compétences existantes ou les supprimer lorsqu'elles ne sont plus nécessaires.
+-   **Gérer les Accès** : Contrôler qui au sein de votre organisation peut voir ou modifier la compétence.
+
+*Pour une documentation détaillée sur les endpoints, consultez la [Référence de l'API](/fr/api-reference/introduction).*

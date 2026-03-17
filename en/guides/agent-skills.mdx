@@ -1,0 +1,38 @@
+---
+title: "Agent Skills"
+description: "Equip your AI agents with reusable custom capabilities, instructions, and tools."
+---
+
+## What are Agent Skills?
+
+An **Agent Skill** is a packaged set of instructions, configurations, files, and tools that define a specific, reusable capability for an AI agent. 
+
+Instead of writing long and repetitive prompts, or manually attaching the same files and context each time you want an agent to perform a specific task, you can bundle everything into a Skill. Once created, a Skill can be attached to any number of agents, giving them instant access to that capability.
+
+### Key Benefits
+
+- **Reusability**: Build a complex behavior once and reuse it across multiple agents or workspaces.
+- **Modularity**: Compose agents with different sets of skills (e.g., giving one agent a "Data Analysis" skill and another a "Creative Writing" skill).
+- **Organization**: Keep your agent instructions clean by delegating specific tasks and logic to isolated skills.
+- **Collaboration**: Share useful skills within your company or keep them private for your own workflows.
+
+## Anatomy of a Skill
+
+A typical Skill includes:
+
+1.  **Metadata**: Name and description of what the skill does.
+2.  **Content (`SKILL.md`)**: The core instructions, guidelines, and context that the agent needs to follow when exercising this skill.
+3.  **Files**: Additional scripts, reference documents, or structured data that the skill relies on to function correctly.
+4.  **Access Control**: Settings determining whether the skill is private to you, shared with your company, or public.
+
+## Managing Skills via API
+
+You can programmatically manage your Agent Skills using our REST API:
+
+-   **Create a Skill**: Define a new skill with its base content and metadata.
+-   **Upload Skill Files**: Attach supporting documents or scripts to the skill.
+-   **List Skills**: Retrieve all skills available to your user or company.
+-   **Update/Delete**: Modify existing skills or remove them when no longer needed.
+-   **Manage Access**: Control who within your organization can view or edit the skill.
+
+*For detailed endpoint documentation, see the [API Reference](/en/api-reference/introduction).*

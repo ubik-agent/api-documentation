@@ -1,0 +1,50 @@
+---
+title: "Outils de Compétences (Skills Tools)"
+description: "Documentation détaillée des outils utilisés par les agents pour interagir avec les Compétences (Skills)."
+---
+
+Le système de Compétences d'Agent (Skills) fournit plusieurs outils intégrés qui permettent à vos agents IA d'interagir dynamiquement avec le contenu des compétences, de les charger et de les exécuter pendant une session.
+
+Ces outils permettent aux agents de lire les instructions définies dans une compétence, ou même d'exécuter des scripts regroupés avec le fichier `SKILL.md` d'une compétence.
+
+
+## Outils de Compétences Disponibles
+
+Il existe deux outils principaux qui gèrent les opérations de compétences :
+
+### 1. `activate_skill`
+
+Charge les instructions complètes et le contenu d'une compétence spécialisée. Un agent l'utilisera lorsqu'il détermine que la demande de l'utilisateur correspond à la description d'une compétence, ce qui lui permet de "charger en mémoire" le contexte nécessaire.
+
+**Paramètres d'Entrée :**
+- `skill_id` (chaîne, requis) : L'UUID de la compétence à activer.
+
+**Sortie :**
+- Renvoie le contenu complet (`SKILL.md`) de la compétence enveloppé dans des balises de type XML, informant l'agent du répertoire virtuel où résident les fichiers de la compétence.
+
+### 2. `read_execute_skill_file`
+
+Permet à l'agent de lire un fichier joint OU d'exécuter un script provenant de l'ensemble d'une compétence.
+
+Si l'agent demande à lire un fichier texte ou markdown à partir du répertoire virtuel de la compétence, cet outil lit et renvoie le texte. Si l'agent demande à exécuter un script Python (`.py`), cet outil exécute le script en toute sécurité dans l'environnement des nœuds logiques UBIK et renvoie la sortie.
+
+**Paramètres d'Entrée :**
+- `skill_id` (chaîne, requis) : L'UUID de la compétence.
+- `file_path` (chaîne, requis) : Le chemin relatif du fichier (par ex., `scripts/run.py` ou `docs/info.md`).
+- `args` (tableau de chaînes, optionnel) : Arguments de ligne de commande à passer lors de l'exécution d'un script python.
+
+**Sortie :**
+- `status` : Succès ou erreur.
+- `action` : Soit `'read'` (lu) ou `'executed'` (exécuté).
+- `content` : Le contenu textuel (si lu).
+- `stdout` / `stderr` : Les flux de sortie standard et d'erreur (si exécuté).
+- `artifacts` / `generated_files` : Tableaux contenant tout fichier, image ou donnée généré par le script pendant son exécution. Ces fichiers peuvent être récupérés en utilisant l'endpoint `GET /assets/tools/{tool_id}/{execution_id}/{filename}`.
+
+## Comment les Agents Utilisent les Outils de Compétences
+
+Lorsque vous attachez une Compétence à un Agent, l'agent est automatiquement informé du nom et de la description de la compétence.
+
+1. **Déclencheur :** L'utilisateur pose une question (par ex., "Analysez cet ensemble de données en utilisant notre méthodologie standard").
+2. **Activation :** L'agent réalise qu'il possède une compétence "Méthodologie d'Analyse de Données". Il appelle `activate_skill` avec l'ID de cette compétence pour récupérer les étapes détaillées.
+3. **Exécution :** Les instructions de la compétence peuvent indiquer à l'agent d'exécuter un script spécifique. L'agent appelle alors `read_execute_skill_file` avec le chemin `scripts/analyze.py` pour effectuer le travail.
+4. **Finalisation :** L'agent lit le `stdout` du script et formule une réponse finale pour l'utilisateur.

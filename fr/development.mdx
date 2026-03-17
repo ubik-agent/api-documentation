@@ -15,6 +15,9 @@ Pour tirer le meilleur parti de l'API UBIK, il est utile de comprendre les conce
   <Card title="Outils" icon="wrench" href="#outils-tools">
     Fonctions puissantes et pré-construites qui effectuent des tâches complexes sur vos documents.
   </Card>
+  <Card title="Compétences (Skills)" icon="lightbulb" href="#competences-skills">
+    Instructions, logiques et capacités personnalisées regroupées dans des modules réutilisables.
+  </Card>
   <Card title="Sessions d'Agent" icon="message-square" href="#sessions-dagent">
     Conversations avec état avec des agents IA qui maintiennent le contexte et l'historique.
   </Card>
@@ -46,6 +49,16 @@ Exemples d'utilisation :
 - Répondre à des questions basées sur le contenu de plusieurs documents.
 
 <Info>Vous pouvez découvrir et exécuter des outils à l'aide des points de terminaison [`/tools`](/fr/api-reference/public-api/lister-les-outils-disponibles).</Info>
+
+## Compétences (Skills)
+
+Une **Compétence (Skill)** est un ensemble packagé d'instructions, de fichiers et de logiques qui définissent une capacité personnalisée pour vos agents IA. Au lieu de réécrire constamment des invites complexes ou de joindre des fichiers, vous pouvez les regrouper dans une compétence réutilisable.
+
+- **Réutilisabilité** : Créez une capacité une fois et partagez-la entre plusieurs agents.
+- **Personnalisation** : Fournissez des fichiers spécifiques (`SKILL.md`, scripts, données) pour guider le comportement de l'agent.
+- **Contrôle d'accès** : Partagez les compétences avec votre entreprise ou gardez-les privées pour votre compte utilisateur.
+
+<Info>Vous pouvez gérer vos compétences à l'aide des points de terminaison [`/skills`](/fr/api-reference/public-api/lister-les-competences).</Info>
 
 ## Sessions d'Agent
 

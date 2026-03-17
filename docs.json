@@ -52,7 +52,8 @@
                   "/en/guides/agent-session-events",
                   "/en/guides/agent-message-structure",
                   "/en/guides/streaming-results",
-                  "/en/guides/embedding-tools"
+                  "/en/guides/embedding-tools",
+                  "/en/guides/agent-skills"
                 ]
               },
               {
@@ -64,7 +65,9 @@
                   "/en/core-features/information-analysis",
                   "/en/core-features/structured-writing-task",
                   "/en/core-features/image-generation",
-                  "/en/core-features/code-execution"
+                  "/en/core-features/code-execution",
+                  "/en/core-features/subagent-task",
+                  "/en/core-features/agent-skills-tools"
                 ]
               },
               {
@@ -117,7 +120,8 @@
                   "/fr/guides/agent-session-events",
                   "/fr/guides/agent-message-structure",
                   "/fr/guides/streaming-results",
-                  "/fr/guides/embedding-tools"
+                  "/fr/guides/embedding-tools",
+                  "/fr/guides/agent-skills"
                 ]
               },
               {
@@ -129,7 +133,9 @@
                   "/fr/core-features/information-analysis",
                   "/fr/core-features/structured-writing-task",
                   "/fr/core-features/image-generation",
-                  "/fr/core-features/code-execution"
+                  "/fr/core-features/code-execution",
+                  "/fr/core-features/subagent-task",
+                  "/fr/core-features/agent-skills-tools"
                 ]
               },
               {
