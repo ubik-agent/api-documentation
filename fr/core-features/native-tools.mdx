@@ -106,6 +106,27 @@ L'outil **Exécution de Code** fournit à l'agent un environnement Python isolé
 
 **Cas d'Usage :** Analyser une feuille de calcul de ventes pour prévoir des tendances, tracer un graphique de croissance des utilisateurs ou résoudre une équation algébrique complexe.
 
+### 7. Tâche de Sous-agent (`subagent_task`)
+
+L'outil **Tâche de Sous-agent** permet à l'agent principal de déléguer des tâches complexes à plusieurs étapes à des sous-agents spécialisés. C'est crucial pour gérer de grands flux de travail sans perdre le contexte ou atteindre les limites de contexte.
+
+**Capacités Clés :**
+*   **Délégation de Tâches :** Crée une nouvelle instance d'agent dédiée à une sous-tâche spécifique.
+*   **Isolation du Contexte :** Garde le contexte de l'agent principal propre en déchargeant le travail détaillé sur le sous-agent.
+
+**Cas d'Usage :** Demander à un agent de rechercher trois concurrents différents simultanément, où l'agent principal délègue chaque concurrent à un sous-agent distinct puis synthétise leurs découvertes. Voir la [Documentation de Tâche de Sous-agent](/fr/core-features/subagent-task) pour plus de détails.
+
+### 8. Outils de Compétences d'Agent (`activate_skill`, `read_execute_skill_file`)
+
+Les **Outils de skills d'Agent** fournissent un moyen pour les agents de récupérer et d'exécuter des procédures réutilisables ou "skills" au moment de l'exécution. Cela permet aux agents de s'appuyer sur des guides pour gérer des tâches répétitives ou spécialisées plus efficacement. Ces skills sont chargés uniquement dans le cadre d'une interaction pertinente, ce qui évite de surcharger la fenêtre de contexte du modèle.
+
+**Capacités Clés :**
+*   **Activation de Compétence (`activate_skill`) :** Les agents peuvent charger les instructions complètes d'une compétence spécialisée lorsque la demande d'un utilisateur correspond à la description de la compétence.
+*   **Exécution de Scripts et Lecture de Fichiers (`read_execute_skill_file`) :** Les agents peuvent lire des fichiers statiques attachés à un skill, ou exécuter directement des scripts Python (`.py`) contenus dans le répertoire virtuel du skill.
+*   **Contrôle d'Accès Granulaire :** Les compétences respectent des permissions d'accès strictes. Elles peuvent être privées, partagées avec des entreprises spécifiques, accorder un accès explicite en lecture/écriture à certains utilisateurs, être liées à des assistants spécifiques, ou rendues publiques.
+
+**Cas d'Usage :** Un administrateur crée un processus en plusieurs étapes pour déployer un nouveau serveur et le sauvegarde en tant que compétence avec un accès restreint. Lorsqu'un utilisateur autorisé demande de déployer un serveur, l'agent utilise `activate_skill` pour lire les instructions, puis `read_execute_skill_file` pour exécuter les scripts de déploiement en toute sécurité. Voir la [Documentation des Outils de Compétences d'Agent](/fr/core-features/agent-skills-tools) pour plus de détails.
+
 ## Étendre les Capacités
 
 Bien que ces outils natifs fournissent une base puissante, la plateforme UBIK est conçue pour l'extensibilité. Vous n'êtes pas limité aux outils listés ci-dessus.

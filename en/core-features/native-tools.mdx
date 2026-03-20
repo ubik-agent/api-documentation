@@ -106,6 +106,27 @@ The **Code Execution** tool provides the agent with a sandboxed Python environme
 
 **Use Case:** analyzing a sales spreadsheet to forecast trends, plotting a graph of user growth, or solving a complex algebraic equation.
 
+### 7. Subagent Task (`subagent_task`)
+
+The **Subagent Task** tool allows the primary agent to delegate complex, multi-step tasks to specialized subagents. This is crucial for handling large workflows without losing context or hitting context limits.
+
+**Key Capabilities:**
+*   **Task Delegation:** Spawns a new agent instance dedicated to a specific sub-task.
+*   **Context Isolation:** Keeps the main agent's context clean by offloading detailed work to the subagent.
+
+**Use Case:** Asking an agent to research three different competitors simultaneously, where the main agent delegates each competitor to a separate subagent and then synthesizes their findings. See the [Subagent Task Documentation](/en/core-features/subagent-task) for more details.
+
+### 8. Agent Skills Tools (`activate_skill`, `read_execute_skill_file`)
+
+The **Agent Skills Tools** provide a way for agents to retrieve and execute predefined, reusable procedures or "skills" at runtime. This allows agents to handle repetitive or specialized tasks more efficiently without requiring the user to provide long prompts, and without cluttering the context window. The agent loads the skill only when it needs it.
+
+**Key Capabilities:**
+*   **Skill Activation (`activate_skill`):** Agents can load the full instructions and content of a specialized skill when a user's request matches the skill's description.
+*   **File Reading & Execution (`read_execute_skill_file`):** Agents can read static files (like documentation) attached to a skill, or directly execute Python scripts (`.py`) contained within the skill's virtual directory.
+*   **Granular Access Control:** Skills respect strict access permissions. They can be private, shared with specific companies, granted explicit read/write access to certain users, linked to specific assistants, or made public for everyone.
+
+**Use Case:** An administrator creates a multi-step process for deploying a new server and saves it as a skill with restricted access. When an authorized user asks to deploy a server, the agent uses `activate_skill` to read the instructions, and `read_execute_skill_file` to run the deployment scripts securely. See the [Agent Skills Tools Documentation](/en/core-features/agent-skills-tools) for more details.
+
 ## Extending Capabilities
 
 While these native tools provide a powerful foundation, the UBIK platform is designed for extensibility. You are not limited to the tools listed above.
