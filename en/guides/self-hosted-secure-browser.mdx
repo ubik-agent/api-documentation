@@ -1,0 +1,76 @@
+---
+title: 'Self-hosted Secure Browser'
+description: 'Learn how to deploy and manage your own secure browser instance.'
+---
+
+This guide explains how to self-host a secure web browser instance for your AI agents, allowing you to control the search environment and restrict or prioritize specific domains.
+
+<Note>
+  **Disclaimer**: This deployment process is currently manual. We are working to streamline it in future updates. If you encounter any issues, need assistance, or have specific requirements for other cloud providers, please do not hesitate to reach out to us.
+</Note>
+
+## Prerequisites
+
+- Access to the [UBIK Admin Console](https://app.ubik-agent.com/admin)
+- Billing owner permissions
+
+## Deployment Steps
+
+The deployment process is identical to deploying a custom GPU parser. If you are unfamiliar with the UBIK Admin Console, please refer to the visual steps in the [Self-hosted GPU Parser guide](/en/guides/self-hosted-gpu-parser).
+
+1.  **Navigate to the Admin Page**
+    Go to [https://app.ubik-agent.com/admin](https://app.ubik-agent.com/admin).
+
+2.  **Initiate Deployment**
+    Click on **Deploy Service**.
+
+3.  **Configure Service**
+    In the deployment modal:
+    -   Select **"Secure Browser"** (or the equivalent web search service) for the service.
+    -   Select **"Digital Ocean"** as the provider.
+    -   Select your company as the billing owner.
+
+4.  **JSON Configuration**
+    Insert the following JSON configuration into the deployment configuration field:
+
+    ```json
+    {
+      "region": "ams3",
+      "instance_size": "s-1vcpu-1gb-amd",
+      "image": "ubuntu-24-04-x64",
+      "health_check_path": "/healthz",
+      "environment_vars": {
+        "SECURE_BROWSER_BASE_URL": "http://localhost:8080",
+        "SECURE_BROWSER_SECRET": "change-me-to-a-random-secret-key",
+        "WHITELISTED_DOMAINS": "example.com,anotherexample.com",
+        "BLACKLISTED_DOMAINS": "baddomain.com"
+      }
+    }
+    ```
+
+    ### Environment Variables Explained
+
+    - `SECURE_BROWSER_BASE_URL`: The base URL where the secure browser will be accessible internally. You should leave this as `http://localhost:8080`.
+    - `SECURE_BROWSER_SECRET`: A secure, random string used to authenticate requests to your browser instance. **Please change this to a strong, unique secret key.** or leave it like this if you prefer.
+    - `WHITELISTED_DOMAINS` *(Optional)*: A comma-separated list of domains. If provided, the browser will prioritize or restrict searches to these specific domains.
+    - `BLACKLISTED_DOMAINS` *(Optional)*: A comma-separated list of domains. If provided, the browser will actively exclude these domains from search results.
+
+5.  **Deploy**
+    Click on **Deploy**. The service will enter a deployment state. This process typically takes a few minutes for the machine to be set up.
+
+## Access Management
+
+Once the machine is ready and in a "Running" state, you need to link it to the platform and grant access.
+
+1.  Go to the **Service Registry Management** section.
+2.  Click **Add from deployment** and select your new secure browser machine.
+3.  Click **Register** and then **Save**.
+4.  Click on the **Key icon** next to the new service to manage permissions.
+5.  Grant access to **"A specific company"** (your company) or a specific user.
+
+For detailed screenshots of this process, please refer to the [Access Management section of the GPU Parser guide](/en/guides/self-hosted-gpu-parser#access-management).
+
+## Important Notes
+
+-   **Cost Management**: This instance will keep running until you either reach a low balance of credits or manually click on the **Delete deployment** action.
+-   **Warning**: Remember to delete the instance when it is no longer needed to avoid depleting your credits.

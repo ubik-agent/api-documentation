@@ -27,6 +27,7 @@ The tool accepts the following parameters:
 | :--- | :--- | :--- | :--- |
 | `query` | `string` | Yes | The search query to send to the web browser. Be specific for best results. |
 | `time_range` | `string` | No | Filter results by time. Options: `day`, `month`, `year`, `none` (default). Only use this if the user explicitly requests a timeframe. |
+| `whitelisted_domains` | `array of strings` | No | A list of domains to strictly filter the search results. If provided, only results from these domains will be returned. |
 
 ## Output Structure
 
@@ -93,6 +94,27 @@ The agent will return the current price sourced from a financial news site or ex
 
 **Result:**
 The agent restricts results to the past 24 hours, ensuring the information is about recent events rather than historical ones.
+
+## Domain Whitelisting and Blacklisting
+
+The Web Search tool supports domain whitelisting and blacklisting to give you control over the sources of information. There are two distinct ways this is handled, depending on your setup:
+
+### 1. Strict Whitelisting (Tool Level)
+
+When you configure whitelisted domains directly within the agent's tool settings, this applies a **strict filter**. 
+- If a whitelisted domain is provided, the tool will *only* return results from that specific domain. 
+- If the search engine does not find any results from the whitelisted domain, **no results will be shown** to the agent.
+- This is ideal when you want to absolutely guarantee that the agent only uses information from a specific, trusted source (e.g., your own company's documentation).
+
+### 2. Granular Control & Bonus Scoring (Self-Hosted Secure Browser)
+
+If you want a softer approach—where you still surface general web results but give a "bonus" score to trusted domains, or if you want to completely block certain domains—you can leverage a [Self-hosted Secure Browser](/en/guides/self-hosted-secure-browser).
+
+By deploying your own browser instance, you can configure `WHITELISTED_DOMAINS` and `BLACKLISTED_DOMAINS` at the browser level:
+- **Whitelisted Domains (Browser Level):** The search engine will actively prioritize and give a bonus to results from these domains, but it will still return other relevant results if the trusted domains don't have the answer.
+- **Blacklisted Domains:** The search engine will completely filter out results from these domains (e.g., blocking known spam or competitor sites).
+
+This approach allows for a more flexible and granular control over the search environment without strictly limiting the agent's ability to find answers.
 
 ## How It Works
 

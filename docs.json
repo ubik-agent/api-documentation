@@ -73,7 +73,8 @@
               {
                 "group": "Infrastructure",
                 "pages": [
-                  "/en/guides/self-hosted-gpu-parser"
+                  "/en/guides/self-hosted-gpu-parser",
+                  "/en/guides/self-hosted-secure-browser"
                 ]
               },
               {
@@ -141,7 +142,8 @@
               {
                 "group": "Infrastructure",
                 "pages": [
-                  "/fr/guides/self-hosted-gpu-parser"
+                  "/fr/guides/self-hosted-gpu-parser",
+                  "/fr/guides/self-hosted-secure-browser"
                 ]
               },
               {

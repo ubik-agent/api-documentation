@@ -1,0 +1,76 @@
+---
+title: 'Navigateur Sécurisé Auto-hébergé'
+description: 'Apprenez à déployer et gérer votre propre instance de navigateur sécurisé.'
+---
+
+Ce guide explique comment auto-héberger une instance de navigateur web sécurisé pour vos agents IA, vous permettant de contrôler l'environnement de recherche et de restreindre ou prioriser des domaines spécifiques.
+
+<Note>
+  **Avertissement** : Ce processus de déploiement est actuellement manuel. Nous travaillons à le simplifier dans les futures mises à jour. Si vous rencontrez des problèmes, avez besoin d'aide ou avez des besoins spécifiques pour d'autres fournisseurs de cloud, n'hésitez pas à nous contacter.
+</Note>
+
+## Prérequis
+
+- Accès à la [Console d'Administration UBIK](https://app.ubik-agent.com/admin)
+- Permissions de propriétaire de facturation
+
+## Étapes de Déploiement
+
+Le processus de déploiement est identique au déploiement d'un parseur GPU personnalisé. Si vous n'êtes pas familier avec la Console d'Administration UBIK, veuillez vous référer aux étapes visuelles dans le [Guide du Parseur GPU Auto-hébergé](/fr/guides/self-hosted-gpu-parser).
+
+1.  **Accéder à la Page d'Administration**
+    Allez sur [https://app.ubik-agent.com/admin](https://app.ubik-agent.com/admin).
+
+2.  **Lancer le Déploiement**
+    Cliquez sur **Deploy Service** (Déployer un service).
+
+3.  **Configurer le Service**
+    Dans la modale de déploiement :
+    -   Sélectionnez **"Secure Browser"** (ou le service de recherche web équivalent) pour le service.
+    -   Sélectionnez **"Digital Ocean"** comme fournisseur.
+    -   Sélectionnez votre entreprise comme propriétaire de la facturation.
+
+4.  **Configuration JSON**
+    Insérez la configuration JSON suivante dans le champ de configuration du déploiement :
+
+    ```json
+    {
+      "region": "ams3",
+      "instance_size": "s-1vcpu-1gb-amd",
+      "image": "ubuntu-24-04-x64",
+      "health_check_path": "/healthz",
+      "environment_vars": {
+        "SECURE_BROWSER_BASE_URL": "http://localhost:8080",
+        "SECURE_BROWSER_SECRET": "change-me-to-a-random-secret-key",
+        "WHITELISTED_DOMAINS": "example.com,anotherexample.com",
+        "BLACKLISTED_DOMAINS": "baddomain.com"
+      }
+    }
+    ```
+
+    ### Explication des Variables d'Environnement
+
+    - `SECURE_BROWSER_BASE_URL` : L'URL de base où le navigateur sécurisé sera accessible en interne. Vous devriez laisser cette valeur à `http://localhost:8080`.
+    - `SECURE_BROWSER_SECRET` : Une chaîne aléatoire et sécurisée utilisée pour authentifier les requêtes vers votre instance de navigateur. **Veuillez la remplacer par une clé secrète forte et unique.** ou laissez-la telle quelle si vous préférez.
+    - `WHITELISTED_DOMAINS` *(Optionnel)* : Une liste de domaines séparés par des virgules. Si fournie, le navigateur priorisera ou restreindra les recherches à ces domaines spécifiques.
+    - `BLACKLISTED_DOMAINS` *(Optionnel)* : Une liste de domaines séparés par des virgules. Si fournie, le navigateur exclura activement ces domaines des résultats de recherche.
+
+5.  **Déployer**
+    Cliquez sur **Deploy**. Le service passera en état de déploiement. Ce processus prend généralement quelques minutes pour que la machine soit configurée.
+
+## Gestion des Accès
+
+Une fois la machine prête et en état "Running" (En cours d'exécution), vous devez la lier à la plateforme et accorder l'accès.
+
+1.  Allez dans la section **Service Registry Management** (Gestion du registre des services).
+2.  Cliquez sur **Add from deployment** (Ajouter depuis le déploiement) et sélectionnez votre nouvelle machine de navigateur sécurisé.
+3.  Cliquez sur **Register** (Enregistrer) puis sur **Save** (Sauvegarder).
+4.  Cliquez sur l'icône **Clé** à côté du nouveau service pour gérer les permissions.
+5.  Accordez l'accès à **"A specific company"** (votre entreprise) ou à un utilisateur spécifique.
+
+Pour des captures d'écran détaillées de ce processus, veuillez vous référer à la [section Gestion des Accès du guide du Parseur GPU](/fr/guides/self-hosted-gpu-parser#gestion-des-accès).
+
+## Notes Importantes
+
+-   **Gestion des Coûts** : Cette instance continuera de fonctionner jusqu'à ce que vous atteigniez un solde de crédits trop bas ou que vous cliquiez manuellement sur l'action **Delete deployment** (Supprimer le déploiement).
+-   **Attention** : N'oubliez pas de supprimer l'instance lorsqu'elle n'est plus nécessaire pour éviter d'épuiser vos crédits.

@@ -27,6 +27,7 @@ L'outil accepte les paramètres suivants :
 | :--- | :--- | :--- | :--- |
 | `query` | `string` | Oui | La requête de recherche à envoyer au navigateur web. Soyez précis pour de meilleurs résultats. |
 | `time_range` | `string` | Non | Filtrer les résultats par temps. Options : `day`, `month`, `year`, `none` (défaut). Utilisez ceci uniquement si l'utilisateur demande explicitement une période. |
+| `whitelisted_domains` | `array of strings` | Non | Une liste de domaines pour filtrer strictement les résultats de recherche. Si fournie, seuls les résultats provenant de ces domaines seront renvoyés. |
 
 ## Structure de Sortie
 
@@ -94,9 +95,30 @@ L'agent renverra le prix actuel provenant d'un site d'actualités financières o
 **Résultat :**
 L'agent restreint les résultats aux dernières 24 heures, assurant que l'information concerne des événements récents plutôt que historiques.
 
+## Liste Blanche et Liste Noire de Domaines
+
+L'outil de Recherche Web prend en charge les listes blanches et listes noires de domaines pour vous donner le contrôle sur les sources d'information. Il existe deux manières distinctes de gérer cela, selon votre configuration :
+
+### 1. Liste Blanche Stricte (Niveau de l'Outil)
+
+Lorsque vous configurez des domaines en liste blanche directement dans les paramètres de l'outil de l'agent, cela applique un **filtre strict**.
+- Si un domaine en liste blanche est fourni, l'outil renverra *uniquement* les résultats de ce domaine spécifique.
+- Si le moteur de recherche ne trouve aucun résultat provenant du domaine en liste blanche, **aucun résultat ne sera affiché** à l'agent.
+- C'est idéal lorsque vous voulez garantir absolument que l'agent n'utilise que des informations provenant d'une source spécifique et de confiance (par exemple, la documentation de votre propre entreprise).
+
+### 2. Contrôle Granulaire et Score Bonus (Navigateur Sécurisé Auto-hébergé)
+
+Si vous souhaitez une approche plus souple — où vous affichez toujours des résultats web généraux mais accordez un "score bonus" aux domaines de confiance, ou si vous souhaitez bloquer complètement certains domaines — vous pouvez utiliser un [Navigateur Sécurisé Auto-hébergé](/fr/guides/self-hosted-secure-browser).
+
+En déployant votre propre instance de navigateur, vous pouvez configurer `WHITELISTED_DOMAINS` et `BLACKLISTED_DOMAINS` au niveau du navigateur :
+- **Domaines en Liste Blanche (Niveau Navigateur) :** Le moteur de recherche priorisera activement et donnera un bonus aux résultats de ces domaines, mais il renverra quand même d'autres résultats pertinents si les domaines de confiance n'ont pas la réponse.
+- **Domaines en Liste Noire :** Le moteur de recherche filtrera complètement les résultats de ces domaines (par exemple, pour bloquer les spams connus ou les sites concurrents).
+
+Cette approche permet un contrôle plus flexible et granulaire sur l'environnement de recherche sans limiter strictement la capacité de l'agent à trouver des réponses.
+
 ## Comment Ça Marche
 
-1.  **Recherche :** L'outil interroge un moteur de recherche (SearXNG) pour obtenir un large ensemble de résultats initiaux.
+1.  **Recherche :** L'outil interroge un moteur de recherche pour obtenir un large ensemble de résultats initiaux.
 2.  **Scraping :** Il visite les meilleures URL pour extraire le contenu textuel complet, pas seulement l'extrait de recherche.
 3.  **Rerank :** Un modèle spécialisé de "reranker" compare la requête de l'utilisateur au texte complet de chaque page pour déterminer lesquelles sont vraiment pertinentes.
 4.  **Générer :** Les morceaux de texte les plus pertinents sont passés à un LLM, qui synthétise la réponse finale et ajoute des citations.
