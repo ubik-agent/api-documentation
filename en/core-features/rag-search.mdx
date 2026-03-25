@@ -162,6 +162,12 @@ During the generation phase, `tool_partial_update` events are emitted for each g
 
 These fragments must be concatenated to form the complete answer.
 
+<Note>
+  **Handling Large Events (Chunking)**
+  
+  If an event payload exceeds the SSE size limit, it will be split into multiple `_delta_sse` events. For detailed instructions and code examples on how to buffer and reconstruct these chunked events, please refer to the [Streaming Results Guide](/en/guides/streaming-results#handling-large-events-chunking) or the [Agent Session Events Guide](/en/guides/agent-session-events#large-payloads-chunking).
+</Note>
+
 ### Example Event Flow
 
 ```json

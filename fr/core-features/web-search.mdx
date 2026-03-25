@@ -121,7 +121,150 @@ Cette approche permet un contrôle plus flexible et granulaire sur l'environneme
 1.  **Recherche :** L'outil interroge un moteur de recherche pour obtenir un large ensemble de résultats initiaux.
 2.  **Scraping :** Il visite les meilleures URL pour extraire le contenu textuel complet, pas seulement l'extrait de recherche.
 3.  **Rerank :** Un modèle spécialisé de "reranker" compare la requête de l'utilisateur au texte complet de chaque page pour déterminer lesquelles sont vraiment pertinentes.
-4.  **Générer :** Les morceaux de texte les plus pertinents sont passés à un LLM, qui synthétise la réponse finale et ajoute des citations.
+    4.  **Générer :** Les morceaux de texte les plus pertinents sont passés à un LLM, qui synthétise la réponse finale et ajoute des citations.
+
+## Événements de Streaming
+
+Lorsqu'il est utilisé en mode streaming, l'outil `web_search` émet des événements en temps réel via SSE (Server-Sent Events). Cela vous permet de suivre la progression du pipeline de recherche et d'afficher la réponse au fur et à mesure de sa génération.
+
+### Types d'Événements
+
+| Événement | Description |
+| :--- | :--- |
+| `tool_update` | Indique une mise à jour de progression (changement de phase) ou fournit des données intermédiaires comme les résultats de recherche. |
+| `tool_partial_update` | Contient un nouveau fragment de texte de la réponse générée (streaming). |
+| `error` | Signale qu'une erreur critique s'est produite pendant l'exécution (par exemple, délai d'attente du moteur de recherche). |
+| `tool_end` | Signale la fin de l'exécution de l'outil et fournit le résultat final complet. |
+
+### Phases du Pipeline (`tool_update`)
+
+L'événement `tool_update` contient un champ `data` avec une `phase` et un `status`. Voici les phases possibles :
+
+            1.  **`WEB_SEARCH`**
+                *   `status`: `started` / `completed`
+                *   `data`: `{ "results_count": <int>, "sources": [...] }` (à la fin)
+                *   Indique la requête initiale au moteur de recherche. Le tableau `sources` contient les résultats bruts de la recherche :
+                    ```json
+                    // Exemple de structure 'sources' dans la phase WEB_SEARCH
+                    [
+                      {
+                        "rank": 1,
+                        "title": "Recent Advances in AI",
+                        "url": "https://example.com/ai-news",
+                        "snippet": "A summary of the latest breakthroughs...",
+                        "engine": "google",
+                        "score": 1.0
+                      }
+                    ]
+                    ```
+
+            2.  **`SCRAPING_URLS`**
+    *   `status`: `started` / `completed`
+    *   `data`: `{ "url_count": <int> }` (au début), `{ "scraped_count": <int> }` (à la fin)
+    *   Indique la récupération du contenu textuel complet à partir des meilleures URL.
+    *   <Note>
+          **Fonctionnalité Avancée**
+          
+          Le scraping du contenu complet de la page est une fonctionnalité avancée et est **désactivé par défaut**. Lorsqu'il est désactivé, l'outil s'appuie uniquement sur les extraits du moteur de recherche. Si vous souhaitez activer le scraping complet des pages pour votre espace de travail, veuillez contacter l'équipe UBIK à [contact@ubik-agent.com](mailto:contact@ubik-agent.com).
+        </Note>
+
+3.  **`RERANKING`**
+    *   `status`: `started` / `completed`
+    *   `data`: `{ "reranked_count": <int> }` (à la fin). Note : Le tableau `sources` affiné est émis dans un événement `tool_update` séparé juste après.
+    *   Indique que les résultats ont été reclassés par pertinence sémantique. Une fois cette phase terminée, des événements `tool_update` supplémentaires sont émis contenant le nombre final `reranked_results` et le tableau affiné `sources` avec les scores sémantiques :
+        ```json
+        // Exemple de structure 'sources' après la phase RERANKING
+        [
+          {
+            "rank": 1,
+            "title": "Recent Advances in AI",
+            "url": "https://example.com/ai-news",
+            "snippet": "A summary of the latest breakthroughs...",
+            "rerank_score": 0.85,
+            "used_in_response": false
+          }
+        ]
+        ```
+
+4.  **`GENERATION`**
+    *   `status`: `started` / `completed`
+    *   Indique que la génération LLM de la réponse finale commence.
+
+### Streaming de Contenu (`tool_partial_update`)
+
+Pendant la phase de génération, des événements `tool_partial_update` sont émis pour chaque fragment de texte généré.
+
+*   `content`: `<string>` (Le fragment de texte)
+*   `output_key`: `"response"`
+
+Ces fragments doivent être concaténés pour former la réponse complète. Le texte peut contenir des balises de citation brutes comme `<source_1>` qui sont remplacées par des balises riches `<web_citation>` à la fin de la génération.
+
+<Note>
+  **Gestion des Événements Volumineux (Chunking)**
+  
+  Si la charge utile d'un événement (comme un grand tableau de résultats de recherche) dépasse la limite de taille SSE, elle sera divisée en plusieurs événements `_delta_sse`. Pour des instructions détaillées et des exemples de code sur la façon de mettre en mémoire tampon et de reconstruire ces événements fragmentés, veuillez consulter le [Guide des Résultats en Streaming](/fr/guides/streaming-results#handling-large-events-chunking) ou le [Guide des Événements de Session d'Agent](/fr/guides/agent-session-events#large-payloads-chunking).
+</Note>
+
+### Exemple de Flux d'Événements
+
+```json
+// Début de la Recherche Web
+{ "event": "tool_update", "data": { "phase": "WEB_SEARCH", "status": "started", "query": "dernières avancées en IA" } }
+
+// Recherche Web terminée
+{ "event": "tool_update", "data": { "phase": "WEB_SEARCH", "status": "completed", "data": { "results_count": 10, "sources": [...] }, "output_key": "sources" } }
+
+// Début du Scraping
+{ "event": "tool_update", "data": { "phase": "SCRAPING_URLS", "status": "started", "data": { "url_count": 10 } } }
+
+// Scraping terminé
+{ "event": "tool_update", "data": { "phase": "SCRAPING_URLS", "status": "completed", "data": { "scraped_count": 8 } } }
+
+// Début du Reranking
+{ "event": "tool_update", "data": { "phase": "RERANKING", "status": "started" } }
+
+// Reranking terminé
+{ "event": "tool_update", "data": { "phase": "RERANKING", "status": "completed", "data": { "reranked_count": 8 } } }
+
+// Sources finales émises
+{ "event": "tool_update", "data": { "reranked_results": 5, "output_key": "reranked_results" } }
+{ "event": "tool_update", "data": { "sources": [...], "output_key": "sources" } }
+
+// Début de la Génération
+{ "event": "tool_update", "data": { "phase": "GENERATION", "status": "started" } }
+
+// Streaming de la réponse (tool_partial_update)
+{ "event": "tool_partial_update", "data": { "content": "Selon", "output_key": "response" } }
+{ "event": "tool_partial_update", "data": { "content": " les", "output_key": "response" } }
+{ "event": "tool_partial_update", "data": { "content": " résultats <source_1>...", "output_key": "response" } }
+
+// Génération terminée
+{ "event": "tool_update", "data": { "phase": "GENERATION", "status": "completed" } }
+
+// Fin
+{ 
+  "event": "tool_end", 
+  "data": { 
+    "query": "dernières avancées en IA",
+    "response": "Selon les résultats <web_citation url=\"...\">[1]</web_citation>...",
+    "sources": [
+      {
+        "rank": 1,
+        "title": "Recent Advances in AI",
+        "url": "https://example.com/ai-news",
+        "snippet": "A summary of the latest breakthroughs...",
+        "rerank_score": 0.85,
+        "used_in_response": true
+      }
+    ],
+    "sources_used": [1],
+    "model": "claude-sonnet-4-20250514",
+    "reranker": "bge_text_reranker",
+    "total_results": 10,
+    "reranked_results": 5
+  } 
+}
+```
 
 <Tip>
   **Configuration**

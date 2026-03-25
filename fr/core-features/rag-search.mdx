@@ -162,6 +162,12 @@ Pendant la phase de génération, des événements `tool_partial_update` sont é
 
 Ces fragments doivent être concaténés pour former la réponse complète.
 
+<Note>
+  **Gestion des Événements Volumineux (Chunking)**
+  
+  Si la charge utile d'un événement dépasse la limite de taille SSE, elle sera divisée en plusieurs événements `_delta_sse`. Pour des instructions détaillées et des exemples de code sur la façon de mettre en mémoire tampon et de reconstruire ces événements fragmentés, veuillez consulter le [Guide des Résultats en Streaming](/fr/guides/streaming-results#handling-large-events-chunking) ou le [Guide des Événements de Session d'Agent](/fr/guides/agent-session-events#large-payloads-chunking).
+</Note>
+
 ### Exemple de Flux d'Événements
 
 ```json
