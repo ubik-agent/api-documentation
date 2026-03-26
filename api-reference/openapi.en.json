@@ -5389,18 +5389,17 @@
             "description": "Whether to stream the response.",
             "default": true
           },
-          "force_tool_id": {
+          "tool_choice": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "uuid"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Force Tool Id",
-            "description": "Force the agent to use a specific tool by its ID during regeneration."
+            "title": "Tool Choice",
+            "description": "Force a specific tool to be used by providing its UUID during regeneration."
           }
         },
         "type": "object",
@@ -5496,26 +5495,13 @@
               }
             ],
             "title": "Tool Choice",
-            "description": "Force a specific tool to be used."
+            "description": "Force a specific tool to be used by providing its UUID."
           },
           "stream": {
             "type": "boolean",
             "title": "Stream",
             "description": "Whether to stream the response.",
             "default": true
-          },
-          "force_tool_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Force Tool Id",
-            "description": "Force the agent to use a specific tool by its ID."
           }
         },
         "type": "object",
@@ -5828,18 +5814,17 @@
             "description": "Whether to stream the response.",
             "default": true
           },
-          "force_tool_id": {
+          "tool_choice": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "uuid"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Force Tool Id",
-            "description": "Force the agent to use a specific tool by its ID during regeneration."
+            "title": "Tool Choice",
+            "description": "Force a specific tool to be used by providing its UUID during regeneration."
           }
         },
         "type": "object",
