@@ -472,6 +472,76 @@
         }
       }
     },
+    "/agent-sessions/{session_id}/mcp-servers": {
+      "get": {
+        "tags": [
+          "Public API",
+          "Public API - Agent Sessions"
+        ],
+        "summary": "List session MCP servers",
+        "description": "Retrieves a list of MCP servers currently active in the agent session.",
+        "operationId": "list_session_mcp_servers_agent_sessions__session_id__mcp_servers_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicMCPServer"
+                  },
+                  "title": "Response List Session Mcp Servers Agent Sessions  Session Id  Mcp Servers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agent-sessions/{session_id}/tools": {
       "get": {
         "tags": [
@@ -479,7 +549,7 @@
           "Public API - Agent Sessions"
         ],
         "summary": "List session tools",
-        "description": "Retrieves a list of tools accessible to the agent session with full details.",
+        "description": "Retrieves a list of static platform/user tools accessible to the agent session. Note: This endpoint does not return active MCP servers. To see active MCP servers, use the /mcp-servers endpoint.",
         "operationId": "list_session_tools_agent_sessions__session_id__tools_get",
         "security": [
           {
@@ -2404,7 +2474,87 @@
                   "chat_session_count": 5,
                   "document_count": 42,
                   "workspace_count": 3,
-                  "assistant_count": 2
+                  "assistant_count": 2,
+                  "mcp_server_count": 1,
+                  "skill_count": 4
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-servers": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "List available MCP servers",
+        "description": "Retrieves a paginated list of MCP servers accessible to the user.",
+        "operationId": "list_available_mcp_servers_mcp_servers_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-End-User-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-End-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPaginatedMCPServersResponse"
                 }
               }
             }
@@ -3956,7 +4106,7 @@
           "Public API - Tool Executions"
         ],
         "summary": "Execute a tool",
-        "description": "Asynchronously starts a tool execution and returns an execution ID to track the results.",
+        "description": "Asynchronously starts a tool execution and returns an execution ID to track the results. Note: MCP tools cannot be used through this API for now. Only tools from the /tools endpoint can be executed.",
         "operationId": "execute_public_tool_tools__tool_id__execute_post",
         "security": [
           {
@@ -4708,6 +4858,19 @@
             "type": "array",
             "title": "Workspaces",
             "description": "List of workspaces linked to this session."
+          },
+          "mcp_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mcp Config",
+            "description": "The currently active MCP configuration for this session."
           }
         },
         "type": "object",
@@ -4828,6 +4991,19 @@
             ],
             "title": "Prompt Variables",
             "description": "A dictionary of variables to inject into the system prompt template (e.g. {'tone': 'formal'} for {{tone}}). These variables can be defined in the assistant's parameters (as defaults) or provided here at runtime to override them."
+          },
+          "mcp_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mcp Config",
+            "description": "Optional MCP configuration to override the assistant's default servers for this session."
           }
         },
         "type": "object",
@@ -4914,6 +5090,19 @@
             ],
             "title": "External User Id",
             "description": "The external user ID associated with this session."
+          },
+          "mcp_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mcp Config",
+            "description": "Update the active MCP servers for this session mid-conversation."
           }
         },
         "type": "object",
@@ -4955,6 +5144,19 @@
             ],
             "title": "Model Name",
             "description": "The model used by this assistant."
+          },
+          "mcp_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mcp Config",
+            "description": "The default MCP configuration for this assistant."
           },
           "created_at": {
             "type": "string",
@@ -5462,6 +5664,63 @@
         ],
         "title": "PublicLinkWorkspacesRequest"
       },
+      "PublicMCPServer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "The unique identifier for the MCP server."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the MCP server."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "A description of the MCP server."
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "The current status of the MCP server (e.g., active, inactive)."
+          },
+          "cached_tools": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Cached Tools",
+            "description": "The tools provided by this MCP server."
+          },
+          "cached_resources": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Cached Resources",
+            "description": "The resources provided by this MCP server."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status"
+        ],
+        "title": "PublicMCPServer"
+      },
       "PublicMessageCreate": {
         "properties": {
           "content": {
@@ -5685,6 +5944,46 @@
           "has_more"
         ],
         "title": "PublicPaginatedDocumentsResponse"
+      },
+      "PublicPaginatedMCPServersResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PublicMCPServer"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of MCP servers available."
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page",
+            "description": "The current page number."
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "The number of items per page."
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "description": "Indicates if there are more pages available."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "has_more"
+        ],
+        "title": "PublicPaginatedMCPServersResponse"
       },
       "PublicPaginatedSessionDocumentsResponse": {
         "properties": {
@@ -6408,6 +6707,16 @@
             "type": "integer",
             "title": "Assistant Count",
             "description": "The total number of assistants accessible to the user."
+          },
+          "mcp_server_count": {
+            "type": "integer",
+            "title": "Mcp Server Count",
+            "description": "The total number of MCP servers accessible to the user."
+          },
+          "skill_count": {
+            "type": "integer",
+            "title": "Skill Count",
+            "description": "The total number of skills accessible to the user."
           }
         },
         "type": "object",
@@ -6419,7 +6728,9 @@
           "chat_session_count",
           "document_count",
           "workspace_count",
-          "assistant_count"
+          "assistant_count",
+          "mcp_server_count",
+          "skill_count"
         ],
         "title": "PublicUserResponse",
         "description": "Schema for publicly exposed user information."
