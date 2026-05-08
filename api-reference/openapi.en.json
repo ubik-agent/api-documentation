@@ -2579,7 +2579,7 @@
           "Public API - Workspaces"
         ],
         "summary": "List workspaces",
-        "description": "Retrieves a paginated list of all workspaces accessible to the user.\nThis includes personal workspaces and shared company workspaces.",
+        "description": "Retrieves a paginated list of all workspaces accessible to the user.\nThis includes personal workspaces, shared company workspaces, and workspaces linked to assistants the user can access.",
         "operationId": "get_workspaces_workspaces_get",
         "security": [
           {
@@ -2996,7 +2996,7 @@
           "Public API - Documents"
         ],
         "summary": "List documents",
-        "description": "Retrieves a paginated list of all documents accessible to the user.",
+        "description": "Retrieves a paginated list of all documents accessible to the user.\nIncludes direct access, documents in accessible workspaces (including assistant-linked workspaces), and assistant default files.",
         "operationId": "get_documents_documents_get",
         "security": [
           {
