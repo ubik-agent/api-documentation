@@ -4657,6 +4657,72 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "ProductAccessStatus": {
+        "properties": {
+          "has_access": {
+            "type": "boolean",
+            "title": "Has Access",
+            "description": "True si l'utilisateur a accès au produit."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "trialing",
+              "active",
+              "past_due",
+              "canceled",
+              "unpaid",
+              "inactive"
+            ],
+            "title": "Status",
+            "description": "Statut Stripe normalisé, ou 'none' si jamais abonné."
+          },
+          "plan_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Name",
+            "description": "Plan actif. Null si aucun abonnement."
+          },
+          "trial_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trial End"
+          },
+          "current_period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "has_access",
+          "status"
+        ],
+        "title": "ProductAccessStatus",
+        "description": "État d'accès à un produit UBIK (Flow, futurs produits, etc.)."
+      },
       "PublicAgentMessage": {
         "properties": {
           "id": {
@@ -6717,6 +6783,14 @@
             "type": "integer",
             "title": "Skill Count",
             "description": "Le nombre total de compétences accessibles à l'utilisateur."
+          },
+          "product_subscriptions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProductAccessStatus"
+            },
+            "type": "object",
+            "title": "Product Subscriptions",
+            "description": "Statut d'accès pour tous les produits UBIK standalone."
           }
         },
         "type": "object",
