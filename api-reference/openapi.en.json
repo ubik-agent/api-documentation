@@ -4713,6 +4713,25 @@
               }
             ],
             "title": "Current Period End"
+          },
+          "canceled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canceled At",
+            "description": "Set when cancellation is scheduled or completed."
+          },
+          "is_stripe_managed": {
+            "type": "boolean",
+            "title": "Is Stripe Managed",
+            "description": "True when billing is tied to a Stripe subscription (self-service).",
+            "default": false
           }
         },
         "type": "object",
