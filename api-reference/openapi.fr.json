@@ -4415,6 +4415,357 @@
           }
         }
       }
+    },
+    "/flow/update-info": {
+      "get": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Get Flow Update Info",
+        "description": "Read-only version check for launcher and optional gated payload (no rate limit).",
+        "operationId": "get_flow_update_info_flow_update_info_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Platform"
+            }
+          },
+          {
+            "name": "arch",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Arch"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowUpdateInfoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/updates/launcher/{platform}/{arch}/{filename}": {
+      "get": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Download Flow Launcher Update Feed",
+        "description": "Public electron-updater generic feed files (latest-*.yml + zip).",
+        "operationId": "download_flow_launcher_update_feed_flow_updates_launcher__platform___arch___filename__get",
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Platform"
+            }
+          },
+          {
+            "name": "arch",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Arch"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/me": {
+      "get": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Get Flow Me",
+        "description": "Protected health check for Flow product access.",
+        "operationId": "get_flow_me_flow_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/flow/launcher/{platform}/{arch}": {
+      "get": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Download Flow Launcher",
+        "description": "Public launcher download (bootstrap — reads flow-dist/ per request).",
+        "operationId": "download_flow_launcher_flow_launcher__platform___arch__get",
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Platform"
+            }
+          },
+          {
+            "name": "arch",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Arch"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/devices/deactivate": {
+      "post": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Deactivate Flow Device",
+        "description": "Deactivate a registered Flow device for this account.",
+        "operationId": "deactivate_flow_device_flow_devices_deactivate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowDeviceDeactivateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowDeviceDeactivateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/flow/download-url": {
+      "post": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Create Flow Download Url",
+        "description": "Return gated payload download URL + metadata for subscribed users.",
+        "operationId": "create_flow_download_url_flow_download_url_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowDownloadUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowDownloadUrlResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/flow/download/payload": {
+      "get": {
+        "tags": [
+          "flow"
+        ],
+        "summary": "Download Flow Payload",
+        "description": "Stream gated encrypted payload (requires JWT + active Flow subscription).",
+        "operationId": "download_flow_payload_flow_download_payload_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Platform"
+            }
+          },
+          {
+            "name": "arch",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Arch"
+            }
+          },
+          {
+            "name": "download_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Download Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4643,6 +4994,254 @@
           "api_metadata"
         ],
         "title": "DocumentAccessMetadataUpdate"
+      },
+      "FlowDeviceDeactivateRequest": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Device Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "FlowDeviceDeactivateRequest"
+      },
+      "FlowDeviceDeactivateResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "FlowDeviceDeactivateResponse"
+      },
+      "FlowDownloadUrlRequest": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "title": "Platform",
+            "examples": [
+              "darwin"
+            ]
+          },
+          "arch": {
+            "type": "string",
+            "title": "Arch",
+            "examples": [
+              "arm64"
+            ]
+          },
+          "device_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Device Id"
+          },
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          },
+          "force_replace": {
+            "type": "boolean",
+            "title": "Force Replace",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "platform",
+          "arch",
+          "device_id"
+        ],
+        "title": "FlowDownloadUrlRequest"
+      },
+      "FlowDownloadUrlResponse": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "flow_trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flow Trace Id"
+          },
+          "activation_bundle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activation Bundle"
+          },
+          "download_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Id"
+          },
+          "payload_decrypt_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payload Decrypt Key"
+          },
+          "payload_decrypt_iv": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payload Decrypt Iv"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "version",
+          "sha256",
+          "size_bytes"
+        ],
+        "title": "FlowDownloadUrlResponse"
+      },
+      "FlowLauncherUpdateInfo": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "update_feed_url": {
+            "type": "string",
+            "title": "Update Feed Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "update_feed_url"
+        ],
+        "title": "FlowLauncherUpdateInfo"
+      },
+      "FlowMeResponse": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "flow": {
+            "$ref": "#/components/schemas/ProductAccessStatus",
+            "description": "Current Flow subscription access state."
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "email",
+          "flow"
+        ],
+        "title": "FlowMeResponse"
+      },
+      "FlowPayloadUpdateInfo": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "sha256",
+          "size_bytes",
+          "url"
+        ],
+        "title": "FlowPayloadUpdateInfo"
+      },
+      "FlowUpdateInfoResponse": {
+        "properties": {
+          "launcher": {
+            "$ref": "#/components/schemas/FlowLauncherUpdateInfo"
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FlowPayloadUpdateInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "launcher"
+        ],
+        "title": "FlowUpdateInfoResponse"
       },
       "HTTPValidationError": {
         "properties": {
@@ -7211,6 +7810,15 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
+      },
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/api/internal/v1/token"
+          }
+        }
       }
     }
   }
