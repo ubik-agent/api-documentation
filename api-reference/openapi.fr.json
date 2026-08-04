@@ -4766,6 +4766,670 @@
           }
         }
       }
+    },
+    "/flow/mcp/{profile_id}/sse": {
+      "get": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Sse",
+        "operationId": "relay_sse_flow_mcp__profile_id__sse_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/mcp/{profile_id}/messages": {
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Messages",
+        "operationId": "relay_messages_flow_mcp__profile_id__messages_post",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/mcp/{profile_id}/mcp": {
+      "get": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Http Mcp",
+        "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Http Mcp",
+        "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Http Mcp",
+        "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Http Mcp",
+        "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/mcp/devices/register": {
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Register Device",
+        "operationId": "register_device_flow_mcp_devices_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowMcpDeviceRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpOkResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/flow/mcp/devices/heartbeat": {
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Device Heartbeat",
+        "operationId": "device_heartbeat_flow_mcp_devices_heartbeat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowMcpHeartbeatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpHeartbeatResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/flow/mcp/profiles": {
+      "get": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "List Profiles",
+        "operationId": "list_profiles_flow_mcp_profiles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FlowMcpProfileResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Profiles Flow Mcp Profiles Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Create Profile",
+        "operationId": "create_profile_flow_mcp_profiles_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowMcpProfileCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpProfileCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/flow/mcp/profiles/{profile_id}": {
+      "get": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Get Profile",
+        "operationId": "get_profile_flow_mcp_profiles__profile_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Update Profile",
+        "operationId": "update_profile_flow_mcp_profiles__profile_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowMcpProfileUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Delete Profile",
+        "operationId": "delete_profile_flow_mcp_profiles__profile_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpOkResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/mcp/profiles/{profile_id}/rotate-token": {
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Rotate Token",
+        "operationId": "rotate_token_flow_mcp_profiles__profile_id__rotate_token_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowMcpRotateTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpOkResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flow/mcp/sync": {
+      "post": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Sync Instances",
+        "operationId": "sync_instances_flow_mcp_sync_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlowMcpSyncRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowMcpSyncResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -5169,6 +5833,507 @@
           "update_feed_url"
         ],
         "title": "FlowLauncherUpdateInfo"
+      },
+      "FlowMcpDeviceRegisterRequest": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Device Id"
+          },
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "FlowMcpDeviceRegisterRequest"
+      },
+      "FlowMcpHeartbeatRequest": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Device Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "FlowMcpHeartbeatRequest"
+      },
+      "FlowMcpHeartbeatResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "default": true
+          },
+          "relay_connected": {
+            "type": "boolean",
+            "title": "Relay Connected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "relay_connected"
+        ],
+        "title": "FlowMcpHeartbeatResponse"
+      },
+      "FlowMcpInstanceSummary": {
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Instance Id"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "local_path": {
+            "type": "string",
+            "title": "Local Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instance_id",
+          "device_id",
+          "local_path"
+        ],
+        "title": "FlowMcpInstanceSummary"
+      },
+      "FlowMcpOkResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "FlowMcpOkResponse"
+      },
+      "FlowMcpProfileCreateRequest": {
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Instance Id"
+          },
+          "device_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Device Id"
+          },
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "local_path": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Local Path"
+          },
+          "scopes": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scopes"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Token"
+          },
+          "remote_enabled": {
+            "type": "boolean",
+            "title": "Remote Enabled",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "instance_id",
+          "device_id",
+          "name",
+          "local_path",
+          "token"
+        ],
+        "title": "FlowMcpProfileCreateRequest"
+      },
+      "FlowMcpProfileCreateResponse": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          },
+          "instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Instance Id"
+          },
+          "remote_urls": {
+            "$ref": "#/components/schemas/FlowMcpRemoteUrls"
+          },
+          "mcp_server_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mcp Server Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "instance_id",
+          "remote_urls"
+        ],
+        "title": "FlowMcpProfileCreateResponse"
+      },
+      "FlowMcpProfileResponse": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "scopes": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scopes"
+          },
+          "remote_enabled": {
+            "type": "boolean",
+            "title": "Remote Enabled"
+          },
+          "mcp_server_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mcp Server Id"
+          },
+          "remote_urls": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FlowMcpRemoteUrls"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instances": {
+            "items": {
+              "$ref": "#/components/schemas/FlowMcpInstanceSummary"
+            },
+            "type": "array",
+            "title": "Instances"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "name",
+          "scopes",
+          "remote_enabled"
+        ],
+        "title": "FlowMcpProfileResponse"
+      },
+      "FlowMcpProfileUpdateRequest": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "scopes": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scopes"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "remote_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remote Enabled"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token",
+            "description": "Required when re-enabling remote_enabled after mirror was removed."
+          }
+        },
+        "type": "object",
+        "title": "FlowMcpProfileUpdateRequest"
+      },
+      "FlowMcpRemoteUrls": {
+        "properties": {
+          "sse": {
+            "type": "string",
+            "title": "Sse"
+          },
+          "http": {
+            "type": "string",
+            "title": "Http"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sse",
+          "http"
+        ],
+        "title": "FlowMcpRemoteUrls"
+      },
+      "FlowMcpRotateTokenRequest": {
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Instance Id"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instance_id",
+          "token"
+        ],
+        "title": "FlowMcpRotateTokenRequest"
+      },
+      "FlowMcpSyncInstanceItem": {
+        "properties": {
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Id"
+          },
+          "instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Instance Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "local_path": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Local Path"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Token"
+          },
+          "scopes": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scopes"
+          },
+          "remote_enabled": {
+            "type": "boolean",
+            "title": "Remote Enabled",
+            "default": true
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instance_id",
+          "name",
+          "local_path",
+          "token"
+        ],
+        "title": "FlowMcpSyncInstanceItem"
+      },
+      "FlowMcpSyncRequest": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Device Id"
+          },
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          },
+          "instances": {
+            "items": {
+              "$ref": "#/components/schemas/FlowMcpSyncInstanceItem"
+            },
+            "type": "array",
+            "title": "Instances"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "FlowMcpSyncRequest"
+      },
+      "FlowMcpSyncResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "default": true
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/FlowMcpProfileCreateResponse"
+            },
+            "type": "array",
+            "title": "Profiles"
+          }
+        },
+        "type": "object",
+        "title": "FlowMcpSyncResponse"
       },
       "FlowMeResponse": {
         "properties": {
@@ -6378,6 +7543,33 @@
             "title": "Status",
             "description": "Le statut actuel du serveur MCP (ex: actif, inactif)."
           },
+          "source_type": {
+            "type": "string",
+            "title": "Source Type",
+            "description": "Origine du serveur : manual ou flow_relay.",
+            "default": "manual"
+          },
+          "transport_type": {
+            "type": "string",
+            "title": "Transport Type",
+            "description": "Type de transport MCP (sse ou http)."
+          },
+          "server_url": {
+            "type": "string",
+            "title": "Server Url",
+            "description": "URL de connexion du serveur MCP."
+          },
+          "flow": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicMCPServerFlowInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Métadonnées du relais Flow lorsque source_type est flow_relay."
+          },
           "cached_tools": {
             "items": {
               "additionalProperties": true,
@@ -6401,9 +7593,81 @@
         "required": [
           "id",
           "name",
-          "status"
+          "status",
+          "transport_type",
+          "server_url"
         ],
         "title": "PublicMCPServer"
+      },
+      "PublicMCPServerFlowInfo": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id",
+            "description": "Identifiant du profil Flow MCP."
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id",
+            "description": "Identifiant de l'appareil desktop hébergeant cette instance MCP."
+          },
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name",
+            "description": "Nom lisible de l'appareil."
+          },
+          "local_path": {
+            "type": "string",
+            "title": "Local Path",
+            "description": "Chemin local sur l'agent desktop."
+          },
+          "online": {
+            "type": "boolean",
+            "title": "Online",
+            "description": "Indique si le relais est actuellement connecté."
+          },
+          "remote_urls": {
+            "$ref": "#/components/schemas/PublicMCPServerRemoteUrls",
+            "description": "URLs publiques du relais pour ce profil."
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "device_id",
+          "local_path",
+          "online",
+          "remote_urls"
+        ],
+        "title": "PublicMCPServerFlowInfo"
+      },
+      "PublicMCPServerRemoteUrls": {
+        "properties": {
+          "sse": {
+            "type": "string",
+            "title": "Sse",
+            "description": "URL du point de terminaison SSE du relais."
+          },
+          "http": {
+            "type": "string",
+            "title": "Http",
+            "description": "URL du point de terminaison MCP HTTP streamable du relais."
+          }
+        },
+        "type": "object",
+        "required": [
+          "sse",
+          "http"
+        ],
+        "title": "PublicMCPServerRemoteUrls"
       },
       "PublicMessageCreate": {
         "properties": {
