@@ -4565,7 +4565,7 @@
           "flow"
         ],
         "summary": "Download Flow Launcher",
-        "description": "Public launcher download (bootstrap — reads flow-dist/ per request).",
+        "description": "Public launcher download (bootstrap — reads flow-dist/ per request).\n\nRate-limited to 5 downloads per client IP per minute.",
         "operationId": "download_flow_launcher_flow_launcher__platform___arch__get",
         "parameters": [
           {
@@ -4890,7 +4890,7 @@
           }
         }
       },
-      "delete": {
+      "post": {
         "tags": [
           "flow-mcp"
         ],
@@ -4930,7 +4930,7 @@
           }
         }
       },
-      "post": {
+      "delete": {
         "tags": [
           "flow-mcp"
         ],
