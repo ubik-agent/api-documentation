@@ -4850,13 +4850,53 @@
       }
     },
     "/flow/mcp/{profile_id}/mcp": {
+      "options": {
+        "tags": [
+          "flow-mcp"
+        ],
+        "summary": "Relay Http Mcp",
+        "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_options",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "flow-mcp"
         ],
         "summary": "Relay Http Mcp",
         "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
-        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_post",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_options",
         "parameters": [
           {
             "name": "profile_id",
@@ -4896,7 +4936,7 @@
         ],
         "summary": "Relay Http Mcp",
         "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
-        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_post",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_options",
         "parameters": [
           {
             "name": "profile_id",
@@ -4936,47 +4976,7 @@
         ],
         "summary": "Relay Http Mcp",
         "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
-        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_post",
-        "parameters": [
-          {
-            "name": "profile_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Profile Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "flow-mcp"
-        ],
-        "summary": "Relay Http Mcp",
-        "description": "Streamable HTTP MCP ingress (S5) — forwards to desktop {local_path}/mcp.",
-        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_post",
+        "operationId": "relay_http_mcp_flow_mcp__profile_id__mcp_options",
         "parameters": [
           {
             "name": "profile_id",
